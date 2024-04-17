@@ -2,6 +2,7 @@
     "files.associations": {
         "stdint.h": "c",
         "ushell_hal_port.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "ushell_osal_port.h": "c"
     }
 }

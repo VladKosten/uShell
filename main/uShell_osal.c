@@ -289,7 +289,7 @@ UShellOsalErr_e UShellOsalMsgSend(UShellOsal_s* const osal, const UShellOsalMsg_
 
     switch(msg)
     {
-        case USHELL_OSAL_MSG_RX_RECEIVED:
+        case USHELL_OSAL_MSG_RX_COMPLETED:
         case USHELL_OSAL_MSG_TX_COMPLETE:
         case USHELL_OSAL_MSG_RX_TX_ERROR:
             break;
