@@ -31,7 +31,7 @@
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
- * @brief Initialize the UShell Hal module.
+ * \brief Initialize the UShell Hal module.
  * \param [in] osal - UShellOsal obj to be initialized
  * \param [in] portTable - port table to be used
  * \param [in] name - name of the object
@@ -49,9 +49,8 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* const osal, const UShellOsalPortabl
 
     /* Check if the port table is valid */
     if((portTable->lock == NULL) || (portTable->unlock == NULL) ||
-       (portTable->eventOcurred == NULL) || (portTable->eventGetQty == NULL) ||
-       (portTable->eventFlush == NULL) || (portTable->threadStart == NULL) ||
-       (portTable->threadStop == NULL))
+       (portTable->msgGet == NULL) || (portTable->threadStart == NULL) ||
+       (portTable->threadStop == NULL) || (portTable->msgSend == NULL))
     {
         return USHELL_OSAL_INVALID_ARGS_ERR;
     }
@@ -61,7 +60,7 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* const osal, const UShellOsalPortabl
     osal->parent = parent;
     osal->name = name;
     osal->worker = NULL;
-    osal->eventHandle = NULL;
+    osal->msgHandle = NULL;
     osal->mutexHandle = NULL;
     osal->threadHandle = NULL;
 
@@ -69,7 +68,7 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* const osal, const UShellOsalPortabl
 }
 
 /**
- * @brief Deinitialize the UShell Hal module.
+ * \brief Deinitialize the UShell Hal module.
  * \param [in] osal - UShellOsal obj to be deinitialized
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -87,7 +86,7 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* const osal)
     osal->parent = NULL;
     osal->name = NULL;
     osal->worker = NULL;
-    osal->eventHandle = NULL;
+    osal->msgHandle = NULL;
     osal->mutexHandle = NULL;
     osal->threadHandle = NULL;
 
@@ -96,7 +95,7 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* const osal)
 }
 
 /**
- * @brief Set the parent object of the UShellOsal module.
+ * \brief Set the parent object of the UShellOsal module.
  * \param [in] osal - UShellOsal obj to set parent
  * \param [in] parent - pointer to the parent object
  * \param [out] none
@@ -116,7 +115,7 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, const void* const 
 }
 
 /**
- * @brief Get the parent object of the UShellOsal module.
+ * \brief Get the parent object of the UShellOsal module.
  * \param [in] osal - UShellOsal obj to get parent
  * \param [out] parent - pointer to the parent object
  * \return UShellOsalErr_e - error code
@@ -136,7 +135,7 @@ UShellOsalErr_e UShellOsalParentGet(const UShellOsal_s* const osal, void** const
 
 }
 /**
- * @brief Set the name of the UShellOsal module.
+ * \brief Set the name of the UShellOsal module.
  * \param [in] osal - UShellOsal obj to set name
  * \param [in] name - name of the object
  * \param [out] none
@@ -157,7 +156,7 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, const char* const na
 }
 
 /**
- * @brief Get the name of the UShellOsal module.
+ * \brief Get the name of the UShellOsal module.
  * \param [in] osal - UShellOsal obj to get name
  * \param [out] name - name of the object
  * \return UShellOsalErr_e - error code
@@ -178,7 +177,7 @@ UShellOsalErr_e UShellOsalNameGet(const UShellOsal_s* const osal, const char** c
 }
 
 /**
- * @brief Attach a worker function to the UShellOsal module.
+ * \brief Attach a worker function to the UShellOsal module.
  * \param [in] osal - UShellOsal obj to attach worker
  * \param [in] worker - worker function
  * \param [out] none
@@ -200,7 +199,7 @@ UShellOsalErr_e UShellOsalWorkerAttach(UShellOsal_s* const osal, UShellOsalWorke
 }
 
 /**
- * @brief Detach a worker function from the UShellOsal module.
+ * \brief Detach a worker function from the UShellOsal module.
  * \param [in] osal - UShellOsal obj to detach worker
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -221,7 +220,7 @@ UShellOsalErr_e UShellOsalWorkerDetach(UShellOsal_s* const osal)
 }
 
 /**
- * @brief Lock object
+ * \brief Lock object
  * \param [in] osal - UShellOsal obj to lock
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -247,7 +246,7 @@ UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal)
 }
 
 /**
- * @brief Unlock object
+ * \brief Unlock object
  * \param [in] osal - UShellOsal obj to unlock
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -274,12 +273,13 @@ UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal)
 }
 
 /**
- * @brief Event ocurred
- * \param [in] osal - UShellOsal obj to check event
+ * \brief Send message
+ * \param [in] osal - UShellOsal obj to send message
+ * \param [in] msg - message to send
  * \param [out] none
  * \return UShellOsalErr_e - error code
 */
-UShellOsalErr_e UShellOsalEventOcurred(UShellOsal_s* const osal)
+UShellOsalErr_e UShellOsalMsgSend(UShellOsal_s* const osal, const UShellOsalMsg_e msg)
 {
     /* Check input parametrs */
     if(osal == NULL)
@@ -287,74 +287,57 @@ UShellOsalErr_e UShellOsalEventOcurred(UShellOsal_s* const osal)
         return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
     }
 
+    switch(msg)
+    {
+        case USHELL_OSAL_MSG_RX_RECEIVED:
+        case USHELL_OSAL_MSG_TX_COMPLETE:
+        case USHELL_OSAL_MSG_RX_TX_ERROR:
+            break;
+        default:
+            return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+    }
+
     /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->eventOcurred == NULL))
+    if((osal->portTable == NULL) || (osal->portTable->msgSend == NULL))
     {
         return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
     }
 
-    /* Check if event ocurred */
-    UShellOsalErr_e status = osal->portTable->eventOcurred(osal);
+    /* Send the message */
+    UShellOsalErr_e status = osal->portTable->msgSend(osal, msg);
 
     return status;      // Exit: Success
 }
 
 /**
- * @brief Get quantity of events ocurred
- * \param [in] osal - UShellOsal obj to wait for event
- * \param [out] qt - quantity of events
+ * \brief Get message
+ * \param [in] osal - UShellOsal obj to get message
+ * \param [out] msg - pointer to store the message
+ * \param [in] msWait - timeout in ms to wait for the message
  * \return UShellOsalErr_e - error code
 */
-UShellOsalErr_e UShellOsalEventQtyGet(UShellOsal_s* const osal, uint8_t* const qty)
+UShellOsalErr_e UShellOsalMsgGet(UShellOsal_s* const osal, UShellOsalMsg_e* const msg, const UShellOsalTimeOut_t msWait)
 {
     /* Check input parametrs */
-    if((osal == NULL) || (qty == NULL))
+    if((osal == NULL) || (msg == NULL))
     {
         return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
     }
 
     /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->eventQtyGet == NULL))
+    if((osal->portTable == NULL) || (osal->portTable->msgGet == NULL))
     {
         return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
     }
 
-    /* Get quantity of events ocurred */
-    UShellOsalErr_e status = osal->portTable->eventQtyGet(osal, qty);
+    /* Get the message */
+    UShellOsalErr_e status = osal->portTable->msgGet(osal, msg, msWait);
 
     return status;      // Exit: Success
-
 }
 
 /**
- * @brief Flush the event queue
- * \param [in] osal - UShellOsal obj to flush event queue
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalEventFlush(UShellOsal_s* const osal)
-{
-    /* Check input parametrs */
-    if(osal == NULL)
-    {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
-    }
-
-    /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->eventFlush == NULL))
-    {
-        return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
-    }
-
-    /* Flush the event queue */
-    UShellOsalErr_e status = osal->portTable->eventFlush(osal);
-
-    return status;      // Exit: Success
-
-}
-
-/**
- * @brief Start the thread
+ * \brief Start the thread
  * \param [in] osal - UShellOsal obj to start thread
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -380,7 +363,7 @@ UShellOsalErr_e UShellOsalThreadStart(UShellOsal_s* const osal)
 }
 
 /**
- * @brief Stop the thread
+ * \brief Stop the thread
  * \param [in] osal - UShellOsal obj to stop thread
  * \param [out] none
  * \return UShellOsalErr_e - error code

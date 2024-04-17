@@ -24,9 +24,19 @@ extern "C" {
     #define USHELL_MAX_CMD 10
 #endif
 
+#ifndef USHELL_INPUTE_BUFFER_SIZE
+    #define USHELL_INPUTE_BUFFER_SIZE 128
+#endif
+
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
+
 /**
- * @brief Enumeration of possible error codes returned by the UShell Hal module.
+ * \brief Descriibe size of one item in the UShell
+*/
+typedef char UShellItem_t;
+
+/**
+ * \brief Enumeration of possible error codes returned by the UShell Hal module.
  */
 typedef enum
 {
@@ -34,24 +44,38 @@ typedef enum
     USHELL_INVALID_ARGS_ERR,      ///< Exit: error - invalid pointers (e.g. null pointers)
     USHELL_NOT_INIT_ERR,          ///< Exit: error - not initialized
     USHELL_PORT_ERR,              ///< Exit: error - port error (e.g. port layer error)
+    USHELL_CMD_SPACE_ERR,         ///< Exit: error - no space for command
 
 }UShellErr_e;
 
+/**
+ * \brief Description of the uShell authentification object
+*/
+typedef struct
+{
+    const char* name;           ///< Name of the object
+    const char* password;       ///< Password of the object
+    const bool isAuth;          ///< Is object authenticated
+
+}UShellAuthentification_s;
 
 /**
  * \brief Description of the uShell object
 */
 typedef struct
 {
-    const void* parent;                         ///< Parent object
-    const char* name;                           ///< Name of the object
+    const void* parent;                                         ///< Parent object
+    const char* name;                                           ///< Name of the object
 
-    const UShellOsal_s* osal;                   ///< OSAL object
-    const UShellHal_s* hal;                     ///< HAL object
+    const UShellOsal_s* osal;                                   ///< OSAL object
+    const UShellHal_s* hal;                                     ///< HAL object
 
-    const UShellCmd_s* cmd[USHELL_MAX_CMD];     ///< Commands
+    const UShellCmd_s* cmd[USHELL_INPUTE_BUFFER_SIZE + 1];      ///< Commands
+    size_t cmdCount;                                            ///< Number of commands actually in the buffer
 
+    UShellAuthentification_s auth;                              ///< Authentification object
 
+    UShellItem_t buffer[];        ///< Buffer for commands
 
 }UShell_s;
 

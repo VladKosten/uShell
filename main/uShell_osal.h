@@ -14,12 +14,35 @@ extern "C" {
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
-
+#ifndef USHELL_OSAL_WAIT_FOREVER
+    #define USHELL_OSAL_WAIT_FOREVER 0xFFFFFFFF
+#endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
- * @brief Enumeration of possible error codes returned by the UShell Osal module.
+ * \brief Descriibe UShellOsal thread handle
+*/
+typedef void* UShellOsalThreadHandle_t;
+
+/**
+ * \brief Descriibe UShellOsal mutex handle
+*/
+typedef void* UShellOsalMsgHandle_t;
+
+/**
+ * \brief Descriibe UShellOsal mutex handle
+*/
+typedef void* UShellOsalMutexHandle_t;
+
+/**
+ * \brief Descriibe timeout for UShellOsal
+*/
+typedef uint32_t UShellOsalTimeOut_t;
+
+
+/**
+ * \brief Enumeration of possible error codes returned by the UShell Osal module.
  */
 typedef enum
 {
@@ -31,34 +54,30 @@ typedef enum
 } UShellOsalErr_e;
 
 /**
+ * \brief Enumeration of possible messages.
+*/
+typedef enum
+{
+    USHELL_OSAL_MSG_NONE = 0x00,          ///< No message
+    USHELL_OSAL_MSG_RX_TX_ERROR = 0x01,   ///< Message for error
+    USHELL_OSAL_MSG_TX_COMPLETE = 0x02,   ///< Message for tx complete
+    USHELL_OSAL_MSG_RX_RECEIVED = 0x04,   ///< Message for rx received
+
+}UShellOsalMsg_e;
+
+/**
  * \brief Descriibe function needed to port for OSAL
 */
 typedef struct
 {
-    UShellOsalErr_e (*threadStart)(const void* const osal);                     ///< Start the thread
-    UShellOsalErr_e (*threadStop)(const void* const osal);                      ///< Stop the thread
-    UShellOsalErr_e (*lock)(const void* const osal);                            ///< Lock the resource
-    UShellOsalErr_e (*unlock)(const void* const osal);                          ///< Unlock the resource
-    UShellOsalErr_e (*eventOcurred)(const void* const osal);                    ///< Check if event occurred
-    UShellOsalErr_e (*eventQtyGet)(const void* const osal, uint8_t* const qt);  ///< Wait for event
-    UShellOsalErr_e (*eventFlush)(const void* const osal);                      ///< Flush the event queue
+    UShellOsalErr_e (*threadStart)(const void* const osal);                                                             ///< Start the thread
+    UShellOsalErr_e (*threadStop)(const void* const osal);                                                              ///< Stop the thread
+    UShellOsalErr_e (*lock)(const void* const osal);                                                                    ///< Lock the resource
+    UShellOsalErr_e (*unlock)(const void* const osal);                                                                  ///< Unlock the resource
+    UShellOsalErr_e (*msgSend)(const void* const osal, const UShellOsalMsg_e msg);                                      ///< Send message
+    UShellOsalErr_e (*msgGet)(const void* const osal, UShellOsalMsg_e* const msg, const UShellOsalTimeOut_t msWait);    ///< Receive message
 
 }UShellOsalPortableTable_s;
-
-/**
- * \brief Descriibe UShellOsal thread handle
-*/
-typedef void* UShellOsalThreadHandle_t;
-
-/**
- * \brief Descriibe UShellOsal mutex handle
-*/
-typedef void* UShellOsalEventHandle_t;
-
-/**
- * \brief Descriibe UShellOsal mutex handle
-*/
-typedef void* UShellOsalMutexHandle_t;
 
 /**
  * \brief Descriibe UShellOsal worker function
@@ -74,7 +93,7 @@ typedef struct
     const char* name;                           ///< Pointer to the name of the object
 
     UShellOsalWorker_t worker;                  ///< Worker function
-    UShellOsalEventHandle_t eventHandle;        ///< Event handle
+    UShellOsalMsgHandle_t msgHandle;            //< Msg handle
     UShellOsalMutexHandle_t mutexHandle;        ///< Mutex handle
     UShellOsalThreadHandle_t threadHandle;      ///< Thread handle
 
@@ -86,7 +105,7 @@ typedef struct
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
- * @brief Initialize the UShell Osal module.
+ * \brief Initialize the UShell Osal module.
  * \param [in] osal - UShellOsal obj to be initialized
  * \param [in] portTable - port table to be used
  * \param [in] name - name of the object
@@ -97,7 +116,7 @@ typedef struct
 UShellOsalErr_e UShellOsalInit(UShellOsal_s* const osal, const UShellOsalPortableTable_s* const portTable, const char* const name, const void* const parent);
 
 /**
- * @brief Deinitialize the UShell Osal module.
+ * \brief Deinitialize the UShell Osal module.
  * \param [in] osal - UShellOsal obj to be deinitialized
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -105,7 +124,7 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* const osal, const UShellOsalPortabl
 UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* const osal);
 
 /**
- * @brief Set the parent object of the UShellOsal module.
+ * \brief Set the parent object of the UShellOsal module.
  * \param [in] osal - UShellOsal obj to set parent
  * \param [in] parent - pointer to the parent object
  * \param [out] none
@@ -113,7 +132,7 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* const osal);
 UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, const void* const parent);
 
 /**
- * @brief Get the parent object of the UShellOsal module.
+ * \brief Get the parent object of the UShellOsal module.
  * \param [in] osal - UShellOsal obj to get parent
  * \param [out] parent - pointer to the parent object
  * \return UShellOsalErr_e - error code
@@ -121,7 +140,7 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, const void* const 
 UShellOsalErr_e UShellOsalParentGet(const UShellOsal_s* const osal, void** const parent);
 
 /**
- * @brief Set the name of the UShellOsal module.
+ * \brief Set the name of the UShellOsal module.
  * \param [in] osal - UShellOsal obj to set name
  * \param [in] name - name of the object
  * \param [out] none
@@ -130,7 +149,7 @@ UShellOsalErr_e UShellOsalParentGet(const UShellOsal_s* const osal, void** const
 UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, const char* const name);
 
 /**
- * @brief Get the name of the UShellOsal module.
+ * \brief Get the name of the UShellOsal module.
  * \param [in] osal - UShellOsal obj to get name
  * \param [out] name - name of the object
  * \return UShellOsalErr_e - error code
@@ -138,7 +157,7 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, const char* const na
 UShellOsalErr_e UShellOsalNameGet(const UShellOsal_s* const osal, const char** const name);
 
 /**
- * @brief Attach a worker function to the UShellOsal module.
+ * \brief Attach a worker function to the UShellOsal module.
  * \param [in] osal - UShellOsal obj to attach worker
  * \param [in] worker - worker function
  * \param [out] none
@@ -147,7 +166,7 @@ UShellOsalErr_e UShellOsalNameGet(const UShellOsal_s* const osal, const char** c
 UShellOsalErr_e UShellOsalWorkerAttach(UShellOsal_s* const osal, UShellOsalWorker_t worker);
 
 /**
- * @brief Detach a worker function from the UShellOsal module.
+ * \brief Detach a worker function from the UShellOsal module.
  * \param [in] osal - UShellOsal obj to detach worker
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -155,7 +174,7 @@ UShellOsalErr_e UShellOsalWorkerAttach(UShellOsal_s* const osal, UShellOsalWorke
 UShellOsalErr_e UShellOsalWorkerDetach(UShellOsal_s* const osal);
 
 /**
- * @brief Lock object
+ * \brief Lock object
  * \param [in] osal - UShellOsal obj to lock
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -163,7 +182,7 @@ UShellOsalErr_e UShellOsalWorkerDetach(UShellOsal_s* const osal);
 UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal);
 
 /**
- * @brief Unlock object
+ * \brief Unlock object
  * \param [in] osal - UShellOsal obj to unlock
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -171,31 +190,25 @@ UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal);
 UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal);
 
 /**
- * @brief Event ocurred
- * \param [in] osal - UShellOsal obj to check event
+ * \brief Send message
+ * \param [in] osal - UShellOsal obj to send message
+ * \param [in] msg - message to send
  * \param [out] none
  * \return UShellOsalErr_e - error code
 */
-UShellOsalErr_e UShellOsalEventOcurred(UShellOsal_s* const osal);
+UShellOsalErr_e UShellOsalMsgSend(UShellOsal_s* const osal, const UShellOsalMsg_e msg);
 
 /**
- * @brief Get quantity of events ocurred
- * \param [in] osal - UShellOsal obj to wait for event
- * \param [out] qt - quantity of events
+ * \brief Get message
+ * \param [in] osal - UShellOsal obj to get message
+ * \param [out] msg - pointer to store the message
+ * \param [in] msWait - timeout in ms to wait for the message
  * \return UShellOsalErr_e - error code
 */
-UShellOsalErr_e UShellOsalEventQtyGet(UShellOsal_s* const osal, uint8_t* const qty);
+UShellOsalErr_e UShellOsalMsgGet(UShellOsal_s* const osal, UShellOsalMsg_e* const msg, const UShellOsalTimeOut_t msWait);
 
 /**
- * @brief Flush the event queue
- * \param [in] osal - UShellOsal obj to flush event queue
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalEventFlush(UShellOsal_s* const osal);
-
-/**
- * @brief Start the thread
+ * \brief Start the thread
  * \param [in] osal - UShellOsal obj to start thread
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -203,7 +216,7 @@ UShellOsalErr_e UShellOsalEventFlush(UShellOsal_s* const osal);
 UShellOsalErr_e UShellOsalThreadStart(UShellOsal_s* const osal);
 
 /**
- * @brief Stop the thread
+ * \brief Stop the thread
  * \param [in] osal - UShellOsal obj to stop thread
  * \param [out] none
  * \return UShellOsalErr_e - error code

@@ -17,7 +17,7 @@ extern "C" {
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
- * @brief Enumeration of possible error codes returned by the UShellCmd module.
+ * \brief Enumeration of possible error codes returned by the UShellCmd module.
  */
 typedef enum
 {
@@ -27,32 +27,35 @@ typedef enum
 
 } UShellCmdErr_e;
 
+/**
+ * \brief Prototype of the function to execute a command.
+*/
+typedef UShellCmdErr_e (*UShelCmdExecute_t)( const void* const cmd, const char* const args, const size_t argsLen);
 
-typedef struct
-{
-    UShellCmdErr_e (*execute)(const char* const cmd, const char* const args);
-    UShellCmdErr_e (*help)(const char* const cmd);
-
-}UShellCmdHook_s;
-
+/**
+ * \brief Describe a cmd.
+*/
+typedef char* UShellCmdHelp_t;
 
 /**
  * \brief Descriibe UShellCmd
 */
 typedef struct
 {
-    const void* parent;                         ///< Pointer to the parent object
-    const char* name;                           ///< Pointer to the name of the object
+    const void* parent;         ///< Pointer to the parent object
 
-    const UShellCmdHook_s* hooks;               ///< Hooks to execute specific commands
+    const char* name;           ///< Pointer to the name of the object
+    size_t arg_max;             ///< Maximum number of arguments
 
+    UShelCmdExecute_t execute;  ///< Pointer to the function to execute the command
+    UShellCmdHelp_t help;       ///< Pointer to the help string
 }UShellCmd_s;
 
 
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
- * @brief Initialize the UShell Hal module.
+ * \brief Initialize the UShell Hal module.
  * \param [in] osal - UShellOsal obj to be initialized
  * \param [in] portTable - port table to be used
  * \param [in] name - name of the object
@@ -63,12 +66,14 @@ typedef struct
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const osal, const UShellCmd_s* const cmd, const char* const name, const void* const parent);
 
 /**
- * @brief Deinitialize the UShell Hal module.
+ * \brief Deinitialize the UShell Hal module.
  * \param [in] osal - UShellOsal obj to be deinitialized
  * \param [out] none
  * \return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const osal);
+
+
 
 
 
