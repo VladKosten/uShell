@@ -15,7 +15,7 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * @brief Enumeration of possible error codes returned by the UShell Hal module.
+ * \brief Enumeration of possible error codes returned by the UShell Hal module.
  */
 typedef enum
 {
@@ -39,8 +39,8 @@ typedef uint8_t UShellHalItem_t;
 */
 typedef struct
 {
-    UShellHalErr_e (*send)(const void* const hal, const UShellHalItem_t* const item, const size_t numberOfItems); ///< Send data to the port
-    UShellHalErr_e (*receieve)(const void* const hal, UShellHalItem_t* const item, const size_t numberOfItems);   ///< Get data from the port
+    UShellHalErr_e (*send)(const void* const hal, const UShellHalItem_t* const item, const size_t numberOfItems);       ///< Send data to the port
+    UShellHalErr_e (*receieve)(const void* const hal, UShellHalItem_t* const item, const size_t* const numberOfItems);  ///< Get data from the port
 
 }UShellHalPortableTable_s;
 
@@ -49,7 +49,7 @@ typedef enum
     USHELL_HAL_CB_NONE = 0x00,          ///< No callback
     USHELL_HAL_CB_RX_TX_ERROR = 0x01,   ///< Callback for error
     USHELL_HAL_CB_TX_COMPLETE = 0x02,   ///< Callback for tx complete
-    USHELL_HAL_CB_RX_RECEIVED = 0x04,   ///< Callback for rx received
+    USHELL_HAL_CB_RX_COMPLETED = 0x04,   ///< Callback for rx received
     USHELL_HAL_CB_ALL = 0xFF            ///< All callbacks
 }UShellHalCallback_e;
 
@@ -167,7 +167,7 @@ UShellHalErr_e UShellHalSend(UShellHal_s* const hal, const UShellHalItem_t* cons
  * \param[out] none
  * \return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
 */
-UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const item, const size_t numberOfItems);
+UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const item, const size_t* const numberOfItems);
 
 #ifdef __cplusplus
 }

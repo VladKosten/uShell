@@ -191,7 +191,7 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal, const UShellHalCallback
     /* Attach callback to the UShellHal object */
     switch(cbType )
     {
-        case USHELL_HAL_CB_RX_RECEIVED:
+        case USHELL_HAL_CB_RX_COMPLETED:
             hal->rxReceivedCb = cb;
             break;
         case USHELL_HAL_CB_TX_COMPLETE:
@@ -229,7 +229,7 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal, const UShellHalCallback
     /* Detach callback from the UShellHal object */
     switch(cbType )
     {
-        case USHELL_HAL_CB_RX_RECEIVED:
+        case USHELL_HAL_CB_RX_COMPLETED:
             hal->rxReceivedCb = NULL;
             break;
         case USHELL_HAL_CB_TX_COMPLETE:
@@ -285,10 +285,10 @@ UShellHalErr_e UShellHalSend(UShellHal_s* const hal, const UShellHalItem_t* cons
  * \param[out] none
  * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
 */
-UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const item, const size_t numberOfItems)
+UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const item, const size_t* const numberOfItems)
 {
     /* Check input parameter */
-    if((hal == NULL) || (item == NULL) || (numberOfItems == 0))
+    if((hal == NULL) || (item == NULL) || (numberOfItems == NULL))
     {
         return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
     }
