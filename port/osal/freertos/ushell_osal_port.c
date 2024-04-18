@@ -111,7 +111,7 @@ static const UShellOsalPortableTable_s matrixkbdOsalPortPortableFunc =
     .msgSend            = uShellOsalPortMsgSend         ///< OSAL port port send message
 };
 
-static const char* uShellOsalPortName = USHELL_OSAL_PORT_THREAD_NAME;
+static const char* uShellOsalPortName = USHELL_STARTUP_OSAL_PORT_TASK_NAME;
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]===============================================================================
 

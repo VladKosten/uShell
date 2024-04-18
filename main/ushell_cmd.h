@@ -74,12 +74,8 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const osal, const UShellCmd_s* const c
 UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const osal);
 
 
-
-
-
-
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */
 
-#endif  /* USHELL_OSAL_H_ */
+#endif  /* USHELL_CMD_H_ */

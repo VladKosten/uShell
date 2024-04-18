@@ -8,7 +8,7 @@ extern "C" {
 /*================================================================[INCLUDE]================================================*/
 
 /* Project includes */
-#include "uShell_hal.h"             ///< UShell HAL layer
+#include "ushell_hal.h"             ///< UShell HAL layer
 #include "stm32f4xx_hal_conf.h"     ///< Device-specific HAL configuration file
 
 /**
@@ -18,47 +18,53 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * \brief The USART peripheral to be used (USART1, USART2, USART3, etc.)
+ * \brief Check define USHELL_HAL_PORT_USART
  */
-#ifndef USHELL_HAL_PORT_USART
-    #define USHELL_HAL_PORT_USART USART1
+#if !defined(USHELL_HAL_PORT_USART)
+    #error USART not define.
 #endif
 
 /**
- * \brief The baudrate to be used
+ * \brief Check define USHELL_HAL_PORT_BAUDRATE
  */
-#ifndef USHELL_HAL_PORT_BAUDRATE
-    #define USHELL_HAL_PORT_BAUDRATE 115200
+#if !defined(USHELL_HAL_PORT_BAUDRATE)
+    #error Baudrate not define.
 #endif
 
 /**
- * \brief The word length to be used
+ * \brief Check define USE_HAL_UART_REGISTER_CALLBACKS (need set to 1U)
  */
-#ifndef USHELL_HAL_PORT_WORD_LENGTH
-    #define USHELL_HAL_PORT_WORD_LENGTH UART_WORDLENGTH_8B
+#if !defined(USE_HAL_UART_REGISTER_CALLBACKS)
+    #error USE_HAL_UART_REGISTER_CALLBACKS not define.
 #endif
 
 /**
- * \brief The stop bits to be used
+ * \brief Check define USHELL_HAL_PORT_WORD_LENGTH
  */
-#ifndef USHELL_HAL_PORT_STOP_BITS
-    #define USHELL_HAL_PORT_STOP_BITS UART_STOPBITS_1
+#if !defined(USHELL_HAL_PORT_WORD_LENGTH)
+    #error USHELL_HAL_PORT_WORD_LENGTH not define.
 #endif
 
 /**
- * \brief The parity to be used
+ * \brief Check define USHELL_HAL_PORT_STOP_BITS
  */
-#ifndef USHELL_HAL_PORT_PARITY
-    #define USHELL_HAL_PORT_PARITY UART_PARITY_NONE
+#if !defined(USHELL_HAL_PORT_STOP_BITS)
+    #error USHELL_HAL_PORT_STOP_BITS not define.
 #endif
 
 /**
- * \brief The HAL PORT name
+ * \brief Check define USHELL_HAL_PORT_PARITY
  */
-#ifndef USHELL_HAL_PORT_NAME
-    #define USHELL_HAL_PORT_NAME "uShellHal"
+#if !defined(USHELL_HAL_PORT_PARITY)
+    #error USHELL_HAL_PORT_PARITY not define.
 #endif
 
+/**
+ * \brief Check define USHELL_HAL_PORT_NAME
+ */
+#if !defined(USHELL_HAL_PORT_NAME)
+    #error USHELL_HAL_PORT_NAME not define.
+#endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 

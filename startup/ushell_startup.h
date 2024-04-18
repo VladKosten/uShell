@@ -11,7 +11,10 @@ extern "C"{
 #include <stdint.h>
 #include <stddef.h>
 #include <assert.h>
+
+#include "ushell_startup_cfg.h"
 #include "ushell.h"
+
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -19,8 +22,37 @@ extern "C"{
  * \brief uShell assert definition
 */
 #ifndef USHELL_STARTUP_ASSERT
-    #define USHELL_STARTUP_ASSERT(cond)                    assert((cond))
+    #error USHELL_STARTUP_ASSERT not defined
 #endif
+
+/**
+ * \brief Check define for uShell startup name
+ */
+#ifndef USHELL_STARTUP_NAME
+    #error USHELL_STARTUP_NAME not defined
+#endif
+
+/**
+ * \brief Check define for uShell startup version
+ */
+#ifndef USHELL_STARTUP_OSAL_PORT_TYPE
+    #error USHELL_STARTUP_OSAL_PORT_TYPE not defined
+#endif
+
+/**
+ * \brief Check define for uShell startup version
+ */
+#ifndef USHELL_STARTUP_HAL_PORT_TYPE
+    #error USHELL_STARTUP_HAL_PORT_TYPE not defined
+#endif
+
+/**
+ * \brief Check define for uShell startup version
+ */
+#ifndef USHELL_STARTUP_OSAL_PORT_TYPE
+    #error USHELL_STARTUP_OSAL_PORT_TYPE not defined
+#endif
+
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 

@@ -17,26 +17,12 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * \brief Name for the thread required for driver operation
+ * \brief Check define for freeRTOS
  */
-#ifndef USHELL_OSAL_PORT_THREAD_NAME
-    #define USHELL_OSAL_PORT_THREAD_NAME "USHELL_THREAD"
+#if !defined(USHELL_OSAL_PORT_THREAD_NAME) || !defined(USHELL_OSAL_PORT_THREAD_STACK_SIZE) || \
+    !defined(USHELL_OSAL_PORT_THREAD_PRIO) 
+    #error "Please define USHELL_OSAL_PORT_THREAD_NAME, USHELL_OSAL_PORT_THREAD_STACK_SIZE and USHELL_OSAL_PORT_THREAD_PRIO"
 #endif
-
-/**
- * \brief Stack size (byte) for the thread required for driver operation
- */
-#ifndef USHELL_OSAL_PORT_THREAD_STACK_SIZE
-    #define USHELL_OSAL_PORT_THREAD_STACK_SIZE ((uint16_t)256)
-#endif
-
-/**
- * \brief  priority levels for thread
- */
-#ifndef USHELL_OSAL_PORT_THREAD_PRIO
-    #define USHELL_OSAL_PORT_THREAD_PRIO    (tskIDLE_PRIORITY + 1)
-#endif
-
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
@@ -54,16 +40,15 @@ typedef enum
 
 
 /**
- * \brief Matrix KBD FreeRTOS OSAL structure
+ * \brief FreeRTOS OSAL structure
  */
 typedef struct
 {
     // Do not move the base structure from the first position
     UShellOsal_s base;
 
+    /* Port specific part */
 
-    // Optional fields
-    UShellOsalPortThreadCfg_s threadCfg;
 
 } UShellOsalPort_s;
 
