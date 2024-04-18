@@ -10,7 +10,19 @@
 */
 //===============================================================================[ INCLUDE ]========================================================================================
 
-#include "uShell.h"
+
+/* Standard includes */
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <string.h>
+#include <assert.h>
+
+/* Project includes */
+#include "ushell.h"
+#include "ushell_hal.h"
+#include "ushell_osal.h"
+
 
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
@@ -18,12 +30,7 @@
 * \brief Assert macro for the UShell module.
 */
 #ifndef USHELL_ASSERT
-    #ifdef DEBUG
-        #include <assert.h>
         #define USHELL_ASSERT(cond) assert(cond)
-    #else
-        #define USHELL_ASSERT(cond)
-    #endif
 #endif
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
@@ -49,13 +56,22 @@ static void uShellThreadWorker(void* const uShell);
 static void uShellRxReceivedCb(const void* const hal);
 
 /**
+ * \brief Callback for the received data
+ * \param[in] hal - hal object
+ * \param[out] none
+ * \return none
+ * \note This function is called when the data is received from the serial port.
+*/
+static void uShellRxCpltCallback(const void* const hal);
+
+/**
  * \brief Callback for the transmitted data
  * \param[in] hal - hal object
  * \param[out] none
  * \return none
  * \note This function is called when the data is transmitted to the serial port.
 */
-static void uShellTxCompleteCb(const void* const hal);
+static void uShellTxCpltCb(const void* const hal);
 
 /**
  * \brief Callback for the error
@@ -64,7 +80,7 @@ static void uShellTxCompleteCb(const void* const hal);
  * \return none
  * \note This function is called when the error occurs in the serial port.
 */
-static void uShellRxTxErrorCb(const void* const hal);
+static void uShellXferErrorCb(const void* const hal);
 
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
@@ -78,7 +94,10 @@ static void uShellRxTxErrorCb(const void* const hal);
  * \param[out] none
  * \return USHELL_NO_ERR if success, otherwise error code
 */
-UShellErr_e UShellInit(UShell_s* const uShell, const UShellOsal_s* const osal, const UShellHal_s* const hal, const void* const parent, const char* const name)
+UShellErr_e UShellInit(UShell_s* const uShell, const UShellOsal_s* const osal,
+                                               const UShellHal_s* const hal,
+                                               const void* const parent,
+                                               const char* const name)
 {
     /* Check input parametrs */
     if((uShell == NULL) || (osal == NULL) || (hal == NULL))
@@ -321,7 +340,7 @@ static void uShellThreadWorker(void* const uShell)
         USHELL_ASSERT(halErr == USHELL_HAL_NO_ERR);
 
         /* Process the data */
-        
+
     }
 }
 
@@ -332,27 +351,16 @@ static void uShellThreadWorker(void* const uShell)
  * \return none
  * \note This function is called when the data is received from the serial port.
 */
-static void uShellRxReceivedCb(const void* const hal)
-{
-    /* Check input parametrs */
-    USHELL_ASSERT(hal != NULL);
+static void uShellRxReceivedCb(const void* const hal);
 
-    /* Local variables */
-    UShellHal_s* const halObj = (UShellHal_s*)hal;
-
-    /*Get the parent object */
-    UShell_s* const uShell = (UShell_s*)halObj->parent;
-
-
-    /* Received byte */
-    USHELL_ASSERT(uShell->osal != NULL);
-    USHELL_ASSERT(uShell->osal->eventHandle != NULL);
-    USHELL_ASSERT(uShell->osal->portTable != NULL);
-    USHELL_ASSERT(uShell->osal->portTable->eventOcurred != NULL);
-
-    UShellOsalErr_e osalErr = UShellOsalMsgSend(uShell->osal, USHELL_OSAL_MSG_RX_RECEIVED);
-    USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
-}
+/**
+ * \brief Callback for the received data
+ * \param[in] hal - hal object
+ * \param[out] none
+ * \return none
+ * \note This function is called when the data is received from the serial port.
+*/
+static void uShellRxCpltCallback(const void* const hal);
 
 /**
  * \brief Callback for the transmitted data
@@ -361,27 +369,7 @@ static void uShellRxReceivedCb(const void* const hal)
  * \return none
  * \note This function is called when the data is transmitted to the serial port.
 */
-static void uShellTxCompleteCb(const void* const hal)
-{
-    /* Check input parametrs */
-    USHELL_ASSERT(hal != NULL);
-
-    /* Local variables */
-    UShellHal_s* const halObj = (UShellHal_s*)hal;
-
-    /*Get the parent object */
-    UShell_s* const uShell = (UShell_s*)halObj->parent;
-
-    /* Get the osal object */
-    USHELL_ASSERT(uShell->osal != NULL);
-    USHELL_ASSERT(uShell->osal->eventHandle != NULL);
-    USHELL_ASSERT(uShell->osal->portTable != NULL);
-    USHELL_ASSERT(uShell->osal->portTable->eventOcurred != NULL);
-
-    UShellOsalErr_e osalErr = UShellOsalEventOcurred(uShell->osal, USHELL_OSAL_MSG_TX_COMPLETE);
-    USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
-
-}
+static void uShellTxCpltCb(const void* const hal);
 
 /**
  * \brief Callback for the error
@@ -390,23 +378,4 @@ static void uShellTxCompleteCb(const void* const hal)
  * \return none
  * \note This function is called when the error occurs in the serial port.
 */
-static void uShellRxTxErrorCb(const void* const hal)
-{
-    /* Check input parametrs */
-    USHELL_ASSERT(hal != NULL);
-
-    /* Local variables */
-    UShellHal_s* const halObj = (UShellHal_s*)hal;
-
-    /*Get the parent object */
-    UShell_s* const uShell = (UShell_s*)halObj->parent;
-
-    /* Get the osal object */
-    USHELL_ASSERT(uShell->osal != NULL);
-    USHELL_ASSERT(uShell->osal->eventHandle != NULL);
-    USHELL_ASSERT(uShell->osal->portTable != NULL);
-    USHELL_ASSERT(uShell->osal->portTable->eventOcurred != NULL);
-
-    UShellOsalErr_e osalErr = UShellOsalEventOcurred(uShell->osal, USHELL_OSAL_MSG_RX_TX_ERROR);
-    USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
-}
+static void uShellXferErrorCb(const void* const hal);

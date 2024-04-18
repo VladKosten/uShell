@@ -17,6 +17,48 @@ extern "C" {
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
+/**
+ * \brief The USART peripheral to be used (USART1, USART2, USART3, etc.)
+ */
+#ifndef USHELL_HAL_PORT_USART
+    #define USHELL_HAL_PORT_USART USART1
+#endif
+
+/**
+ * \brief The baudrate to be used
+ */
+#ifndef USHELL_HAL_PORT_BAUDRATE
+    #define USHELL_HAL_PORT_BAUDRATE 115200
+#endif
+
+/**
+ * \brief The word length to be used
+ */
+#ifndef USHELL_HAL_PORT_WORD_LENGTH
+    #define USHELL_HAL_PORT_WORD_LENGTH UART_WORDLENGTH_8B
+#endif
+
+/**
+ * \brief The stop bits to be used
+ */
+#ifndef USHELL_HAL_PORT_STOP_BITS
+    #define USHELL_HAL_PORT_STOP_BITS UART_STOPBITS_1
+#endif
+
+/**
+ * \brief The parity to be used
+ */
+#ifndef USHELL_HAL_PORT_PARITY
+    #define USHELL_HAL_PORT_PARITY UART_PARITY_NONE
+#endif
+
+/**
+ * \brief The HAL PORT name
+ */
+#ifndef USHELL_HAL_PORT_NAME
+    #define USHELL_HAL_PORT_NAME "uShellHal"
+#endif
+
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
@@ -58,12 +100,7 @@ typedef struct
  * \return UShellHalPortErr_e  - error code. non-zero = an error has occurred.
 
  */
-UShellHalPortErr_e UShell_HalPortInit(UShellHalPort_s* const halPort, USART_TypeDef* const usart,
-                                                                      uint32_t baudrate,
-                                                                      uint32_t WordLenght,
-                                                                      uint32_t stopBits,
-                                                                      uint32_t parity,
-                                                                      const void* const parent,
+UShellHalPortErr_e UShell_HalPortInit(UShellHalPort_s* const halPort, const void* const parent,
                                                                       const char* const name);
 
 /**

@@ -7,7 +7,7 @@ extern "C" {
 
 /*================================================================[INCLUDE]================================================*/
 
-#include "uShell_osal.h"
+#include "ushell_osal.h"
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -15,6 +15,28 @@ extern "C" {
 #include <semphr.h>
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
+
+/**
+ * \brief Name for the thread required for driver operation
+ */
+#ifndef USHELL_OSAL_PORT_THREAD_NAME
+    #define USHELL_OSAL_PORT_THREAD_NAME "USHELL_THREAD"
+#endif
+
+/**
+ * \brief Stack size (byte) for the thread required for driver operation
+ */
+#ifndef USHELL_OSAL_PORT_THREAD_STACK_SIZE
+    #define USHELL_OSAL_PORT_THREAD_STACK_SIZE ((uint16_t)256)
+#endif
+
+/**
+ * \brief  priority levels for thread
+ */
+#ifndef USHELL_OSAL_PORT_THREAD_PRIO
+    #define USHELL_OSAL_PORT_THREAD_PRIO    (tskIDLE_PRIORITY + 1)
+#endif
+
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
@@ -30,21 +52,6 @@ typedef enum
 
 } UShellOsalPortErr_e;
 
-/**
- * \brief
- */
-typedef UBaseType_t UShellOsalPortThreadPriority_t;
-
-/**
- * \brief Parameters of the thread responsible for the worker
- */
-typedef struct
-{
-    char*                                   name;             ///< A descriptive name for the task
-    size_t                                  stackSize;        ///< Stack size in bytes
-    UShellOsalPortThreadPriority_t          threadPriority;   ///< Priority at which the task is created
-
-} UShellOsalPortThreadCfg_s;
 
 /**
  * \brief Matrix KBD FreeRTOS OSAL structure
@@ -65,15 +72,13 @@ typedef struct
 /**
  * \brief       Initialize the UShell FreeRTOS osal instance
  * \param[in]   UShellOsalPort_s *const osalFreeRtos - OSAL FreeRTOS descriptor;
- * \param[in]   const UShellOsalPortThreadCfg_s* const threadCfg - thread parameters descriptor;
  * \param[in]   const void *const parent - pointer to a parent object;
  * \param[in]   const char* const name - the name of the osal object;
  * \param[out]  no;
  * \return      UShellOsalPortErr_e  - error code. non-zero = an error has occurred;
  */
-UShellOsalPortErr_e UShellOsalPortInit(UShellOsalPort_s *const osalFreeRtos, const UShellOsalPortThreadCfg_s* const threadCfg,
-                                                                                                  const void *const parent,
-                                                                                                  const char* const name);
+UShellOsalPortErr_e UShellOsalPortInit(UShellOsalPort_s *const osalFreeRtos, const void *const parent,
+                                                                             const char* const name);
 
 /**
  * \brief       Deinitialize the UShell FreeRTOS osal instance;

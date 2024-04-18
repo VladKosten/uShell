@@ -14,9 +14,7 @@ extern "C" {
 #include <string.h>
 
 /* Project includes */
-#include "uShell_hal.h"
-#include "uShell_osal.h"
-#include "uShell_cmd.h"
+#include "ushell_cmd.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 

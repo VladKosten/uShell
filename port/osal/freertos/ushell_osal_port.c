@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "uShell_osal_port.h"
+#include "ushell_osal_port.h"
 
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
@@ -25,27 +25,6 @@
     #else
         #define USHELL_OSAL_PORT_ASSERT(cond)
     #endif
-#endif
-
-/**
- * \brief Name for the thread required for driver operation
- */
-#ifndef USHELL_OSAL_PORT_THREAD_NAME
-    #define USHELL_OSAL_PORT_THREAD_NAME "USHELL"
-#endif
-
-/**
- * \brief Stack size (byte) for the thread required for driver operation
- */
-#ifndef USHELL_OSAL_PORT_THREAD_STACK_SIZE
-    #define USHELL_OSAL_PORT_THREAD_STACK_SIZE ((uint16_t)256)
-#endif
-
-/**
- * \brief  priority levels for thread
- */
-#ifndef USHELL_OSAL_PORT_THREAD_PRIO
-    #define USHELL_OSAL_PORT_THREAD_PRIO    (tskIDLE_PRIORITY + 1)
 #endif
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
@@ -132,15 +111,7 @@ static const UShellOsalPortableTable_s matrixkbdOsalPortPortableFunc =
     .msgSend            = uShellOsalPortMsgSend         ///< OSAL port port send message
 };
 
-/**
- * \brief Standard parameters for the thread
- */
-static const UShellOsalPortThreadCfg_s uShellOsalPortThreadCfg =
-{
-    .name = USHELL_OSAL_PORT_THREAD_NAME,
-    .stackSize = USHELL_OSAL_PORT_THREAD_STACK_SIZE,
-    .threadPriority = USHELL_OSAL_PORT_THREAD_PRIO
-};
+static const char* uShellOsalPortName = USHELL_OSAL_PORT_THREAD_NAME;
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]===============================================================================
 
@@ -199,7 +170,7 @@ UShellOsalPortErr_e UShellOsalPortInit(UShellOsalPort_s *const osalPort, const U
     osalPort->base.msgHandle = msgHandle;
 
     /* Create the thread */
-    UShellOsalPortErr_e osalPortStatus = uShellOsalPortThreadCreate(osalPort,threadCfg);
+    UShellOsalPortErr_e osalPortStatus = uShellOsalPortThreadCreate(osalPort);
     if(USHELL_OSAL_PORT_NO_ERR != osalPortStatus)
     {
         osalPortStatus = UShellOsalPortDeinit(osalPort);
@@ -272,11 +243,10 @@ UShellOsalPortErr_e UShellOsalPortDeinit(UShellOsalPort_s *const osalPort)
 /**
  * \brief       Create thread
  * \param[in]   UShellOsalPort_s* const osalPort - OSAL FreeRTOS descriptor;
- * \param[in]   UShellOsalPortThreadCfg_s* const threadCfg - OSAL descriptor;
  * \param[out]  no;
  * \return      UShellOsalErr_e  - error code. non-zero = an error has occurred;
  */
-static UShellOsalPortErr_e uShellOsalPortThreadCreate(UShellOsalPort_s* const osalPort, const UShellOsalPortThreadCfg_s* const threadCfg )
+static UShellOsalPortErr_e uShellOsalPortThreadCreate(UShellOsalPort_s* const osalPort)
 {
     /* Checking of params */
     USHELL_OSAL_PORT_ASSERT(osalPort);
@@ -292,31 +262,14 @@ static UShellOsalPortErr_e uShellOsalPortThreadCreate(UShellOsalPort_s* const os
         return USHELL_OSAL_PORT_CALL_FROM_ISR_ERR ; // Exit: Error: Call from isr
     }
 
-    /* Check the thread parameters */
-    UShellOsalPortThreadCfg_s  thisThreadCfg = {0};
-    if(NULL != threadCfg)
-    {
-        if((configMINIMAL_STACK_SIZE > threadCfg->stackSize)    ||
-           (configMAX_PRIORITIES < threadCfg->threadPriority))
-        {
-            return USHELL_OSAL_PORT_NOT_INIT_ERR;
-        }
-        thisThreadCfg = *threadCfg;
-    }
-    else
-    {
-        thisThreadCfg = uShellOsalPortThreadCfg;
-    }
-
     /* Creating a thread  */
     BaseType_t xReturned = pdFALSE;
     TaskHandle_t threadHandle = NULL;
-    xReturned = xTaskCreate(uShellOsalPortThread,
-                                    thisThreadCfg.name,
-                                    thisThreadCfg.stackSize,
-                                    (void*)osalPort,
-                                    thisThreadCfg.threadPriority,
-                                    &threadHandle);
+    xReturned = xTaskCreate(uShellOsalPortThread, uShellOsalPortName,
+                                                  USHELL_OSAL_PORT_THREAD_STACK_SIZE,
+                                                  (void*)osalPort,
+                                                  USHELL_OSAL_PORT_THREAD_PRIO,
+                                                  &threadHandle);
 
     if (pdPASS != xReturned)
     {

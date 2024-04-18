@@ -20,13 +20,13 @@
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
 /**
-* \brief MATRIX_KBD_HAL_PORT_ASSERT macro definition
+* \brief USHELL_HAL_PORT_ASSERT macro definition
 */
-#ifndef MATRIX_KBD_HAL_PORT_ASSERT
-    #ifdef MATRIX_KBD_ASSERT
-        #define MATRIX_KBD_HAL_PORT_ASSERT(cond)  MATRIX_KBD_ASSERT(cond)
+#ifndef USHELL_HAL_PORT_ASSERT
+    #ifdef USHELL_ASSERT
+        #define USHELL_HAL_PORT_ASSERT(cond)  USHELL_ASSERT(cond)
     #else
-        #define MATRIX_KBD_HAL_PORT_ASSERT(cond)
+        #define USHELL_HAL_PORT_ASSERT(cond)
     #endif
 #endif
 
@@ -63,6 +63,7 @@ UShellHalPortErr_e UShell_HalPortInit(UShellHalPort_s* const halPort, USART_Type
     {
         return USHELL_HAL_PORT_INVALID_ARGS_ERR;    // Invalid pointers
     }
+    
     switch (usart)
     {
     case USART1_BASE:
