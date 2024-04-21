@@ -60,6 +60,7 @@ typedef enum
 {
     USHELL_OSAL_MSG_NONE = 0x00,          ///< No message
     USHELL_OSAL_MSG_RX_TX_ERROR = 0x01,   ///< Message for error
+    USHELL_OSAL_MSG_RX_RECEIVED = 0x02,   ///< Message for rx received
     USHELL_OSAL_MSG_TX_COMPLETE = 0x02,   ///< Message for tx complete
     USHELL_OSAL_MSG_RX_COMPLETED = 0x04,  ///< Message for rx received
 
