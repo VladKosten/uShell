@@ -344,14 +344,6 @@ static void uShellThreadWorker(void* const uShell)
     }
 }
 
-/**
- * \brief Callback for the received data
- * \param[in] hal - hal object
- * \param[out] none
- * \return none
- * \note This function is called when the data is received from the serial port.
-*/
-static void uShellRxReceivedCb(const void* const hal);
 
 /**
  * \brief Callback for the received data

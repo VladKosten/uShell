@@ -15,15 +15,24 @@ extern "C" {
 
 /* Project includes */
 #include "ushell_cmd.h"
+#include "ushell_hal.h"
+#include "ushell_osal.h"
+#include "ushell_vt100.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
+/**
+ * \brief Description of the maximum number of commands in the UShell
+*/
 #ifndef USHELL_MAX_CMD
     #define USHELL_MAX_CMD 10
 #endif
 
-#ifndef USHELL_INPUTE_BUFFER_SIZE
-    #define USHELL_INPUTE_BUFFER_SIZE 128
+/**
+ * \brief Description of the maximum size of the buffer in the UShell
+*/
+#ifndef USHELL_BUFFER_SIZE
+    #define USHELL_BUFFER_SIZE 128
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -58,6 +67,17 @@ typedef struct
 }UShellAuthentification_s;
 
 /**
+ * \brief Description of the uShell IO object
+ * \note This object is used to store the buffer for input/output operations in the uShell
+*/
+typedef struct
+{
+    UShellItem_t buffer[USHELL_BUFFER_SIZE];      ///< Buffer for commands
+    size_t size;                                         ///< Size of the buffer
+}
+UShellIo_s;
+
+/**
  * \brief Description of the uShell object
 */
 typedef struct
@@ -68,7 +88,7 @@ typedef struct
     const UShellOsal_s* osal;                                   ///< OSAL object
     const UShellHal_s* hal;                                     ///< HAL object
 
-    const UShellCmd_s* cmd[USHELL_INPUTE_BUFFER_SIZE + 1];      ///< Commands
+    const UShellCmd_s* cmd[USHELL_MAX_CMD + 1];                 ///< Commands array 
     size_t cmdCount;                                            ///< Number of commands actually in the buffer
 
     UShellAuthentification_s auth;                              ///< Authentification object
