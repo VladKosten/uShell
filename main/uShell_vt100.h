@@ -14,7 +14,15 @@ extern "C" {
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
-#define USHELL_VT100_CMD_LENGTH_MAX 10
+/**
+ * \brief Escape sequence
+*/
+#define USHELL_VT100_ESC_SEQ            "\x1B"
+
+/**
+ * \brief Escape sequence length
+*/
+#define USHELL_VT100_ESC_SEQ_LENGTH     2
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
@@ -78,7 +86,7 @@ typedef enum
     USHELL_VT100_ACTION_TERMINAL_CURSOR_RIGHT,   ///< Move cursor right
     USHELL_VT100_ACTION_TERMINAL_CURSOR_HIDE,    ///< Hide cursor
     USHELL_VT100_ACTION_TERMINAL_CURSOR_SHOW,    ///< Show cursor
-
+    
 }UShellVt100KeyAction_e;
 
 /**
@@ -103,10 +111,7 @@ typedef UShellVt100Err_e (*UShellVt100PrintHook_t)(const void* const uShellVt100
 */
 typedef struct
 {
-    UShellVt100Err_e (*executeCmdHook)(const void* const uShellVt100);                                              ///< Execute command
-    UShellVt100Err_e (*autoCompleteHook)(const void* const uShellVt100);                                            ///< Auto complete
     UShellVt100Err_e (*printHook)(const void* const uShellVt100, const char* const data, const size_t dataSize);    ///< Print
-    UShellVt100Err_e (*removeHook)(const void* const uShellVt100, const size_t size);                               ///< Remove character
 
 }UShellVt100Hook_s;
 
@@ -116,20 +121,21 @@ typedef struct
     char data[USHELL_VT100_CMD_LENGTH_MAX];     ///< Data buffer
     size_t size;        ///< Data size
 }UShelVt100Io_s;
+
 /**
  * \brief Descriibe UShellVt100 object
 */
 typedef struct
 {
     /* Manatory */
-    const void* parent;                             ///< Pointer to the parent object
+    const void* parent;                                     ///< Pointer to the parent object
 
-    const UShellVt100Callback_s* cb;                ///< Callbacks
-    const UShellVt100Hook_s* hook;                  ///< Pointer to the print hook function
+    const UShellVt100Callback_s* cb;                        ///< Callbacks
+    const UShellVt100Hook_s* hook;                          ///< Pointer to the print hook function
 
     /* Internal use */
-    UShellVt100FontColor_e fontColor;               ///< Font color
-    UShellVt100BackgroundColor_e backgroundColor;   ///< Background color
+    UShellVt100FontColor_e fontColorCurrent;               ///< Font color
+    UShellVt100BackgroundColor_e backgroundColorCurrent;   ///< Background color
 
 
 
