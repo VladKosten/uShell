@@ -88,12 +88,12 @@ typedef struct
     const UShellOsal_s* osal;                                   ///< OSAL object
     const UShellHal_s* hal;                                     ///< HAL object
 
-    const UShellCmd_s* cmd[USHELL_MAX_CMD + 1];                 ///< Commands array 
+    const UShellCmd_s* cmd[USHELL_MAX_CMD + 1];                 ///< Commands array
     size_t cmdCount;                                            ///< Number of commands actually in the buffer
 
     UShellAuthentification_s auth;                              ///< Authentification object
-
-    UShellItem_t buffer[];        ///< Buffer for commands
+    UShellVt100_s vt100;                                        ///< VT100 object
+    UShellIo_s io;                                              ///< IO object
 
 }UShell_s;
 
