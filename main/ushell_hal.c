@@ -9,7 +9,7 @@
 */
 //===============================================================================[ INCLUDE ]========================================================================================
 
-#include "uShell_hal.h"
+#include "ushell_hal.h"
 
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
@@ -277,18 +277,17 @@ UShellHalErr_e UShellHalSend(UShellHal_s* const hal, const UShellHalItem_t* cons
 
     return status;                              // Exit: success
 }
+
 /**
  * \brief Receive data
  * \param[in] hal - UShellHal object to receive data
- * \param[in] item - pointer to the data to be received
- * \param[in] numberOfItems - number of items to be received
- * \param[out] none
+ * \param[out] symbol - pointer to the data to be received
  * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
 */
-UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const item, const size_t* const numberOfItems)
+UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, const UShellHalItem_t* const symbol)
 {
     /* Check input parameter */
-    if((hal == NULL) || (item == NULL) || (numberOfItems == NULL))
+    if((hal == NULL) || (symbol == NULL))
     {
         return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
     }
@@ -300,7 +299,7 @@ UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const i
     }
 
     /* Receive data */
-    UShellHalErr_e status = hal->portTable->receieve(hal, item, numberOfItems);
+    UShellHalErr_e status = hal->portTable->receieve(hal, symbol);
 
     return status;                              // Exit: success
 }

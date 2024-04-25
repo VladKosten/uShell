@@ -40,7 +40,7 @@ typedef uint8_t UShellHalItem_t;
 typedef struct
 {
     UShellHalErr_e (*send)(const void* const hal, const UShellHalItem_t* const item, const size_t numberOfItems);       ///< Send data to the port
-    UShellHalErr_e (*receieve)(const void* const hal, UShellHalItem_t* const item, const size_t* const numberOfItems);  ///< Get data from the port
+    UShellHalErr_e (*receieve)(const void* const hal, UShellHalItem_t* const symbol);  ///< Get data from the port
 
 }UShellHalPortableTable_s;
 
@@ -163,12 +163,10 @@ UShellHalErr_e UShellHalSend(UShellHal_s* const hal, const UShellHalItem_t* cons
 /**
  * \brief Receive data
  * \param[in] hal - UShellHal object to receive data
- * \param[in] buff - pointer to the buffer to store the received data
- * \param[in] sizeOfBuff - size of the buffer
- * \param[out] numberOfItems - number of items to be received
- * \return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ * \param[out] symbol - pointer to the data to be received
+ * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
 */
-UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const buff, const size_t sizeOfBuff, const size_t* const numberOfItems);
+UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const symbol);
 
 #ifdef __cplusplus
 }
