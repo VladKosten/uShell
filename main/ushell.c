@@ -66,7 +66,7 @@ typedef enum
     USHELL_ASCII_CONTROL_CHAR_FS = 0x1C,     ///< File Separator
     USHELL_ASCII_CONTROL_CHAR_GS = 0x1D,     ///< Group Separator
     USHELL_ASCII_CONTROL_CHAR_RS = 0x1E,     ///< Record Separator
-    USHELL_ASCII_CONTROL_CHAR_US = 0x1F      ///< Unit Separator
+    USHELL_ASCII_CONTROL_CHAR_US = 0x1F,      ///< Unit Separator
 
     USHELL_ASCII_CONTROL_CHAR_DEL = 0x7F     ///< Delete
 
@@ -101,7 +101,7 @@ static void uShellRxReceivedCb(const void* const hal);
  * \return none
  * \note This function is called when the data is received from the serial port.
 */
-static void uShellRxCpltCallback(const void* const hal);
+static void uShellRxReceivedCallback(const void* const hal);
 
 /**
  * \brief Callback for the transmitted data
@@ -354,6 +354,7 @@ static void uShellThreadWorker(void* const uShell)
     UShellHalErr_e halErr = USHELL_HAL_NO_ERR;
     (void) halErr;
     UShellOsalMsg_e msg = USHELL_OSAL_MSG_NONE;
+
     UShellItem_t item = 0;
 
     /* Check RTE state */
@@ -371,18 +372,92 @@ static void uShellThreadWorker(void* const uShell)
         do
         {
             osalErr = UShellOsalMsgGet(ushell->osal, &msg, USHELL_OSAL_WAIT_FOREVER);
-            USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
-        } while (msg != USHELL_OSAL_MSG_RX_RECEIVED);
 
-        /* Get the data */
-        halErr = ushell->hal->portTable->receieve(ushell->hal, &item);
+        } while (msg != USHELL_OSAL_MSG_RX_RECEIVED && osalErr != USHELL_OSAL_NO_ERR);
+
+        /* Get data*/
+        halErr = UShellHalReceive(ushell->hal, &item);
         USHELL_ASSERT(halErr == USHELL_HAL_NO_ERR);
 
+
         /* Process the data */
+        switch(item)
+        {
+            /* Carriage return */
+            case USHELL_ASCII_CONTROL_CHAR_CR:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* Line feed */
+            case USHELL_ASCII_CONTROL_CHAR_LF:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* Backspace */
+            case USHELL_ASCII_CONTROL_CHAR_BS:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* Delete */
+            case USHELL_ASCII_CONTROL_CHAR_DEL:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* End of text */
+            case USHELL_ASCII_CONTROL_CHAR_ETX:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* Start of Text */
+            case USHELL_ASCII_CONTROL_CHAR_EOT:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* End of Text */
+            case USHELL_ASCII_CONTROL_CHAR_CAN:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* End of Transmission */
+            case USHELL_ASCII_CONTROL_CHAR_ESC:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* Enquiry */
+            case USHELL_ASCII_CONTROL_CHAR_ETB:
+            {
+                /* Process the command */
+                break;
+            }
+
+            /* Acknowledge */
+            default:
+            {
+                /* Process the command */
+                break;
+            }
+        }
+
+
 
     }
 }
-
 
 /**
  * \brief Callback for the received data
@@ -391,7 +466,21 @@ static void uShellThreadWorker(void* const uShell)
  * \return none
  * \note This function is called when the data is received from the serial port.
 */
-static void uShellRxCpltCallback(const void* const hal);
+static void uShellRxReceivedCallback(const void* const hal)
+{
+    /* Check input parametrs */
+    USHELL_ASSERT(hal != NULL);
+
+    /* Local variables */
+    UShellHal_s* const ushellHal = (UShellHal_s*)hal;
+    UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
+    (void) osalErr;
+
+    /* Send msg */
+    osalErr = UShellOsalMsgSend(ushellHal->osal, USHELL_OSAL_MSG_RX_RECEIVED);
+    USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
+
+}
 
 /**
  * \brief Callback for the transmitted data
@@ -400,7 +489,20 @@ static void uShellRxCpltCallback(const void* const hal);
  * \return none
  * \note This function is called when the data is transmitted to the serial port.
 */
-static void uShellTxCpltCb(const void* const hal);
+static void uShellTxCpltCb(const void* const hal)
+{
+    /* Check input parametrs */
+    USHELL_ASSERT(hal != NULL);
+
+    /* Local variables */
+    UShellHal_s* const ushellHal = (UShellHal_s*)hal;
+    UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
+    (void) osalErr;
+
+    /* Send msg */
+    osalErr = UShellOsalMsgSend(ushellHal->osal, USHELL_OSAL_MSG_TX_COMPLETE);
+    USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
+}
 
 /**
  * \brief Callback for the error
@@ -409,4 +511,17 @@ static void uShellTxCpltCb(const void* const hal);
  * \return none
  * \note This function is called when the error occurs in the serial port.
 */
-static void uShellXferErrorCb(const void* const hal);
+static void uShellXferErrorCb(const void* const hal)
+{
+    /* Check input parametrs */
+    USHELL_ASSERT(hal != NULL);
+
+    /* Local variables */
+    UShellHal_s* const ushellHal = (UShellHal_s*)hal;
+    UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
+    (void) osalErr;
+
+    /* Send msg */
+    osalErr = UShellOsalMsgSend(ushellHal->osal, USHELL_OSAL_MSG_XFER_ERROR);
+    USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
+}
