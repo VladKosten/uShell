@@ -73,7 +73,7 @@ typedef struct
 typedef struct
 {
     UShellItem_t buffer[USHELL_BUFFER_SIZE];      ///< Buffer for commands
-    size_t size;                                         ///< Size of the buffer
+    size_t ind;                                         ///< Size of the buffer
 }
 UShellIo_s;
 
@@ -92,6 +92,7 @@ typedef struct
     size_t cmdCount;                                            ///< Number of commands actually in the buffer
 
     UShellAuthentification_s auth;                              ///< Authentification object
+    
     UShellVt100_s vt100;                                        ///< VT100 object
     UShellIo_s io;                                              ///< IO object
 

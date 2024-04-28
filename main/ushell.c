@@ -35,42 +35,14 @@
 
 typedef enum
 {
-    USHELL_ASCII_CONTROL_CHAR_NUL = 0x00,    ///< Null  (Null character)
-    USHELL_ASCII_CONTROL_CHAR_SOH = 0x01,    ///< Start of Heading  ()
-    USHELL_ASCII_CONTROL_CHAR_STX = 0x02,    ///< Start of Text
-    USHELL_ASCII_CONTROL_CHAR_ETX = 0x03,    ///< End of Text
-    USHELL_ASCII_CONTROL_CHAR_EOT = 0x04,    ///< End of Transmission
-    USHELL_ASCII_CONTROL_CHAR_ENQ = 0x05,    ///< Enquiry
-    USHELL_ASCII_CONTROL_CHAR_ACK = 0x06,    ///< Acknowledge
-    USHELL_ASCII_CONTROL_CHAR_BEL = 0x07,    ///< Bell
-    USHELL_ASCII_CONTROL_CHAR_BS = 0x08,     ///< Backspace
-    USHELL_ASCII_CONTROL_CHAR_HT = 0x09,     ///< Horizontal Tab
-    USHELL_ASCII_CONTROL_CHAR_LF = 0x0A,     ///< Line Feed
-    USHELL_ASCII_CONTROL_CHAR_VT = 0x0B,     ///< Vertical Tab
-    USHELL_ASCII_CONTROL_CHAR_FF = 0x0C,     ///< Form Feed
-    USHELL_ASCII_CONTROL_CHAR_CR = 0x0D,     ///< Carriage Return
-    USHELL_ASCII_CONTROL_CHAR_SO = 0x0E,     ///< Shift Out
-    USHELL_ASCII_CONTROL_CHAR_SI = 0x0F,     ///< Shift In
-    USHELL_ASCII_CONTROL_CHAR_DLE = 0x10,    ///< Data Link Escape
-    USHELL_ASCII_CONTROL_CHAR_DC1 = 0x11,    ///< Device Control 1 (XON)
-    USHELL_ASCII_CONTROL_CHAR_DC2 = 0x12,    ///< Device Control 2
-    USHELL_ASCII_CONTROL_CHAR_DC3 = 0x13,    ///< Device Control 3 (XOFF)
-    USHELL_ASCII_CONTROL_CHAR_DC4 = 0x14,    ///< Device Control 4
-    USHELL_ASCII_CONTROL_CHAR_NAK = 0x15,    ///< Negative Acknowledge
-    USHELL_ASCII_CONTROL_CHAR_SYN = 0x16,    ///< Synchronous Idle
-    USHELL_ASCII_CONTROL_CHAR_ETB = 0x17,    ///< End of Transmission Block
-    USHELL_ASCII_CONTROL_CHAR_CAN = 0x18,    ///< Cancel
-    USHELL_ASCII_CONTROL_CHAR_EM = 0x19,     ///< End of Medium
-    USHELL_ASCII_CONTROL_CHAR_SUB = 0x1A,    ///< Substitute
-    USHELL_ASCII_CONTROL_CHAR_ESC = 0x1B,    ///< Escape
-    USHELL_ASCII_CONTROL_CHAR_FS = 0x1C,     ///< File Separator
-    USHELL_ASCII_CONTROL_CHAR_GS = 0x1D,     ///< Group Separator
-    USHELL_ASCII_CONTROL_CHAR_RS = 0x1E,     ///< Record Separator
-    USHELL_ASCII_CONTROL_CHAR_US = 0x1F,      ///< Unit Separator
+    USHELL_ASCII_CHAR_CR = 0x0D,      ///< Carriage Return
+    USHELL_ASCII_CHAR_LF = 0x0A,      ///< Line Feed
+    USHELL_ASCII_CHAR_BS = 0x08,      ///< Backspace
+    USHELL_ASCII_CHAR_DEL = 0x7F,     ///< Delete
+    USHELL_ASCII_CHAR_SPACE = 0x20,   ///< Space
+    USHELL_ASCII_CHAR_TAB = 0x09      ///< Tab
 
-    USHELL_ASCII_CONTROL_CHAR_DEL = 0x7F     ///< Delete
-
-}UShellAsciiControlChar_e;
+}UShellAsciiChar_e;
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
 
@@ -354,7 +326,9 @@ static void uShellThreadWorker(void* const uShell)
     UShellHalErr_e halErr = USHELL_HAL_NO_ERR;
     (void) halErr;
     UShellOsalMsg_e msg = USHELL_OSAL_MSG_NONE;
-
+    (void)msg;
+    UShellVt100Err_e vt100Err = USHELL_VT100_NO_ERR;
+    (void) vt100Err;
     UShellItem_t item = 0;
 
     /* Check RTE state */
@@ -365,9 +339,13 @@ static void uShellThreadWorker(void* const uShell)
     USHELL_ASSERT(ushell->osal != NULL);
     USHELL_ASSERT(ushell->osal->worker != NULL);
 
+    /* First msg */
+    
+
     /* Main loop */
     while(1)
     {
+
         /* Wait msg */
         do
         {
@@ -383,64 +361,24 @@ static void uShellThreadWorker(void* const uShell)
         /* Process the data */
         switch(item)
         {
-            /* Carriage return */
-            case USHELL_ASCII_CONTROL_CHAR_CR:
+            /* Carriage return (\r) */
+            case USHELL_ASCII_CHAR_CR:
+            case USHELL_ASCII_CHAR_LF:
             {
                 /* Process the command */
                 break;
             }
 
-            /* Line feed */
-            case USHELL_ASCII_CONTROL_CHAR_LF:
+            /* Backspace  */
+            case USHELL_ASCII_CHAR_BS:
+            case USHELL_ASCII_CHAR_DEL:
             {
                 /* Process the command */
                 break;
             }
 
-            /* Backspace */
-            case USHELL_ASCII_CONTROL_CHAR_BS:
-            {
-                /* Process the command */
-                break;
-            }
-
-            /* Delete */
-            case USHELL_ASCII_CONTROL_CHAR_DEL:
-            {
-                /* Process the command */
-                break;
-            }
-
-            /* End of text */
-            case USHELL_ASCII_CONTROL_CHAR_ETX:
-            {
-                /* Process the command */
-                break;
-            }
-
-            /* Start of Text */
-            case USHELL_ASCII_CONTROL_CHAR_EOT:
-            {
-                /* Process the command */
-                break;
-            }
-
-            /* End of Text */
-            case USHELL_ASCII_CONTROL_CHAR_CAN:
-            {
-                /* Process the command */
-                break;
-            }
-
-            /* End of Transmission */
-            case USHELL_ASCII_CONTROL_CHAR_ESC:
-            {
-                /* Process the command */
-                break;
-            }
-
-            /* Enquiry */
-            case USHELL_ASCII_CONTROL_CHAR_ETB:
+            /* Horizontal tab */
+            case USHELL_ASCII_CHAR_TAB:
             {
                 /* Process the command */
                 break;
@@ -449,9 +387,24 @@ static void uShellThreadWorker(void* const uShell)
             /* Acknowledge */
             default:
             {
-                /* Process the command */
+                /* Store the data */
+                if(ushell->io.ind < USHELL_BUFFER_SIZE)
+                {
+                    ushell->io.buffer[ushell->io.ind++] = item;
+                }
+
+                /* Maybe escape sequence */
+                if((ushell->io.ind >= USHELL_VT100_ESCAPE_SEQUENCE_SIZE_MIN) &&
+                   (ushell->io.ind <= USHELL_VT100_ESCAPE_SEQUENCE_SIZE_MAX))
+                {
+                    vt100Err = UShellVt100ParseEscapeSequency(&ushell->vt100, ushell->io.buffer, ushell->io.ind);
+                    USHELL_ASSERT(vt100Err == USHELL_VT100_NO_ERR);
+                }
+
                 break;
             }
+
+            //Print
         }
 
 
@@ -473,11 +426,12 @@ static void uShellRxReceivedCallback(const void* const hal)
 
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*)hal;
+    UShell_s* const ushell = (UShell_s*)ushellHal->parent;
     UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
     (void) osalErr;
 
     /* Send msg */
-    osalErr = UShellOsalMsgSend(ushellHal->osal, USHELL_OSAL_MSG_RX_RECEIVED);
+    osalErr = UShellOsalMsgSend(ushell->osal, USHELL_OSAL_MSG_RX_RECEIVED);
     USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
 
 }
@@ -496,11 +450,12 @@ static void uShellTxCpltCb(const void* const hal)
 
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*)hal;
+    UShell_s* const ushell = (UShell_s*)ushellHal->parent;
     UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
     (void) osalErr;
 
     /* Send msg */
-    osalErr = UShellOsalMsgSend(ushellHal->osal, USHELL_OSAL_MSG_TX_COMPLETE);
+    osalErr = UShellOsalMsgSend(ushell->osal, USHELL_OSAL_MSG_TX_COMPLETE);
     USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
 }
 
@@ -518,10 +473,11 @@ static void uShellXferErrorCb(const void* const hal)
 
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*)hal;
+    UShell_s* const ushell = (UShell_s*)ushellHal->parent;
     UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
     (void) osalErr;
 
     /* Send msg */
-    osalErr = UShellOsalMsgSend(ushellHal->osal, USHELL_OSAL_MSG_XFER_ERROR);
+    osalErr = UShellOsalMsgSend(ushell->osal, USHELL_OSAL_MSG_RX_TX_ERROR);
     USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
 }
