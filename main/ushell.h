@@ -52,6 +52,7 @@ typedef enum
     USHELL_NOT_INIT_ERR,          ///< Exit: error - not initialized
     USHELL_PORT_ERR,              ///< Exit: error - port error (e.g. port layer error)
     USHELL_CMD_SPACE_ERR,         ///< Exit: error - no space for command
+    USHELL_XFER_ERR,              ///< Exit: error - transfer error
 
 }UShellErr_e;
 
@@ -92,7 +93,7 @@ typedef struct
     size_t cmdCount;                                            ///< Number of commands actually in the buffer
 
     UShellAuthentification_s auth;                              ///< Authentification object
-    
+
     UShellVt100_s vt100;                                        ///< VT100 object
     UShellIo_s io;                                              ///< IO object
 

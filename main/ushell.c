@@ -67,15 +67,6 @@ static void uShellThreadWorker(void* const uShell);
 static void uShellRxReceivedCb(const void* const hal);
 
 /**
- * \brief Callback for the received data
- * \param[in] hal - hal object
- * \param[out] none
- * \return none
- * \note This function is called when the data is received from the serial port.
-*/
-static void uShellRxReceivedCallback(const void* const hal);
-
-/**
  * \brief Callback for the transmitted data
  * \param[in] hal - hal object
  * \param[out] none
@@ -92,6 +83,15 @@ static void uShellTxCpltCb(const void* const hal);
  * \note This function is called when the error occurs in the serial port.
 */
 static void uShellXferErrorCb(const void* const hal);
+
+/**
+ * \brief Print string
+ * \param[in] uShell - uShell object
+ * \param[in] str - string to be printed
+ * \param[out] none
+ * \return USHELL_NO_ERR if success, otherwise error code
+*/
+static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const str);
 
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
@@ -340,7 +340,7 @@ static void uShellThreadWorker(void* const uShell)
     USHELL_ASSERT(ushell->osal->worker != NULL);
 
     /* First msg */
-    
+
 
     /* Main loop */
     while(1)
@@ -404,7 +404,7 @@ static void uShellThreadWorker(void* const uShell)
                 break;
             }
 
-            //Print
+
         }
 
 
@@ -419,7 +419,7 @@ static void uShellThreadWorker(void* const uShell)
  * \return none
  * \note This function is called when the data is received from the serial port.
 */
-static void uShellRxReceivedCallback(const void* const hal)
+static void uShellRxReceivedCb(const void* const hal)
 {
     /* Check input parametrs */
     USHELL_ASSERT(hal != NULL);
@@ -480,4 +480,71 @@ static void uShellXferErrorCb(const void* const hal)
     /* Send msg */
     osalErr = UShellOsalMsgSend(ushell->osal, USHELL_OSAL_MSG_RX_TX_ERROR);
     USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
+}
+
+
+/**
+ * \brief Print string
+ * \param[in] uShell - uShell object
+ * \param[in] str - string to be printed
+ * \param[out] none
+ * \return USHELL_NO_ERR if success, otherwise error code
+*/
+static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const str)
+{
+    /* Check input parametrs */
+    if((uShell == NULL) || (str == NULL))
+    {
+        return USHELL_INVALID_ARGS_ERR;
+    }
+
+    /* Check RTE state */
+    if((uShell->hal == NULL) ||
+       (uShell->osal == NULL))
+    {
+        return USHELL_NOT_INIT_ERR;
+    }
+
+    UShellHalErr_e halErr  = USHELL_HAL_NO_ERR;
+    UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
+    UShellVt100Err_e vt100Err = USHELL_VT100_NO_ERR;
+    UShellOsalMsg_e msg = USHELL_OSAL_MSG_NONE;
+    /* Transmit the data */
+    uint8_t ind = 0;
+    char symbol = str[ind++];
+    do
+    {
+        if((symbol == USHELL_ASCII_CHAR_CR) ||
+           (symbol == USHELL_ASCII_CHAR_LF))
+        {
+            vt100Err = UShellVt100CursorRowNext(&uShell->vt100);
+            if(vt100Err != USHELL_VT100_NO_ERR)
+            {
+                break;
+            }
+        }
+
+        vt100Err = UShellVt100CursorColumnNext(&uShell->vt100);
+        if(vt100Err != USHELL_VT100_NO_ERR)
+        {
+            break;
+        }
+
+        halErr = UShellHalTransmit(uShell->hal, symbol);
+        if(halErr != USHELL_HAL_NO_ERR)
+        {
+            break;
+        }
+
+        osalErr = UShellOsalMsgGet(uShell->osal, &msg, 50U);
+        if((osalErr != USHELL_OSAL_NO_ERR) ||
+           (msg != USHELL_OSAL_MSG_TX_COMPLETE))
+        {
+            break;
+        }
+
+        symbol = str[ind++];
+
+    } while (symbol != '\0');
+
 }
