@@ -39,8 +39,8 @@ typedef uint8_t UShellHalItem_t;
 */
 typedef struct
 {
-    UShellHalErr_e (*send)(const void* const hal, const UShellHalItem_t* const item, const size_t numberOfItems);       ///< Send data to the port
-    UShellHalErr_e (*receieve)(const void* const hal, UShellHalItem_t* const symbol);  ///< Get data from the port
+    UShellHalErr_e (*charSend)(const void* const hal, const UShellHalItem_t* const item);       ///< Send data to the port
+    UShellHalErr_e (*charReceive)(const void* const hal, UShellHalItem_t* const item);          ///< Get data from the port
 
 }UShellHalPortableTable_s;
 
@@ -49,8 +49,7 @@ typedef enum
     USHELL_HAL_CB_NONE = 0x00,          ///< No callback
     USHELL_HAL_CB_RX_TX_ERROR = 0x01,   ///< Callback for error
     USHELL_HAL_CB_TX_COMPLETE = 0x02,   ///< Callback for tx complete
-    USHELL_HAL_CB_RX_RECEIVED = 0x03,   ///< Callback for rx received
-    USHELL_HAL_CB_RX_COMPLETED = 0x04,  ///< Callback for rx received
+    USHELL_HAL_CB_RX_RECEIVED = 0x03,  ///< Callback for rx received
     USHELL_HAL_CB_ALL = 0xFF            ///< All callbacks
 }UShellHalCallback_e;
 
@@ -154,19 +153,18 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal, const UShellHalCallback
  * \brief Send data
  * \param[in] hal - UShellHal object to send data
  * \param[in] item - pointer to the data to be sent
- * \param[in] numberOfItems - number of items to be sent
  * \param[out] none
  * \return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
 */
-UShellHalErr_e UShellHalSend(UShellHal_s* const hal, const UShellHalItem_t* const item, const size_t numberOfItems);
+UShellHalErr_e UShellHalCharSend(UShellHal_s* const hal, const UShellHalItem_t* const item);
 
 /**
  * \brief Receive data
  * \param[in] hal - UShellHal object to receive data
- * \param[out] symbol - pointer to the data to be received
+ * \param[out] item - pointer to the data to be received
  * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
 */
-UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, UShellHalItem_t* const symbol);
+UShellHalErr_e UShellHalCharReceive(UShellHal_s* const hal, UShellHalItem_t* const item);
 
 #ifdef __cplusplus
 }

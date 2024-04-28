@@ -191,7 +191,7 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal, const UShellHalCallback
     /* Attach callback to the UShellHal object */
     switch(cbType )
     {
-        case USHELL_HAL_CB_RX_COMPLETED:
+        case USHELL_HAL_CB_RX_RECEIVED:
             hal->rxReceivedCb = cb;
             break;
         case USHELL_HAL_CB_TX_COMPLETE:
@@ -229,7 +229,7 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal, const UShellHalCallback
     /* Detach callback from the UShellHal object */
     switch(cbType )
     {
-        case USHELL_HAL_CB_RX_COMPLETED:
+        case USHELL_HAL_CB_RX_RECEIVED:
             hal->rxReceivedCb = NULL;
             break;
         case USHELL_HAL_CB_TX_COMPLETE:
@@ -254,26 +254,26 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal, const UShellHalCallback
  * \brief Send data
  * \param[in] hal - UShellHal object to send data
  * \param[in] item - pointer to the data to be sent
- * \param[in] numberOfItems - number of items to be sent
  * \param[out] none
  * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
 */
-UShellHalErr_e UShellHalSend(UShellHal_s* const hal, const UShellHalItem_t* const item, const size_t numberOfItems)
+UShellHalErr_e UShellHalCharSend(UShellHal_s* const hal, const UShellHalItem_t* const item)
 {
     /* Check input parameter */
-    if((hal == NULL) || (item == NULL) || (numberOfItems == 0))
+    if((hal == NULL) ||
+       (item == NULL))
     {
         return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
     }
 
     /* Check init state */
-    if((hal->portTable == NULL) || (hal->portTable->send == NULL))
+    if((hal->portTable == NULL) || (hal->portTable->charSend == NULL))
     {
         return USHELL_HAL_NOT_INIT_ERR;         // Exit: not initialized
     }
 
     /* Send data */
-    UShellHalErr_e status = hal->portTable->send(hal, item, numberOfItems);
+    UShellHalErr_e status = hal->portTable->charSend(hal, item);
 
     return status;                              // Exit: success
 }
@@ -281,25 +281,26 @@ UShellHalErr_e UShellHalSend(UShellHal_s* const hal, const UShellHalItem_t* cons
 /**
  * \brief Receive data
  * \param[in] hal - UShellHal object to receive data
- * \param[out] symbol - pointer to the data to be received
+ * \param[out] item - pointer to the data to be received
  * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
 */
-UShellHalErr_e UShellHalReceive(UShellHal_s* const hal, const UShellHalItem_t* const symbol)
+UShellHalErr_e UShellHalCharReceive(UShellHal_s* const hal, const UShellHalItem_t* const symbol)
 {
     /* Check input parameter */
-    if((hal == NULL) || (symbol == NULL))
+    if((hal == NULL) ||
+       (symbol == NULL))
     {
         return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
     }
 
     /* Check init state */
-    if((hal->portTable == NULL) || (hal->portTable->receieve == NULL))
+    if((hal->portTable == NULL) || (hal->portTable->charReceive == NULL))
     {
         return USHELL_HAL_NOT_INIT_ERR;         // Exit: not initialized
     }
 
     /* Receive data */
-    UShellHalErr_e status = hal->portTable->receieve(hal, symbol);
+    UShellHalErr_e status = hal->portTable->charReceive(hal, symbol);
 
     return status;                              // Exit: success
 }
