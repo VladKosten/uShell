@@ -40,11 +40,6 @@
 #define USHELL_VT100_ESC_SEQ_KEY_PGUP   "\x1B[5~"
 #define USHELL_VT100_ESC_SEQ_KEY_PGDN   "\x1B[6~"
 
-/**
- * \brief Size escape sequence for key press
-*/
-#define USHELL_VT100_ESC_SEQ_KEY_SIZE_MAX  5
-#define USHELL_VT100_ESC_SEQ_KEY_SIZE_MIN  4
 
 /**
  * \brief Escape sequence for command color font
@@ -111,8 +106,8 @@ UShellVt100Err_e UShellVt100Init(UShellVt100_s* const uShellVt100, const void* c
     uShellVt100->printHook = hook;
 
     /* Set the default font color and background color */
-    uShellVt100->fontColorCurrent = USHELL_VT100_FONT_COLOR_WHITE;
-    uShellVt100->backgroundColorCurrent = USHELL_VT100_BACKGROUND_COLOR_BLACK;
+    uShellVt100->color.font = USHELL_VT100_FONT_COLOR_DEFAULT;
+    uShellVt100->color.background = USHELL_VT100_BACKGROUND_COLOR_DEFAULT;
 
     return USHELL_VT100_NO_ERR;
 }
@@ -129,6 +124,8 @@ UShellVt100Err_e UShellVt100Deinit(UShellVt100_s* const uShellVt100)
     {
         return USHELL_VT100_INVALID_ARGS_ERR;
     }
+
+
 
     /* Deinitialize the UShellVt100 object */
     memset(uShellVt100, 0, sizeof(UShellVt100_s));
@@ -222,7 +219,7 @@ UShellVt100Err_e UShellVt100KeyCbDetach(UShellVt100_s* const uShellVt100, const 
  * \param[out] none
  * \return UShellVt100Err_e
 */
-UShellVt100Err_e UShellVt100ParseKeyEscapeSequency(UShellVt100_s* const uShellVt100, const UShellVt100Item_t* const data, const size_t dataSize)
+UShellVt100Err_e UShellVt100ParseEscapeSequency(UShellVt100_s* const uShellVt100, const UShellVt100Item_t* const data, const size_t dataSize)
 {
     /* Check input parametr*/
     if((uShellVt100 == NULL) ||
@@ -235,8 +232,8 @@ UShellVt100Err_e UShellVt100ParseKeyEscapeSequency(UShellVt100_s* const uShellVt
     do
     {
         /* Check the size of the data */
-        if((dataSize < USHELL_VT100_ESC_SEQ_KEY_SIZE_MIN) ||
-            (dataSize > USHELL_VT100_ESC_SEQ_KEY_SIZE_MAX))
+        if((dataSize < USHELL_VT100_ESCAPE_SEQUENCE_SIZE_MIN) ||
+            (dataSize > USHELL_VT100_ESCAPE_SEQUENCE_SIZE_MAX))
         {
             break;
         }
@@ -307,7 +304,7 @@ UShellVt100Err_e UShellVt100ParseKeyEscapeSequency(UShellVt100_s* const uShellVt
  * \param[out] none
  * \return UShellVt100Err_e
 */
-UShellVt100Err_e UShellVt100FontColorSet(UShellVt100_s* const uShellVt100, const UShellVt100FontColor_e fontColor)
+UShellVt100Err_e UShellVt100ColorFontSet(UShellVt100_s* const uShellVt100, const UShellVt100ColorFont_e fontColor)
 {
     /* Check input parametr*/
     if(uShellVt100 == NULL)
@@ -385,7 +382,7 @@ UShellVt100Err_e UShellVt100FontColorSet(UShellVt100_s* const uShellVt100, const
     }
 
     /* Set the font color */
-    uShellVt100->fontColorCurrent = fontColor;
+    uShellVt100->color.font = fontColor;
 
     return USHELL_VT100_NO_ERR;             ///< Exit: no errors
 }
@@ -396,7 +393,7 @@ UShellVt100Err_e UShellVt100FontColorSet(UShellVt100_s* const uShellVt100, const
  * \param[out] fontColor - pointer to store the font color
  * \return UShellVt100Err_e
 */
-UShellVt100Err_e UShellVt100FontColorGet(UShellVt100_s* const uShellVt100, UShellVt100FontColor_e* const fontColor)
+UShellVt100Err_e UShellVt100ColorFontGet(UShellVt100_s* const uShellVt100, UShellVt100ColorFont_e* const fontColor)
 {
     /* Check input parametr*/
     if((uShellVt100 == NULL) ||
@@ -406,7 +403,7 @@ UShellVt100Err_e UShellVt100FontColorGet(UShellVt100_s* const uShellVt100, UShel
     }
 
     /* Get the font color */
-    *fontColor = uShellVt100->fontColorCurrent;
+    *fontColor = uShellVt100->color.font;
 
     return USHELL_VT100_NO_ERR;
 
@@ -419,7 +416,7 @@ UShellVt100Err_e UShellVt100FontColorGet(UShellVt100_s* const uShellVt100, UShel
  * \param[out] none
  * \return UShellVt100Err_e
 */
-UShellVt100Err_e UShellVt100BackgroundColorSet(UShellVt100_s* const uShellVt100, const UShellVt100BackgroundColor_e backgroundColor)
+UShellVt100Err_e UShellVt100ColorBackgroundSet(UShellVt100_s* const uShellVt100, const UShellVt100ColorBackground_e backgroundColor)
 {
     /* Check input parametr */
     if(uShellVt100 == NULL)
@@ -497,7 +494,7 @@ UShellVt100Err_e UShellVt100BackgroundColorSet(UShellVt100_s* const uShellVt100,
     }
 
     /* Set the background color */
-    uShellVt100->backgroundColorCurrent = backgroundColor;
+    uShellVt100->color.background = backgroundColor;
 
     return USHELL_VT100_NO_ERR;                         ///< Exit: no errors
 }
@@ -508,7 +505,7 @@ UShellVt100Err_e UShellVt100BackgroundColorSet(UShellVt100_s* const uShellVt100,
  * \param[out] backgroundColor - pointer to store the background color
  * \return UShellVt100Err_e
 */
-UShellVt100Err_e UShellVt100BackgroundColorGet(UShellVt100_s* const uShellVt100, UShellVt100BackgroundColor_e* const backgroundColor)
+UShellVt100Err_e UShellVt100ColorBackgroundGet(UShellVt100_s* const uShellVt100, UShellVt100ColorBackground_e* const backgroundColor)
 {
     /* Check input parametr*/
     if((uShellVt100 == NULL) ||
@@ -518,21 +515,19 @@ UShellVt100Err_e UShellVt100BackgroundColorGet(UShellVt100_s* const uShellVt100,
     }
 
     /* Get the background color */
-    *backgroundColor = uShellVt100->backgroundColorCurrent;
+    *backgroundColor = uShellVt100->color.background;
 
     return USHELL_VT100_NO_ERR;
 
 }
 
 /**
- * \brief Execute the action of the UShellVt100 object
- * \note This function is used to execute the action of the UShellVt100 object
+ * \brief Set next column position of cursor in the UShellVt100 object
  * \param[in] uShellVt100 - pointer to the UShellVt100 object
- * \param[in] action - action to be performed
  * \param[out] none
  * \return UShellVt100Err_e
 */
-UShellVt100Err_e UShellVt100ActionExectute(UShellVt100_s* const uShellVt100, const UShellVt100Action_e action)
+UShellVt100Err_e UShellVt100CursorColumnNext(UShellVt100_s* const uShellVt100)
 {
     /* Check input parametr*/
     if(uShellVt100 == NULL)
@@ -547,49 +542,162 @@ UShellVt100Err_e UShellVt100ActionExectute(UShellVt100_s* const uShellVt100, con
         return USHELL_VT100_NOT_INIT_ERR;
     }
 
-    /* Find the escape sequence for the action */
+    /* Print the escape sequence */
+    UShellVt100Err_e status = uShellVt100->printHook(uShellVt100->parent, USHELL_VT100_ESC_SEQ_CURSOR_RIGHT, strlen(USHELL_VT100_ESC_SEQ_CURSOR_RIGHT));
+    if(status != USHELL_VT100_NO_ERR)
+    {
+        return USHELL_VT100_PORT_ERR;       ///< Exit: error - port error
+    }
+
+    /* Set the cursor position */
+    uShellVt100->cursor.columnPos++;
+
+    return USHELL_VT100_NO_ERR;             ///< Exit: no errors
+}
+
+/**
+ * \brief Set previous column position of cursor in the UShellVt100 object
+ * \param[in] uShellVt100 - pointer to the UShellVt100 object
+ * \param[out] none
+ * \return UShellVt100Err_e
+*/
+UShellVt100Err_e UShellVt100CursorColumnPrevious(UShellVt100_s* const uShellVt100)
+{
+    /* Check input parametr*/
+    if(uShellVt100 == NULL)
+    {
+        return USHELL_VT100_INVALID_ARGS_ERR;
+    }
+
+    /* Check init state */
+    if((uShellVt100->parent == NULL) ||
+        (uShellVt100->printHook == NULL))
+    {
+        return USHELL_VT100_NOT_INIT_ERR;
+    }
+
+    /* Check current state */
+    if(uShellVt100->cursor.columnPos == 0)
+    {
+        return USHELL_VT100_NO_ERR;         ///< Exit: no errors
+    }
+
+    /* Print the escape sequence */
+    UShellVt100Err_e status = uShellVt100->printHook(uShellVt100->parent, USHELL_VT100_ESC_SEQ_CURSOR_LEFT, strlen(USHELL_VT100_ESC_SEQ_CURSOR_LEFT));
+    if(status != USHELL_VT100_NO_ERR)
+    {
+        return USHELL_VT100_PORT_ERR;       ///< Exit: error - port error
+    }
+
+    return USHELL_VT100_NO_ERR;             ///< Exit: no errors
+}
+
+/**
+ * \brief Set next row position of cursor in the UShellVt100 object
+ * \param[in] uShellVt100 - pointer to the UShellVt100 object
+ * \param[out] none
+ * \return UShellVt100Err_e
+*/
+UShellVt100Err_e UShellVt100CursorRowNext(UShellVt100_s* const uShellVt100)
+{
+    /* Check input parametr*/
+    if(uShellVt100 == NULL)
+    {
+        return USHELL_VT100_INVALID_ARGS_ERR;
+    }
+
+    /* Check init state */
+    if((uShellVt100->parent == NULL) ||
+        (uShellVt100->printHook == NULL))
+    {
+        return USHELL_VT100_NOT_INIT_ERR;
+    }
+
+    /* Print the escape sequence */
+    UShellVt100Err_e status = uShellVt100->printHook(uShellVt100->parent, USHELL_VT100_ESC_SEQ_CURSOR_DOWN, strlen(USHELL_VT100_ESC_SEQ_CURSOR_DOWN));
+    if(status != USHELL_VT100_NO_ERR)
+    {
+        return USHELL_VT100_PORT_ERR;       ///< Exit: error - port error
+    }
+
+    /* Set the cursor position */
+    uShellVt100->cursor.rowPos++;
+
+    return USHELL_VT100_NO_ERR;             ///< Exit: no errors
+}
+
+/**
+ * \brief Set previous row position of cursor in the UShellVt100 object
+ * \param[in] uShellVt100 - pointer to the UShellVt100 object
+ * \param[out] none
+ * \return UShellVt100Err_e
+*/
+UShellVt100Err_e UShellVt100CursorRowPrevious(UShellVt100_s* const uShellVt100)
+{
+    /* Check input parametr*/
+    if(uShellVt100 == NULL)
+    {
+        return USHELL_VT100_INVALID_ARGS_ERR;
+    }
+
+    /* Check init state */
+    if((uShellVt100->parent == NULL) ||
+        (uShellVt100->printHook == NULL))
+    {
+        return USHELL_VT100_NOT_INIT_ERR;
+    }
+
+    /* Check current state */
+    if(uShellVt100->cursor.rowPos == 0)
+    {
+        return USHELL_VT100_NO_ERR;         ///< Exit: no errors
+    }
+
+    /* Print the escape sequence */
+    UShellVt100Err_e status = uShellVt100->printHook(uShellVt100->parent, USHELL_VT100_ESC_SEQ_CURSOR_UP, strlen(USHELL_VT100_ESC_SEQ_CURSOR_UP));
+    if(status != USHELL_VT100_NO_ERR)
+    {
+        return USHELL_VT100_PORT_ERR;       ///< Exit: error - port error
+    }
+
+    return USHELL_VT100_NO_ERR;             ///< Exit: no errors
+}
+
+/**
+ * \brief Set cursor show/hide state in the UShellVt100 object
+ * \param[in] uShellVt100 - pointer to the UShellVt100 object
+ * \param[in] show - cursor show/hide state
+ * \param[out] none
+ * \return UShellVt100Err_e
+*/
+UShellVt100Err_e UShellVt100CursorShowStateSet(UShellVt100_s* const uShellVt100, const UShellVt100CursorShow_t show)
+{
+    /* Check input parametr*/
+    if(uShellVt100 == NULL)
+    {
+        return USHELL_VT100_INVALID_ARGS_ERR;
+    }
+
+    /* Check init state */
+    if((uShellVt100->parent == NULL) ||
+        (uShellVt100->printHook == NULL))
+    {
+        return USHELL_VT100_NOT_INIT_ERR;
+    }
+
+    /* Find the escape sequence for the cursor show/hide state */
     const char* escSeq = NULL;
     size_t escSeqSize = 0;
-    switch(action)
+    switch(show)
     {
-        case USHELL_VT100_ACTION_TERMINAL_CURSOR_UP:
-            escSeq = USHELL_VT100_ESC_SEQ_CURSOR_UP;
-            escSeqSize = strlen(USHELL_VT100_ESC_SEQ_CURSOR_UP);
-            break;
-
-        case USHELL_VT100_ACTION_TERMINAL_CLEAR_SCREEN:
-            escSeq = USHELL_VT100_ESC_SEQ_SCREEN_CLEAR;
-            escSeqSize = strlen(USHELL_VT100_ESC_SEQ_SCREEN_CLEAR);
-            break;
-
-        case USHELL_VT100_ACTION_TERMINAL_CLEAR_LINE:
-            escSeq = USHELL_VT100_ESC_SEQ_LINE_CLEAR;
-            escSeqSize = strlen(USHELL_VT100_ESC_SEQ_LINE_CLEAR);
-            break;
-
-        case USHELL_VT100_ACTION_TERMINAL_CURSOR_DOWN:
-            escSeq = USHELL_VT100_ESC_SEQ_CURSOR_DOWN;
-            escSeqSize = strlen(USHELL_VT100_ESC_SEQ_CURSOR_DOWN);
-            break;
-
-        case USHELL_VT100_ACTION_TERMINAL_CURSOR_RIGHT:
-            escSeq = USHELL_VT100_ESC_SEQ_CURSOR_RIGHT;
-            escSeqSize = strlen(USHELL_VT100_ESC_SEQ_CURSOR_RIGHT);
-            break;
-
-        case USHELL_VT100_ACTION_TERMINAL_CURSOR_LEFT:
-            escSeq = USHELL_VT100_ESC_SEQ_CURSOR_LEFT;
-            escSeqSize = strlen(USHELL_VT100_ESC_SEQ_CURSOR_LEFT);
-            break;
-
-        case USHELL_VT100_ACTION_TERMINAL_CURSOR_HIDE:
-            escSeq = USHELL_VT100_ESC_SEQ_CURSOR_HIDE;
-            escSeqSize = strlen(USHELL_VT100_ESC_SEQ_CURSOR_HIDE);
-            break;
-
-        case USHELL_VT100_ACTION_TERMINAL_CURSOR_SHOW:
+        case true:
             escSeq = USHELL_VT100_ESC_SEQ_CURSOR_SHOW;
             escSeqSize = strlen(USHELL_VT100_ESC_SEQ_CURSOR_SHOW);
+            break;
+
+        case false:
+            escSeq = USHELL_VT100_ESC_SEQ_CURSOR_HIDE;
+            escSeqSize = strlen(USHELL_VT100_ESC_SEQ_CURSOR_HIDE);
             break;
 
         default:
@@ -604,7 +712,28 @@ UShellVt100Err_e UShellVt100ActionExectute(UShellVt100_s* const uShellVt100, con
         return USHELL_VT100_PORT_ERR;       ///< Exit: error - port error
     }
 
-    return USHELL_VT100_NO_ERR;            ///< Exit: no errors
+    return USHELL_VT100_NO_ERR;             ///< Exit: no errors
+}
+
+/**
+ * \brief Get cursor show/hide state in the UShellVt100 object
+ * \param[in] uShellVt100 - pointer to the UShellVt100 object
+ * \param[out] show - pointer to store the cursor show/hide state
+ * \return UShellVt100Err_e
+*/
+UShellVt100Err_e UShellVt100CursorShowStateGet(UShellVt100_s* const uShellVt100, UShellVt100CursorShow_t* const show)
+{
+    /* Check input parametr*/
+    if((uShellVt100 == NULL) ||
+        (show == NULL))
+    {
+        return USHELL_VT100_INVALID_ARGS_ERR;
+    }
+
+    /* Get the cursor show/hide state */
+    *show = uShellVt100->cursor.show;
+
+    return USHELL_VT100_NO_ERR;
 }
 
 
