@@ -34,7 +34,6 @@
  * \brief Initialize the UShell cmd  module.
  * \param [in] cmd - UShellCmd obj to be initialized
  * \param [in] argMax - maximum number of arguments of the cmd
- * \param [in] print - pointer to the function to print a string
  * \param [in] portable - portable structure for the command
  * \param [in] portTable - port table to be used
  * \param [in] name - name of the object
@@ -43,7 +42,6 @@
  * \return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd, size_t argMax,
-                                                     const UShellCmdPrintCb_t print,
                                                      const UShellCmdPortable_s* const  portable,
                                                      const char* const name,
                                                      const void* const parent)
@@ -51,7 +49,8 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd, size_t argMax,
     /* Check input parametr */
     if((NULL == cmd) ||
        (NULL == name) ||
-       (NULL == parent))
+       (NULL == parent) ||
+       (NULL == portable))
     {
         return USHELL_CMD_INVALID_ARGS_ERR;
     }
@@ -67,9 +66,6 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd, size_t argMax,
 
     /* Set the maximum number of arguments */
     cmd->argMax = argMax;
-
-    /* Set the print function */
-    cmd->print = print;
 
     /* Set the portable structure */
     cmd->portable = portable;
@@ -95,6 +91,50 @@ UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd)
     memset((void*)cmd, 0, sizeof(UShellCmd_s));
 
     return USHELL_CMD_NO_ERR;
+}
+
+/**
+ * \brief Attach the print function to the UShellCmd
+ * \param [in] cmd - UShellCmd obj
+ * \param [in] print - pointer to the function to print a string
+ * \param [out] none
+ * \return UShellCmdErr_e - error code
+*/
+UShellCmdErr_e UShellCmdPrintCbAttach(UShellCmd_s* const cmd, const UShellCmdPrintCb_t print)
+{
+    /* Check input parametr */
+    if((NULL == cmd) ||
+       (NULL == print))
+    {
+        return USHELL_CMD_INVALID_ARGS_ERR;
+    }
+
+    /* Attach the print function */
+    cmd->print = print;
+
+    return USHELL_CMD_NO_ERR;
+
+}
+
+/**
+ * \brief Detach the print function from the UShellCmd
+ * \param [in] cmd - UShellCmd obj
+ * \param [out] none
+ * \return UShellCmdErr_e - error code
+*/
+UShellCmdErr_e UShellCmdPrintCbDetach(UShellCmd_s* const cmd)
+{
+    /* Check input parametr */
+    if(NULL == cmd)
+    {
+        return USHELL_CMD_INVALID_ARGS_ERR;
+    }
+
+    /* Detach the print function */
+    cmd->print = NULL;
+
+    return USHELL_CMD_NO_ERR;
+
 }
 
 /**

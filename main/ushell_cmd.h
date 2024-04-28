@@ -35,17 +35,6 @@ typedef enum
     USHELL_CMD_EXECUTE_NUMB_ARGS_ERR, ///< Exit: error - number of arguments error
 } UShellCmdErr_e;
 
-
-/**
- * \brief Descriibe size of one item in the UShellCmd
-*/
-typedef char UShellCmdItem_c;
-
-/**
- * \brief Descriibe size of one item in the UShellCmd
-*/
-typedef size_t UShellCmdSize_t;
-
 /**
  * \brief Prototype of the function to execute a command.
 */
@@ -60,22 +49,26 @@ typedef struct
     char* help;                                                                                     ///< Pointer to the help string
 }UShellCmdPortable_s;
 
+typedef enum
+{
+    USHELL_CMD_TEXT_COLOR_BLACK = 0,    ///< Black color
+    USHELL_CMD_TEXT_COLOR_RED,          ///< Red color
+    USHELL_CMD_TEXT_COLOR_GREEN,        ///< Green color
+    USHELL_CMD_TEXT_COLOR_YELLOW,       ///< Yellow color
+    USHELL_CMD_TEXT_COLOR_BLUE,         ///< Blue color
+    USHELL_CMD_TEXT_COLOR_WHITE,        ///< White color
+
+}UShellCmdTextColor_e;
+
 /**
  * \brief Prototype of the function to print a string.
 */
-typedef UShellCmdErr_e (*UShellCmdPrintCb_t)(const void* const cmd, const char* const str);
+typedef UShellCmdErr_e (*UShellCmdPrintCb_t)(const void* const cmd, const char* const str, const UShellCmdTextColor_e color);
 
 /**
  * \brief Describe a cmd help string
 */
 typedef char* UShellCmdHelp_t;
-
-typedef struct
-{
-    UShellCmdItem_c buff[USHELL_CMD_BUFFER_SIZE];   ///< Pointer to the buffer
-    UShellCmdSize_t size;                           ///< Size of the buffer
-}UShellCmdIo_s;
-
 
 /**
  * \brief Descriibe UShellCmd
@@ -86,10 +79,9 @@ typedef struct
     const char* name;               ///< Pointer to the name of the object
 
     size_t argMax;                  ///< Maximum number of arguments
-    UShellCmdPrintCb_t print;       ///< Pointer to the function to print a string
     const UShellCmdPortable_s* portable;   ///< Portable structure for the command
 
-    UShellCmdIo_s io;               ///< UShellCmd IO structure
+    UShellCmdPrintCb_t print;       ///< Pointer to the function to print a string
 
 }UShellCmd_s;
 
@@ -100,7 +92,6 @@ typedef struct
  * \brief Initialize the UShell cmd  module.
  * \param [in] cmd - UShellCmd obj to be initialized
  * \param [in] argMax - maximum number of arguments of the cmd
- * \param [in] print - pointer to the function to print a string
  * \param [in] portable - portable structure for the command
  * \param [in] portTable - port table to be used
  * \param [in] name - name of the object
@@ -109,7 +100,6 @@ typedef struct
  * \return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd, size_t argMax,
-                                                     const UShellCmdPrintCb_t print,
                                                      const UShellCmdPortable_s* const portable,
                                                      const char* const name,
                                                      const void* const parent);
@@ -121,6 +111,23 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd, size_t argMax,
  * \return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd);
+
+/**
+ * \brief Attach the print function to the UShellCmd
+ * \param [in] cmd - UShellCmd obj
+ * \param [in] print - pointer to the function to print a string
+ * \param [out] none
+ * \return UShellCmdErr_e - error code
+*/
+UShellCmdErr_e UShellCmdPrintCbAttach(UShellCmd_s* const cmd, const UShellCmdPrintCb_t print);
+
+/**
+ * \brief Detach the print function from the UShellCmd
+ * \param [in] cmd - UShellCmd obj
+ * \param [out] none
+ * \return UShellCmdErr_e - error code
+*/
+UShellCmdErr_e UShellCmdPrintCbDetach(UShellCmd_s* const cmd);
 
 /**
  * \brief Get the name of the UShell  module.
@@ -155,16 +162,6 @@ UShellCmdErr_e UShellCmdExecute(UShellCmd_s* const cmd, const int argc, const ch
  * \return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const help);
-
-/**
- * \brief Get the IO of the cmd.
- * \note This function called after the UShellCmdExecute
- * \param [in] cmd - UShellOsal obj
- * \param [out] buff - pointer to the buffer
- * \param [out] size - size of the buffer
- * \return UShellOsalErr_e - error code
-*/
-UShellCmdErr_e UShellIoGet(UShellCmd_s* const cmd, UShellCmdItem_c* const buff, UShellCmdSize_t* const size);
 
 #ifdef __cplusplus
 }
