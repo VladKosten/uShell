@@ -51,7 +51,7 @@ typedef enum
     USHELL_INVALID_ARGS_ERR,      ///< Exit: error - invalid pointers (e.g. null pointers)
     USHELL_NOT_INIT_ERR,          ///< Exit: error - not initialized
     USHELL_PORT_ERR,              ///< Exit: error - port error (e.g. port layer error)
-    USHELL_CMD_SPACE_ERR,         ///< Exit: error - no space for command
+    USHELL_CMD_ERR,               ///< Exit: error - no space for command
     USHELL_XFER_ERR,              ///< Exit: error - transfer error
 
 }UShellErr_e;
@@ -89,7 +89,7 @@ typedef struct
     const UShellOsal_s* osal;                                   ///< OSAL object
     const UShellHal_s* hal;                                     ///< HAL object
 
-    const UShellCmd_s* cmd[USHELL_MAX_CMD + 1];                 ///< Commands array
+    const UShellCmd_s* cmd[USHELL_MAX_CMD];                     ///< Commands array
     size_t cmdCount;                                            ///< Number of commands actually in the buffer
 
     UShellAuthentification_s auth;                              ///< Authentification object

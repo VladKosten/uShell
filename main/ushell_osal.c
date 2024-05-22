@@ -1,391 +1,871 @@
 /**
-* \file         uShell_osal.c
-* \brief        The file contains the implementation of the uShell OS abstraction layer.
-*               The OSAL is used to provide the OS specific functionality to the uShell module.
-* \authors      Vladislav Kosten (vladkosten@gmail.com)
-* \copyright
-* \warning      A warning may be placed here...
-* \bug          Bug report may be placed here...
-*/
-//===============================================================================[ INCLUDE ]========================================================================================
+ * \file    ushell_osal.c
+ * \brief   UShell OSAL layer interface implementation.
+ * \author     Vladislav Kosten (vladkosten@gmail.com)
+ * \copyright  Copyright (c) 2024 Vlad Kosten. All rights reserved.
+ * \warning   A warning may be placed here...
+ * \bug       Bug report may be placed here...
+ */
 
-#include "uShell_osal.h"
 
-//=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
+//===============================================================================[ INCLUDE ]=======================================================================================
+
+#include "ushell_osal.h"
+
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+
+//=====================================================================[ INTERNAL MACRO DEFENITIONS ]==============================================================================
 
 /**
-* \brief Assert macro for the UShell module.
+* \brief UShell OSAL ASSERT macro definition
 */
 #ifndef USHELL_OSAL_ASSERT
     #ifdef USHELL_ASSERT
-        #define USHELL_OSAL_ASSERT(cond) USHELL_ASSERT(cond)
-    #else
+        #define USHELL_OSAL_ASSERT(cond)  USHELL_ASSERT(cond)
+     #else
         #define USHELL_OSAL_ASSERT(cond)
-    #endif
-#endif
+     #endif
+ #endif
 
-//====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
 
-//===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]=====================================================================
+//====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]==========================================================================
 
-//=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
+//===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]====================================================================
 
-/**
- * \brief Initialize the UShell Hal module.
- * \param [in] osal - UShellOsal obj to be initialized
- * \param [in] portTable - port table to be used
- * \param [in] name - name of the object
- * \param [in] parent - pointer to the parent object
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalInit(UShellOsal_s* const osal, const UShellOsalPortableTable_s* const portTable, const char* const name, const void* const parent)
-{
-    /* Check input parametrs */
-    if((osal == NULL) || (portTable == NULL) || (parent == NULL))
-    {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
-    }
-
-    /* Check if the port table is valid */
-    if((portTable->lock == NULL) || (portTable->unlock == NULL) ||
-       (portTable->msgGet == NULL) || (portTable->threadStart == NULL) ||
-       (portTable->threadStop == NULL) || (portTable->msgSend == NULL))
-    {
-        return USHELL_OSAL_INVALID_ARGS_ERR;
-    }
-
-    /* Initialize the object */
-    osal->portTable = portTable;
-    osal->parent = parent;
-    osal->name = name;
-    osal->worker = NULL;
-    osal->msgHandle = NULL;
-    osal->mutexHandle = NULL;
-    osal->threadHandle = NULL;
-
-    return USHELL_OSAL_NO_ERR;      // Exit: Success
-}
+//=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
 
 /**
- * \brief Deinitialize the UShell Hal module.
- * \param [in] osal - UShellOsal obj to be deinitialized
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* const osal)
+ * \brief Initialize UShell OSAL instance
+ *        Sets name, parent, clears all internal objects etc.
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] name - pointer to the name of the OSAL instance
+ * \param[in] parent - pointer to a parent object
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalInit(UShellOsal_s *osal, const char *name, void *const parent)
 {
-    /* Check input parametrs */
-    if(osal == NULL)
+    if (NULL == osal)
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Deinitialize the object */
-    osal->portTable = NULL;
-    osal->parent = NULL;
-    osal->name = NULL;
-    osal->worker = NULL;
-    osal->msgHandle = NULL;
-    osal->mutexHandle = NULL;
-    osal->threadHandle = NULL;
+    /* Clear the OSAL object */
+    memset(osal, 0, sizeof(UShellOsal_s));
 
-    return USHELL_OSAL_NO_ERR;      // Exit: Success
-
-}
-
-/**
- * \brief Set the parent object of the UShellOsal module.
- * \param [in] osal - UShellOsal obj to set parent
- * \param [in] parent - pointer to the parent object
- * \param [out] none
-*/
-UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, const void* const parent)
-{
-    /* Check input parametrs */
-    if((osal == NULL) || (parent == NULL))
-    {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
-    }
-
-    /* Set the parent object */
+    /* Init obj */
+    osal->name   = name;
     osal->parent = parent;
 
-    return USHELL_OSAL_NO_ERR;      // Exit: Success
+    return USHELL_OSAL_NO_ERR;
 }
 
+
 /**
- * \brief Get the parent object of the UShellOsal module.
- * \param [in] osal - UShellOsal obj to get parent
- * \param [out] parent - pointer to the parent object
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalParentGet(const UShellOsal_s* const osal, void** const parent)
+ * \brief Deinitialize UShell OSAL instance
+ * \note  Call this function when all functionality has been stopped
+ * \param[in] osal - pointer to OSAL instance
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalDeinit(UShellOsal_s *osal)
 {
-    /* Check input parametrs */
-    if((osal == NULL) || (parent == NULL))
+    if ((NULL == osal))
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Get the parent object */
+    /* Clear the OSAL object */
+    memset(osal, 0, sizeof(UShellOsal_s));
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+
+/**
+ * \brief Get pointer to a parent of the given OSAL object
+ * \param[in]  osal      - pointer to osal instance which parent object will be returned
+ * \param[out] parent    - pointer to an object into which the current osal parent pointer will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalParentGet(UShellOsal_s *const osal, void **const parent)
+{
+    if (NULL == osal)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
     *parent = osal->parent;
 
-    return USHELL_OSAL_NO_ERR;      // Exit: Success
-
-}
-/**
- * \brief Set the name of the UShellOsal module.
- * \param [in] osal - UShellOsal obj to set name
- * \param [in] name - name of the object
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, const char* const name)
-{
-    /* Check input parametrs */
-    if((osal == NULL) || (name == NULL))
-    {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
-    }
-
-    /* Set the name of the object */
-    osal->name = name;
-
-    return USHELL_OSAL_NO_ERR;      // Exit: Success
+    return USHELL_OSAL_NO_ERR;
 }
 
+
 /**
- * \brief Get the name of the UShellOsal module.
- * \param [in] osal - UShellOsal obj to get name
- * \param [out] name - name of the object
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalNameGet(const UShellOsal_s* const osal, const char** const name)
+ * \brief Set the parent object for the given OSAL instance
+ * \param[in] osal      - pointer to osal instance being modified
+ * \param[in] parent    - pointer to parent object being set
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalParentSet(UShellOsal_s *const osal, void *const parent)
 {
-    /* Check input parametrs */
-    if((osal == NULL) || (name == NULL))
+    if ((NULL == osal) ||
+        (NULL == parent))
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Get the name of the object */
+    osal->parent = parent;
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+
+/**
+ * \brief Get pointer to the name field of the given OSAL instance
+ * \param[in] osal  - pointer to osal instance
+ * \param[out] name  - pointer to an object into which the current osal name will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalNameGet(UShellOsal_s *const osal, const char **const name)
+{
+    if (NULL == osal)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
     *name = osal->name;
 
-    return USHELL_OSAL_NO_ERR;      // Exit: Success
-
+    return USHELL_OSAL_NO_ERR;
 }
 
 /**
- * \brief Attach a worker function to the UShellOsal module.
- * \param [in] osal - UShellOsal obj to attach worker
- * \param [in] worker - worker function
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalWorkerAttach(UShellOsal_s* const osal, UShellOsalWorker_t worker)
+ * \brief Set name for the given OSAL instance
+ * \param[in] osal  - pointer to osal instance being modified
+ * \param[in] name  - pointer to name string being set
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalNameSet(UShellOsal_s *const osal, char *const name)
 {
-    /* Check input parametrs */
-    if((osal == NULL) || (worker == NULL))
+    /* Checking of params */
+    if((NULL == osal) ||
+       (NULL == name))
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Attach the worker function */
-    osal->worker = worker;
+    /* Set name */
+    osal->name = name;
 
-    return USHELL_OSAL_NO_ERR;      // Exit: Success
+    return USHELL_OSAL_NO_ERR;
+}
 
+
+/**
+ * \brief Create the queue
+ * \param[in]   osal          - OSAL descriptor;
+ * \param[in]   queueItemSize - the size of the queue item
+ * \param[in]   queueDepth    - the queue depth
+ * \param[out]  queueHandle   - the queue handle was created
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s *const osal, const size_t queueItemSize,
+                                                                const size_t queueDepth,
+                                                                UShellOsalQueueHandle_t * const queueHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == queueHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->queueCreate))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->queueCreate(osal, queueItemSize, queueDepth, queueHandle);
+
+    return retStatus;
+}
+
+
+/**
+ * \brief Delete the queue
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   queueHandle   - the queue handle to delete
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == queueHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->queueDelete))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->queueDelete(osal, queueHandle);
+
+    return retStatus;
+}
+
+
+/**
+ * \brief Put item to the queue
+ * \param[in] osal - OSAL descriptor;
+ * \param[in] queueHandle   - the queue handle in which to put the item
+ * \param[in] queueItemPtr  - pointer to the item source buffer
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
+                                                                 const void *const queueItemPtr)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == queueHandle) ||
+        (NULL == queueItemPtr))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->queueItemPut))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->queueItemPut(osal, queueHandle, queueItemPtr);
+
+    return retStatus;
+}
+
+
+/**
+ * \brief Put item to the queue
+ * \note  (BLOCKING CALL WITH SPECIFIED WAIT)
+ * \param[in] osal - OSAL descriptor;
+ * \param[in] queueHandle   - the queue handle in which to put the item
+ * \param[in] queueItemPtr  - pointer to the item source buffer
+ * \param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
+                                                                  void *const queueItemPtr,
+                                                                  const uint32_t timeoutMs)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == queueHandle) ||
+        (NULL == queueItemPtr))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->queueItemPost))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->queueItemPost(osal, queueHandle, queueItemPtr, timeoutMs);
+
+    return retStatus;
+}
+
+
+/**
+ * \brief Get item from the queue
+ * \note  (NON-BLOCKING CALL)
+ * \param[in]   osal - OSAL descriptor;
+ * \param[in]   queueHandle   - the queue handle in which to put the item
+ * \param[out]  queueItemPtr  - pointer to the destination buffer in which the item should be places
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
+                                                                 void *const queueItemPtr)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == queueHandle) ||
+        (NULL == queueItemPtr))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->queueItemGet))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Get item from the queue */
+    UShellOsalErr_e retStatus = osal->portable->queueItemGet(osal, queueHandle, queueItemPtr);
+
+    return retStatus;
+}
+
+
+/**
+ * \brief Get item from the queue
+ * \note  (BLOCKING CALL WITH INFINITE WAIT)
+ * \param[in]  osal - OSAL descriptor;
+ * \param[in]  queueHandle   - the queue handle in which to put the item
+ * \param[out] queueItemPtr  - pointer to the destination buffer in which the item should be places
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
+                                                                  void *const queueItemPtr)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == queueHandle) ||
+        (NULL == queueItemPtr))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->queueItemWait))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Get item from the queue */
+    UShellOsalErr_e retStatus = osal->portable->queueItemWait(osal, queueHandle, queueItemPtr);
+
+    return retStatus;
+}
+
+
+/**
+ * \brief Get item from the queue
+ * \note  (BLOCKING CALL WITH SPECIFIED WAIT)
+ * \param[in]  UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]  queueHandle   - the queue handle from which to get the item
+ * \param[in]  queueItemPtr  - pointer to the destination buffer in which the item should be placed
+ * \param[out] timeoutMs     - timeout in milliseconds to wait for the item
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e  ushellOsalQueueItemPend(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
+                                                                   void *const queueItemPtr,
+                                                                   const uint32_t timeoutMs)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == queueHandle) ||
+        (NULL == queueItemPtr))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->queueItemPend))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Get item from the queue */
+    UShellOsalErr_e retStatus = osal->portable->queueItemPend(osal, queueHandle, queueItemPtr, timeoutMs);
+
+    return retStatus;
+}
+
+
+/**
+ * @brief Reset queue
+ * @param[in] osal          - pointer to OSAL instance
+ * @param[in] queueHandle   - the queue handle to reset
+ * @return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == queueHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->queueReset))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Reset queue */
+    UShellOsalErr_e retStatus = osal->portable->queueReset(osal, queueHandle);
+
+    return retStatus;
 }
 
 /**
- * \brief Detach a worker function from the UShellOsal module.
- * \param [in] osal - UShellOsal obj to detach worker
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalWorkerDetach(UShellOsal_s* const osal)
+* \brief Enter critical section
+* \param osal - pointer to osal instance being modified
+* \return UShellOsalErr_e  - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalCriticalSectionEnter(UShellOsal_s *const osal)
 {
-    /* Check input parametrs */
-    if(osal == NULL)
+    /* Checking of params */
+    if (NULL == osal)
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Detach the worker function */
-    osal->worker = NULL;
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->criticalSectionEnter))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
 
-    return USHELL_OSAL_NO_ERR;      // Exit: Success
+    /* Enter critical section */
+    UShellOsalErr_e retStatus = osal->portable->criticalSectionEnter(osal);
 
+    return retStatus;
 }
 
 /**
- * \brief Lock object
- * \param [in] osal - UShellOsal obj to lock
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal)
+* \brief Exit critical section
+* \param osal - pointer to osal instance being modified
+* \return UShellOsalErr_e  - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalCriticalSectionExit(UShellOsal_s *const osal)
 {
-    /* Check input parametrs */
-    if(osal == NULL)
+    /* Checking of params */
+    if (NULL == osal)
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->lock == NULL))
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->criticalSectionExit))
     {
-        return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
     }
 
-    /* Lock the object */
-    UShellOsalErr_e status = osal->portTable->lock(osal);
+    /* Exit critical section */
+    UShellOsalErr_e retStatus = osal->portable->criticalSectionExit(osal);
 
-    return status;      // Exit: Success
+    return retStatus;
 }
 
 /**
- * \brief Unlock object
- * \param [in] osal - UShellOsal obj to unlock
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal)
+ * \brief Create the lock object
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[out]  lockObjHandle - lock object handle that was created
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s *const osal, UShellOsalLockObjHandle_t * const lockObjHandle)
 {
-    /* Check input parametrs */
-    if(osal == NULL)
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == lockObjHandle))
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->unlock == NULL))
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->lockObjCreate))
     {
-        return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
     }
 
-    /* Unlock the object */
-    UShellOsalErr_e status = osal->portTable->unlock(osal);
+    /* Create the lock object */
+    UShellOsalErr_e retStatus = osal->portable->lockObjCreate(osal, lockObjHandle);
 
-    return status;      // Exit: Success
-
+    return retStatus;
 }
 
 /**
- * \brief Send message
- * \param [in] osal - UShellOsal obj to send message
- * \param [in] msg - message to send
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalMsgSend(UShellOsal_s* const osal, const UShellOsalMsg_e msg)
+ * \brief Delete the lock object
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   lockObjHandle - lock object handle to delete
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s *const osal, const UShellOsalLockObjHandle_t lockObjHandle)
 {
-    /* Check input parametrs */
-    if(osal == NULL)
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == lockObjHandle))
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    switch(msg)
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->lockObjDelete))
     {
-        case USHELL_OSAL_MSG_RX_COMPLETED:
-        case USHELL_OSAL_MSG_TX_COMPLETE:
-        case USHELL_OSAL_MSG_RX_TX_ERROR:
-            break;
-        default:
-            return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
     }
 
-    /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->msgSend == NULL))
+    /* Delete the lock object */
+    UShellOsalErr_e retStatus = osal->portable->lockObjDelete(osal, lockObjHandle);
+
+    return retStatus;
+}
+
+
+/**
+ * \brief Lock access to the resource for third-party collaborators
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   lockObjHandle - lock object handle
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalLock(UShellOsal_s *const osal, const UShellOsalLockObjHandle_t lockObjHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == lockObjHandle))
     {
-        return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Send the message */
-    UShellOsalErr_e status = osal->portTable->msgSend(osal, msg);
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->lock))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
 
-    return status;      // Exit: Success
+    /* Lock access to the resource */
+    UShellOsalErr_e retStatus = osal->portable->lock(osal, lockObjHandle);
+
+    return retStatus;
+}
+
+
+
+/**
+ * \brief Unlock access to the resource for third-party collaborators
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   lockObjHandle - lock object handle
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalUnlock(UShellOsal_s *const osal, const UShellOsalLockObjHandle_t lockObjHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == lockObjHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->unlock))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Unlock access to the resource */
+    UShellOsalErr_e retStatus = osal->portable->unlock(osal, lockObjHandle);
+
+    return retStatus;
+}
+
+
+/**
+ * \brief Create the semaphore object
+ * \param[in] osal               - pointer to OSAL instance
+ * \param[in] semaphoreCountMax  - the maximum count of the semaphore
+ * \param[in] semaphoreInitValue - the initial value of the semaphore
+ * \param[in] semaphoreHandle    - semaphore object handle that was created
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreCreate(UShellOsal_s *const osal, const UShellOsalSemaphoreCount_t semaphoreCountMax,
+                                                                    const UShellOsalSemaphoreCount_t semaphoreInitValue,
+                                                                    UShellOsalSemaphoreHandle_t *const semaphoreHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->semaphoreCreate))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Create the semaphore object */
+    UShellOsalErr_e retStatus = osal->portable->semaphoreCreate(osal, semaphoreCountMax, semaphoreInitValue, semaphoreHandle);
+
+    return retStatus;
 }
 
 /**
- * \brief Get message
- * \param [in] osal - UShellOsal obj to get message
- * \param [out] msg - pointer to store the message
- * \param [in] msWait - timeout in ms to wait for the message
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalMsgGet(UShellOsal_s* const osal, UShellOsalMsg_e* const msg, const UShellOsalTimeOut_t msWait)
+ * \brief Delete the semaphore object
+ * \param[in] osal              - pointer to OSAL instance
+ * \param[in] semaphoreHandle   - semaphore object handle to delete
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreDelete(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle)
 {
-    /* Check input parametrs */
-    if((osal == NULL) || (msg == NULL))
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle))
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->msgGet == NULL))
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->semaphoreDelete))
     {
-        return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
     }
 
-    /* Get the message */
-    UShellOsalErr_e status = osal->portTable->msgGet(osal, msg, msWait);
+    /* Delete the semaphore object */
+    UShellOsalErr_e retStatus = osal->portable->semaphoreDelete(osal, semaphoreHandle);
 
-    return status;      // Exit: Success
+    return retStatus;
 }
 
 /**
- * \brief Start the thread
- * \param [in] osal - UShellOsal obj to start thread
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalThreadStart(UShellOsal_s* const osal)
+ * \brief Acquire the semaphore
+ * \param[in] osal              - pointer to OSAL instance
+ * \param[in] semaphoreHandle   - semaphore object handle to acquire
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreAcquire(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle)
 {
-    /* Check input parametrs */
-    if(osal == NULL)
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle))
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->threadStart == NULL))
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->semaphoreAcquire))
     {
-        return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
     }
 
-    /* Start the thread */
-    UShellOsalErr_e status = osal->portTable->threadStart(osal);
+    /* Acquire the semaphore */
+    UShellOsalErr_e retStatus = osal->portable->semaphoreAcquire(osal, semaphoreHandle);
 
-    return status;      // Exit: Success
+    return retStatus;
 }
 
 /**
- * \brief Stop the thread
- * \param [in] osal - UShellOsal obj to stop thread
- * \param [out] none
- * \return UShellOsalErr_e - error code
-*/
-UShellOsalErr_e UShellOsalThreadStop(UShellOsal_s* const osal)
+ * \brief Release the semaphore
+ * \param[in] osal              - pointer to OSAL instance
+ * \param[in] semaphoreHandle   - semaphore object handle to release
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreRelease(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle)
 {
-    /* Check input parametrs */
-    if(osal == NULL)
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle))
     {
-        return USHELL_OSAL_INVALID_ARGS_ERR;   // Exit: error - invalid arguments
+        return USHELL_OSAL_INVALID_ARGS;
     }
 
-    /* Check init state */
-    if((osal->portTable == NULL) || (osal->portTable->threadStop == NULL))
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->semaphoreRelease))
     {
-        return USHELL_OSAL_NOT_INIT_ERR;   // Exit: error - not initialized
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
     }
 
-    /* Stop the thread */
-    UShellOsalErr_e status = osal->portTable->threadStop(osal);
+    /* Release the semaphore */
+    UShellOsalErr_e retStatus = osal->portable->semaphoreRelease(osal, semaphoreHandle);
 
-    return status;      // Exit: Success
+    return retStatus;
 }
 
-//============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
+/**
+ * \brief Get the current count of the semaphore
+ * \param[in] osal              - pointer to OSAL instance
+ * \param[in] semaphoreHandle   - semaphore object handle
+ * \param[in] semaphoreCount    - the current count of the semaphore
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle, UShellOsalSemaphoreCount_t *const semaphoreCount)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle) ||
+        (NULL == semaphoreCount))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->semaphoreCountGet))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Get the current count of the semaphore */
+    UShellOsalErr_e retStatus = osal->portable->semaphoreCountGet(osal, semaphoreHandle, semaphoreCount);
+
+    return retStatus;
+}
+
+/**
+ * \brief Create the thread
+ * \param[in]   osal - OSAL descriptor;
+ * \param[out]  threadHandle  - thread handle by which created thread can be referenced
+ * \param[in]   threadCfg     - thread configuration
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s *const osal, UShellOsalThreadHandle_t * const threadHandle, UShellOsalThreadCfg_s threadCfg)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == threadHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->threadCreate))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Create the thread */
+    UShellOsalErr_e retStatus = osal->portable->threadCreate(osal, threadHandle, threadCfg);
+
+    return retStatus;
+}
+
+/**
+ * \brief Delete the thread
+ * \note The operation must be stopped before deleting the thread
+ *        to not to damage the system.
+ * \param[in]   osal - OSAL descriptor;
+ * \param[in]   threadHandle  - the handle of the thread being deleted
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s *const osal, const UShellOsalThreadHandle_t threadHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == threadHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->threadDelete))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Delete the thread */
+    UShellOsalErr_e retStatus = osal->portable->threadDelete(osal, threadHandle);
+
+    return retStatus;
+}
+
+/**
+ * \brief Suspend the thread
+ * \param[in] osal - OSAL descriptor;
+ * \param[in] threadHandle  - the handle of the thread being suspend
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s *const osal, const UShellOsalThreadHandle_t threadHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == threadHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->threadSuspend))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Suspend the thread */
+    UShellOsalErr_e retStatus = osal->portable->threadSuspend(osal, threadHandle);
+
+    return retStatus;
+}
+
+/**
+ * \brief       Perform some delay
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   const uint32_t msDelay - the delay timeout value expressed in ms;
+ * \param[out]  no;
+ * \return      MatrixKbdOsalErr_e  - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal, const uint32_t msDelay)
+{
+    /* Checking of params */
+    if (NULL == osal)
+    {
+        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
+    }
+
+    /* Checking is init obj */
+    if((NULL == osal->portable) ||
+       (NULL == osal->portable->threadDelay))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;        // Exit: Error: init obj
+    }
+
+    /* Perform delay */
+    UShellOsalErr_e osalStatus = osal->portable->threadDelay(osal,msDelay);
+
+    return osalStatus;                  // Exit: no errors
+}
+
+/**
+ * \brief Resume the thread
+ * \param[in] osal - OSAL descriptor;
+ * \param[in] threadHandle  - the handle of the thread being resumed
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s *const osal, const UShellOsalThreadHandle_t threadHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == threadHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->threadResume))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Resume the thread */
+    UShellOsalErr_e retStatus = osal->portable->threadResume(osal, threadHandle);
+
+    return retStatus;
+}
+//============================================================================[PRIVATE FUNCTIONS]==================================================================================

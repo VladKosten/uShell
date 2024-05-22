@@ -93,6 +93,15 @@ static void uShellXferErrorCb(const void* const hal);
 */
 static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const str);
 
+/**
+ * \brief Find command
+ * \param[in] uShell - uShell object
+ * \param[in] str - string to be found
+ * \param[out] ind - index of the command
+ * \return USHELL_NO_ERR if success, otherwise error code
+*/
+static UShellErr_e uShellFindCommand(const UShell_s* const uShell, const char* const str,  uint8_t* const ind);
+
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
@@ -265,16 +274,23 @@ UShellErr_e UShellCmdAttach(UShell_s* const uShell, const UShellCmd_s* const cmd
     }
 
     /* Attach command */
+    uint8_t attachFlag = 0;
     for(uint8_t i = 0; i < USHELL_MAX_CMD; i++)
     {
         if(uShell->cmd[i] == NULL)
         {
             uShell->cmd[i] = cmd;
-            return USHELL_NO_ERR;           ///< Exit: Success
+            attachFlag = 1;
+            break;
         }
     }
 
-    return USHELL_CMD_SPACE_ERR;            ///< Exit: No space for the command
+    if(attachFlag == 0)
+    {
+        return USHELL_CMD_ERR;          ///< Exit: Command not attached
+    }
+
+    return USHELL_NO_ERR;           ///< Exit: Success
 }
 
 /**
@@ -292,13 +308,21 @@ UShellErr_e UShellCmdDetach(UShell_s* const uShell, const UShellCmd_s* const cmd
     }
 
     /* Detach command */
+    uint8_t detachFlag = 0;
     for(uint8_t i = 0; i < USHELL_MAX_CMD; i++)
     {
         if(uShell->cmd[i] == cmd)
         {
+
             uShell->cmd[i] = NULL;
-            return USHELL_NO_ERR;           ///< Exit: Success
+            detachFlag = 1;
+            break;
         }
+    }
+
+    if(detachFlag == 0)
+    {
+        return USHELL_CMD_ERR;          ///< Exit: Command not detached
     }
 
     return USHELL_NO_ERR;       ///< Exit: Command not found
@@ -365,7 +389,24 @@ static void uShellThreadWorker(void* const uShell)
             case USHELL_ASCII_CHAR_CR:
             case USHELL_ASCII_CHAR_LF:
             {
-                /* Process the command */
+                /* Next row */
+                vt100Err = UShellVt100CursorRowNext(&ushell->vt100);
+                if(vt100Err != USHELL_VT100_NO_ERR)
+                {
+                    break;
+                }
+
+                /* Find command */
+                uint8_t ind = 0;
+                UShellErr_e ushellErr = uShellFindCommand(ushell, ushell->io.buffer, &ind);
+                if(ushellErr != USHELL_NO_ERR)
+                {
+                    break;
+                }
+
+                /* Execute command */
+                UShellCmdErr_e cmdErr = UShellCmdExecute(ushell->cmd[ind], 0, NULL);
+
                 break;
             }
 
@@ -403,6 +444,7 @@ static void uShellThreadWorker(void* const uShell)
 
                 break;
             }
+
 
 
         }
@@ -547,4 +589,47 @@ static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const s
 
     } while (symbol != '\0');
 
+}
+
+/**
+ * \brief Find command
+ * \param[in] uShell - uShell object
+ * \param[in] str - string to be found
+ * \param[out] ind - index of the command
+ * \return USHELL_NO_ERR if success, otherwise error code
+*/
+static UShellErr_e uShellFindCommand(const UShell_s* const uShell, const char* const str, uint8_t* const ind)
+{
+    /* Check input parametrs */
+    if((uShell == NULL) ||
+       (str == NULL) ||
+       (ind == NULL))
+    {
+        return USHELL_INVALID_ARGS_ERR;
+    }
+
+    /* Check RTE state */
+    if(uShell->cmdCount != 0)
+    {
+        return USHELL_NOT_INIT_ERR;
+    }
+
+    /* Find command */
+    uint8_t findFlag = 0;
+    for(uint8_t i = 0; i < uShell->cmdCount; i++)
+    {
+        if(strncmp(str, uShell->cmd[i]->name, strlen(uShell->cmd[i]->name)) == 0)
+        {
+            *ind = i;
+            findFlag = 1;
+            break;
+        }
+    }
+
+    if(findFlag == 0)
+    {
+        return USHELL_CMD_ERR;
+    }
+
+    return USHELL_NO_ERR;
 }

@@ -6,6 +6,10 @@
         "ushell_osal_port.h": "c",
         "ushell.h": "c",
         "ushell_vt100.h": "c",
-        "ushell_hal.h": "c"
-    }
+        "ushell_hal.h": "c",
+        "ushell_osal.h": "c",
+        "ushell_osal_freertos.h": "c",
+        "typeinfo": "c"
+    },
+    "terminal.integrated.defaultProfile.linux": "zsh"
 }

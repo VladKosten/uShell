@@ -49,7 +49,7 @@ typedef enum
     USHELL_HAL_CB_NONE = 0x00,          ///< No callback
     USHELL_HAL_CB_RX_TX_ERROR = 0x01,   ///< Callback for error
     USHELL_HAL_CB_TX_COMPLETE = 0x02,   ///< Callback for tx complete
-    USHELL_HAL_CB_RX_RECEIVED = 0x03,  ///< Callback for rx received
+    USHELL_HAL_CB_RX_RECEIVED = 0x03,   ///< Callback for rx received
     USHELL_HAL_CB_ALL = 0xFF            ///< All callbacks
 }UShellHalCallback_e;
 

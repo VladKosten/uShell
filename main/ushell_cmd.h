@@ -12,14 +12,9 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
-/*===========================================================[MACRO DEFINITIONS]============================================*/
+#include "ushell_osal.h"
 
-/**
- * \brief Description of the maximum number of arguments in the UShellCmd
-*/
-#ifndef USHELL_CMD_BUFFER_SIZE
-    #define USHELL_CMD_BUFFER_SIZE 100
-#endif
+/*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
@@ -45,9 +40,20 @@ typedef UShellCmdErr_e (*UShelCmdExecute_t)( const void* const cmd, const int ar
 */
 typedef struct
 {
-    UShellCmdErr_e (*execute)( const void* const cmd, const int argc, const char* const argv[]);    ///< Pointer to the function to execute the command
-    char* help;                                                                                     ///< Pointer to the help string
+    UShellCmdErr_e (*run)(const void* const cmd, const int argc, const char* const argv[]);     ///< Pointer to the function to execute the command
+    UShellCmdErr_e (*stop)(const void* const cmd);                                              ///< Pointer to the function to stop the execution of the command
 }UShellCmdPortable_s;
+
+/**
+ * \brief Callback table
+*/
+typedef struct
+{
+    UShellCmdErr_e (*print)(const void* const cmd, const char* const str, const UShellCmdTextColor_e color);    ///< Pointer to the function to print a string
+    UShellCmdErr_e (*endOfExecution)(const void* const cmd);                                                    ///< Pointer to the function to signal the end of the execution
+
+}UShellCmdCb_s;
+
 
 typedef enum
 {
@@ -61,11 +67,6 @@ typedef enum
 }UShellCmdTextColor_e;
 
 /**
- * \brief Prototype of the function to print a string.
-*/
-typedef UShellCmdErr_e (*UShellCmdPrintCb_t)(const void* const cmd, const char* const str, const UShellCmdTextColor_e color);
-
-/**
  * \brief Describe a cmd help string
 */
 typedef char* UShellCmdHelp_t;
@@ -75,13 +76,14 @@ typedef char* UShellCmdHelp_t;
 */
 typedef struct
 {
-    const void* parent;             ///< Pointer to the parent object
-    const char* name;               ///< Pointer to the name of the object
-
-    size_t argMax;                  ///< Maximum number of arguments
-    const UShellCmdPortable_s* portable;   ///< Portable structure for the command
-
-    UShellCmdPrintCb_t print;       ///< Pointer to the function to print a string
+    /* Mandatory */
+    const void* parent;                     ///< Pointer to the parent object(ushell object)
+    const char* name;                       ///< Pointer to the name of the object(aka command)
+    size_t argMax;                          ///< Maximum number of arguments
+    const UShellOsal_s* osal;               ///< Pointer to the osal object
+    const UShellCmdHelp_t* help;            ///< Pointer to the help string
+    const UShellCmdPortable_s* portTable;   ///< Portable structure for the command
+    UShellCmdCb_s cbTable;                  ///< Pointer to the function to print a string
 
 }UShellCmd_s;
 
@@ -101,8 +103,7 @@ typedef struct
 */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd, size_t argMax,
                                                      const UShellCmdPortable_s* const portable,
-                                                     const char* const name,
-                                                     const void* const parent);
+                                                     const char* const name);
 
 /**
  * \brief Deinitialize the UShell  module.
@@ -119,7 +120,7 @@ UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd);
  * \param [out] none
  * \return UShellCmdErr_e - error code
 */
-UShellCmdErr_e UShellCmdPrintCbAttach(UShellCmd_s* const cmd, const UShellCmdPrintCb_t print);
+UShellCmdErr_e UShellCmdPrintCbAttach(UShellCmd_s* const cmd, const UShellCmdPrintCb_f print);
 
 /**
  * \brief Detach the print function from the UShellCmd
@@ -153,7 +154,15 @@ UShellCmdErr_e UShellCmdArgMaxGet(UShellCmd_s* const cmd, size_t* const argMax);
  * \param [out] none
  * \return UShellOsalErr_e - error code
 */
-UShellCmdErr_e UShellCmdExecute(UShellCmd_s* const cmd, const int argc, const char* const argv[]);
+UShellCmdErr_e UShellCmdRun(UShellCmd_s* const cmd, const int argc, const char* const argv[]);
+
+/**
+ * \brief Stop the execution of the UShell module.
+ * \param [in] cmd - UShellOsal obj
+ * \param [out] none
+ * \return UShellOsalErr_e - error code
+*/
+UShellCmdErr_e UShellCmdStop(UShellCmd_s* const cmd);
 
 /**
  * \brief Get the help string of the cmd.
