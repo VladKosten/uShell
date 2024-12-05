@@ -1,6 +1,6 @@
 /**
 * \file         UShell_cmd.c
-* \brief        The file contains the implementation of the UShell command module.
+* @brief        The file contains the implementation of the UShell command module.
 *               Object UShellCmd is a parent object for the command objects.
 * \authors      Vladislav Kosten (vladkosten@gmail.com)
 * \copyright
@@ -14,7 +14,7 @@
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
 /**
-* \brief Assert macro for the UShellHal module.
+* @brief Assert macro for the UShellHal module.
 */
 #ifndef USHELL_CMD_ASSERT
     #ifdef USHELL_ASSERT
@@ -31,7 +31,7 @@
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
- * \brief Initialize the UShell cmd  module.
+ * @brief Initialize the UShell cmd  module.
  * \param [in] cmd - UShellCmd obj to be initialized
  * \param [in] argMax - maximum number of arguments of the cmd
  * \param [in] portable - portable structure for the command
@@ -39,7 +39,7 @@
  * \param [in] name - name of the object
  * \param [in] parent - pointer to the parent object
  * \param [out] none
- * \return UShellOsalErr_e - error code
+ * @return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd, size_t argMax,
                                                      const UShellCmdPortable_s* const  portable,
@@ -74,10 +74,10 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd, size_t argMax,
 }
 
 /**
- * \brief Deinitialize the UShell  module.
+ * @brief Deinitialize the UShell  module.
  * \param [in] cmd - UShellOsal obj to be deinitialized
  * \param [out] none
- * \return UShellOsalErr_e - error code
+ * @return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd)
 {
@@ -94,11 +94,11 @@ UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd)
 }
 
 /**
- * \brief Attach the print function to the UShellCmd
+ * @brief Attach the print function to the UShellCmd
  * \param [in] cmd - UShellCmd obj
  * \param [in] print - pointer to the function to print a string
  * \param [out] none
- * \return UShellCmdErr_e - error code
+ * @return UShellCmdErr_e - error code
 */
 UShellCmdErr_e UShellCmdPrintCbAttach(UShellCmd_s* const cmd, const UShellCmdPrintCb_t print)
 {
@@ -117,10 +117,10 @@ UShellCmdErr_e UShellCmdPrintCbAttach(UShellCmd_s* const cmd, const UShellCmdPri
 }
 
 /**
- * \brief Detach the print function from the UShellCmd
+ * @brief Detach the print function from the UShellCmd
  * \param [in] cmd - UShellCmd obj
  * \param [out] none
- * \return UShellCmdErr_e - error code
+ * @return UShellCmdErr_e - error code
 */
 UShellCmdErr_e UShellCmdPrintCbDetach(UShellCmd_s* const cmd)
 {
@@ -138,10 +138,10 @@ UShellCmdErr_e UShellCmdPrintCbDetach(UShellCmd_s* const cmd)
 }
 
 /**
- * \brief Get the name of the UShell  module.
+ * @brief Get the name of the UShell  module.
  * \param [in] cmd - UShellOsal obj
  * \param [out] name - name of the object
- * \return UShellOsalErr_e - error code
+ * @return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd, char** const name)
 {
@@ -159,10 +159,10 @@ UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd, char** const name)
 }
 
 /**
- * \brief Get the parent of the UShell  module.
+ * @brief Get the parent of the UShell  module.
  * \param [in] cmd - UShellOsal obj
  * \param [out] parent - pointer to the parent object
- * \return UShellOsalErr_e - error code
+ * @return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdArgMaxGet(UShellCmd_s* const cmd, size_t* const argMax)
 {
@@ -181,12 +181,12 @@ UShellCmdErr_e UShellCmdArgMaxGet(UShellCmd_s* const cmd, size_t* const argMax)
 }
 
 /**
- * \brief Execute the UShell module.
+ * @brief Execute the UShell module.
  * \param [in] cmd - UShellOsal obj
  * \param [in] argc - number of arguments
  * \param [in] argv - arguments
  * \param [out] none
- * \return UShellOsalErr_e - error code
+ * @return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdExecute(UShellCmd_s* const cmd, const int argc, const char* const argv[])
 {
@@ -217,10 +217,10 @@ UShellCmdErr_e UShellCmdExecute(UShellCmd_s* const cmd, const int argc, const ch
 }
 
 /**
- * \brief Get the help string of the cmd.
+ * @brief Get the help string of the cmd.
  * \param [in] cmd - UShellOsal obj
  * \param [out] help - help string
- * \return UShellOsalErr_e - error code
+ * @return UShellOsalErr_e - error code
 */
 UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const help)
 {

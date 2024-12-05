@@ -654,26 +654,6 @@ typedef struct
     UShellOsalErr_e (*threadDelay)(const void* const osal,
                                    const UShellOsalTimeMs_t delay);
 
-    /**
-     * @brief Enter a critical section.
-     *
-     * This function enters a critical section, disabling interrupts.
-     *
-     * @param[in] osal Pointer to the OSAL instance.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*criticalSectionEnter)(void* const osal);
-
-    /**
-     * @brief Exit a critical section.
-     *
-     * This function exits a critical section, enabling interrupts.
-     *
-     * @param[in] osal Pointer to the OSAL instance.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*criticalSectionExit)(void* const osal);
-
 } UShellOsalPortable_s;
 
 
@@ -724,6 +704,13 @@ typedef struct
      * This array contains the thread objects available in the OSAL.
      */
     UShellOsalThread_s threadObj[USHELL_OSAL_THREADS_NUM];
+
+    /**
+     * @brief Semaphore handles table.
+     *
+     * This array contains handles for the semaphores available in the OSAL.
+     */
+    UShellOsalSemaphoreHandle_t semaphoreHandle[USHELL_OSAL_SEMAPHORE_OBJS_NUM];
 
     /**
      * @brief Portable methods table.
@@ -890,22 +877,6 @@ UShellOsalErr_e  ushellOsalQueueItemPend(UShellOsal_s *const osal, const UShellO
  * @return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle);
-
-
-/**
-* @brief Enter critical section
-* @param[in] osal - pointer to osal instance being modified
-* @return UShellOsalErr_e  - error code. non-zero = an error has occurred;
- */
-UShellOsalErr_e UShellOsalCriticalSectionEnter(UShellOsal_s *const osal);
-
-
-/**
-* @brief Exit critical section
-* @param[in] osal - pointer to osal instance being modified
-* @return UShellOsalErr_e  - error code. non-zero = an error has occurred;
- */
-UShellOsalErr_e UShellOsalCriticalSectionExit(UShellOsal_s *const osal);
 
 
 /**
