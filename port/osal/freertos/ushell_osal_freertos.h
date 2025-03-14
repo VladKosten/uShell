@@ -2,7 +2,7 @@
 #define USHELL_OSAL_FREERTOS_H_
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 /*================================================================[INCLUDE]=================================================*/
@@ -16,15 +16,13 @@
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
-
 /**
  * @brief FreeRTOS-specific infinity timeout value.
  *
  * This macro defines the value used to represent an infinite timeout in the
  * UShell Operating System Abstraction Layer (OSAL) when using FreeRTOS.
  */
-#define USHELL_OSAL_FREERTOS_INFINITY_TIMEOUT        UINT32_MAX
-
+#define USHELL_OSAL_FREERTOS_INFINITY_TIMEOUT UINT32_MAX
 
 /**
  * @brief Low priority level for FreeRTOS threads.
@@ -32,9 +30,8 @@
  * This macro defines the low priority level for threads in FreeRTOS.
  */
 #ifndef USHELL_OSAL_FREERTOS_THREAD_PRIO_LOW
-    #define USHELL_OSAL_FREERTOS_THREAD_PRIO_LOW    (tskIDLE_PRIORITY + 1)
+    #define USHELL_OSAL_FREERTOS_THREAD_PRIO_LOW (tskIDLE_PRIORITY + 1)
 #endif
-
 
 /**
  * @brief Middle priority level for FreeRTOS threads.
@@ -42,9 +39,8 @@
  * This macro defines the middle priority level for threads in FreeRTOS.
  */
 #ifndef USHELL_OSAL_FREERTOS_THREAD_PRIO_MIDDLE
-    #define USHELL_OSAL_FREERTOS_THREAD_PRIO_MIDDLE    (tskIDLE_PRIORITY + 2)
+    #define USHELL_OSAL_FREERTOS_THREAD_PRIO_MIDDLE (tskIDLE_PRIORITY + 2)
 #endif
-
 
 /**
  * @brief High priority level for FreeRTOS threads.
@@ -52,9 +48,8 @@
  * This macro defines the high priority level for threads in FreeRTOS.
  */
 #ifndef USHELL_OSAL_FREERTOS_THREAD_PRIO_HIGH
-    #define USHELL_OSAL_FREERTOS_THREAD_PRIO_HIGH    (tskIDLE_PRIORITY + 3)
+    #define USHELL_OSAL_FREERTOS_THREAD_PRIO_HIGH (tskIDLE_PRIORITY + 3)
 #endif
-
 
 /**
  * @brief Ultra priority level for FreeRTOS threads.
@@ -62,7 +57,7 @@
  * This macro defines the ultra priority level for threads in FreeRTOS.
  */
 #ifndef USHELL_OSAL_FREERTOS_THREAD_PRIO_ULTRA
-    #define USHELL_OSAL_FREERTOS_THREAD_PRIO_ULTRA    (tskIDLE_PRIORITY + configMAX_PRIORITIES)
+    #define USHELL_OSAL_FREERTOS_THREAD_PRIO_ULTRA (tskIDLE_PRIORITY + configMAX_PRIORITIES)
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -86,7 +81,6 @@ typedef struct
 
 } UShellOsalFreertos_s;
 
-
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
@@ -96,19 +90,19 @@ typedef struct
  * @param[in] parent       - pointer to a parent object [optional]
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s *const osalFreertos,
-                                       const char *name,
-                                       void *const parent);
+UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s* const osalFreertos,
+                                       const char* name,
+                                       void* const parent);
 
 /**
  * @brief Deinitialize UShell FreeRTOS OSAL instance
  * @param[in] osalFreertos - pointer to osal FreeRTOS instance
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s *const osalFreertos);
+UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreertos);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 
 #endif /* ifndef USHELL_OSAL_FREERTOS_H_ */

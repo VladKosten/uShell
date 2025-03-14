@@ -7,7 +7,6 @@
  * \bug        Bug report may be placed here...
  */
 
-
 //===============================================================================[ INCLUDE ]=======================================================================================
 
 /* Standard includes */
@@ -17,7 +16,6 @@
 
 /* Port includes */
 #include "ushell_osal_freertos.h"
-
 
 //=====================================================================[ INTERNAL MACRO DEFENITIONS ]==============================================================================
 
@@ -32,7 +30,7 @@
  */
 #ifndef USHELL_OSAL_FREERTOS_ASSERT
     #ifdef USHELL_OSAL_ASSERT
-        #define USHELL_OSAL_FREERTOS_ASSERT(cond)  USHELL_OSAL_ASSERT(cond)
+        #define USHELL_OSAL_FREERTOS_ASSERT(cond) USHELL_OSAL_ASSERT(cond)
     #else
         #define USHELL_OSAL_FREERTOS_ASSERT(cond)
     #endif
@@ -42,7 +40,6 @@
 
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]====================================================================
 
-
 /**
  * @brief Create the queue
  * @param[in]   osalFreertos  - pointer to FreeRTOS osal instance
@@ -51,11 +48,10 @@
  * @param[out]  queueHandle   - queue handle that was created
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueCreate(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueCreate(void* const osalFreertos,
                                                      const size_t queueItemSize,
                                                      const size_t queueDepth,
-                                                     UShellOsalQueueHandle_t * const queueHandle);
-
+                                                     UShellOsalQueueHandle_t* const queueHandle);
 
 /**
  * @brief Delete the queue
@@ -63,9 +59,8 @@ static UShellOsalErr_e ushellOsalFreertosQueueCreate(void * const osalFreertos,
  * @param[in] queueHandle   - queue handle to be deleted
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueDelete(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueDelete(void* const osalFreertos,
                                                      const UShellOsalQueueHandle_t queueHandle);
-
 
 /**
  * @brief Put the item to the queue
@@ -74,10 +69,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueDelete(void * const osalFreertos,
  * @param[in] queueItemPtr  - pointer to the item source buff
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void* const osalFreertos,
                                                       const UShellOsalQueueHandle_t queueHandle,
-                                                      const void *const queueItemPtr);
-
+                                                      const void* const queueItemPtr);
 
 /**
  * @brief Put the item to the queue with specified waiting time
@@ -87,11 +81,10 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void * const osalFreertos,
  * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
-                                                       void * const queueItemPtr,
+                                                       void* const queueItemPtr,
                                                        const uint32_t timeoutMs);
-
 
 /**
  * @brief Get the item from the queue [NON-BLOCKING CALL]
@@ -100,10 +93,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void * const osalFreertos
  * @param[out]  queueItemPtr  - tointer to the buffer into which the received item will be copied
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void* const osalFreertos,
                                                       const UShellOsalQueueHandle_t queueHandle,
-                                                      void *const queueItemPtr);
-
+                                                      void* const queueItemPtr);
 
 /**
  * @brief Get the item from the queue [BLOCKING CALL]
@@ -112,10 +104,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void * const osalFreertos,
  * @param[out]  queueItemPtr  - pointer to the buffer into which the received item will be copied
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
-                                                       void *const queueItemPtr);
-
+                                                       void* const queueItemPtr);
 
 /**
  * @brief Get the item from the queue with specified waiting time
@@ -125,11 +116,10 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void * const osalFreertos
  * @param[in]   timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
-                                                       void * const queueItemPtr,
+                                                       void* const queueItemPtr,
                                                        const uint32_t timeoutMs);
-
 
 /**
  * @brief  Reset the queue
@@ -137,9 +127,8 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void * const osalFreertos
  * @param[in] queueHandle   - the handle to the queue to be reset
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueReset(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueReset(void* const osalFreertos,
                                                     const UShellOsalQueueHandle_t queueHandle);
-
 
 /**
  * @brief Create the lock object
@@ -147,9 +136,8 @@ static UShellOsalErr_e ushellOsalFreertosQueueReset(void * const osalFreertos,
  * @param[out] lockObjHandle - lock object handle that was created
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void * const osalFreertos,
-                                                       UShellOsalLockObjHandle_t * const lockObjHandle);
-
+static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void* const osalFreertos,
+                                                       UShellOsalLockObjHandle_t* const lockObjHandle);
 
 /**
  * @brief Delete the lock object
@@ -157,9 +145,8 @@ static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void * const osalFreertos
  * @param[in] lockObjHandle - lock object handle to be deleted
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void* const osalFreertos,
                                                        const UShellOsalLockObjHandle_t lockObjHandle);
-
 
 /**
  * @brief Lock the operation
@@ -167,9 +154,8 @@ static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void * const osalFreertos
  * @param[in] lockObjHandle - lock object handle
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosLock(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosLock(void* const osalFreertos,
                                               const UShellOsalLockObjHandle_t lockObjHandle);
-
 
 /**
  * @brief Unlock the operation
@@ -177,65 +163,8 @@ static UShellOsalErr_e ushellOsalFreertosLock(void * const osalFreertos,
  * @param[in] lockObjHandle - lock object handle
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosUnlock(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosUnlock(void* const osalFreertos,
                                                 const UShellOsalLockObjHandle_t lockObjHandle);
-
-
-/**
- * @brief Create a counting semaphore
- * @param[in] osalFreertos      - pointer to FreeRTOS osal instance
- * @param[in] semaphoreCountMax - the maximum count of the semaphore
- * @param[in] semaphoreInitVal  - the initial value of the semaphore
- * @param[out] semaphoreHandle  - semaphore handle that was created
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreCreate(void * const osalFreertos,
-                                                         const UShellOsalSemaphoreCount_t semaphoreCountMax,
-                                                         const UShellOsalSemaphoreCount_t semaphoreInitVal,
-                                                         UShellOsalSemaphoreHandle_t *const semaphoreHandle);
-
-
-/**
- * @brief Delete a semaphore
- * @param[in] osalFreertos     - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle  - semaphore handle to be deleted
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreDelete(void * const osalFreertos,
-                                                         const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-
-/**
- * @brief Acquire a semaphore
- * @param[in] osalFreertos     - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle  - semaphore handle to be acquired
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquire(void * const osalFreertos,
-                                                          const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-
-/**
- * @brief Release a semaphore
- * @param[in] osalFreertos     - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle  - semaphore handle to be released
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreRelease(void * const osalFreertos,
-                                                          const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-
-/**
- * @brief Get the count of a semaphore
- * @param[in] osalFreertos     - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle  - semaphore handle to get the count
- * @param[out] semaphoreCount  - the count of the semaphore
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreCountGet(void * const osalFreertos,
-                                                           const UShellOsalSemaphoreHandle_t semaphoreHandle,
-                                                           UShellOsalSemaphoreCount_t *const semaphoreCount);
-
 
 /**
  * @brief Create the thread
@@ -244,10 +173,9 @@ static UShellOsalErr_e ushellOsalFreertosSemaphoreCountGet(void * const osalFree
  * @param[in] threadCfg     - thread configuration structure
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosThreadCreate(void * const osalFreertos,
-                                                      UShellOsalThreadHandle_t * const threadHandle,
+static UShellOsalErr_e ushellOsalFreertosThreadCreate(void* const osalFreertos,
+                                                      UShellOsalThreadHandle_t* const threadHandle,
                                                       UShellOsalThreadCfg_s threadCfg);
-
 
 /**
  * @brief Delete the thread
@@ -255,9 +183,8 @@ static UShellOsalErr_e ushellOsalFreertosThreadCreate(void * const osalFreertos,
  * @param[in] threadHandle  - thread handle to be deleted
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosThreadDelete(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosThreadDelete(void* const osalFreertos,
                                                       const UShellOsalThreadHandle_t threadHandle);
-
 
 /**
  * @brief Suspend the thread
@@ -265,9 +192,8 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelete(void * const osalFreertos,
  * @param[in] threadHandle  - thread handle to be suspended
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void* const osalFreertos,
                                                        const UShellOsalThreadHandle_t threadHandle);
-
 
 /**
  * @brief Resume the thread
@@ -275,9 +201,8 @@ static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void * const osalFreertos
  * @param[in] threadHandle  - thread handle to be resumed
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosThreadResume(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosThreadResume(void* const osalFreertos,
                                                       const UShellOsalThreadHandle_t threadHandle);
-
 
 /**
  * @brief delay the thread
@@ -285,9 +210,8 @@ static UShellOsalErr_e ushellOsalFreertosThreadResume(void * const osalFreertos,
  * @param[in] msDelay       - delay in milliseconds
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void* const osalFreertos,
                                                      const uint32_t msDelay);
-
 
 /**
  * @brief Find the queue handle in the queue handles table
@@ -295,9 +219,8 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void * const osalFree
  * @param[in] queueHandle  - queue handle to be found
  * @return uint16_t - index of the queue handle in the table
  */
-static inline uint16_t ushellOsalFreertosFindQueueHandle(UShellOsalFreertos_s * const osalFreeRtos,
+static inline uint16_t ushellOsalFreertosFindQueueHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                          const UShellOsalQueueHandle_t queueHandle);
-
 
 /**
  * @brief Find the lock object handle in the lock objects table
@@ -305,19 +228,8 @@ static inline uint16_t ushellOsalFreertosFindQueueHandle(UShellOsalFreertos_s * 
  * @param[in] lockObjHandle - lock object handle to be found
  * @return uint16_t - index of the lock object handle in the table
  */
-static inline uint16_t ushellOsalFreertosFindLockObjHandle(UShellOsalFreertos_s * const osalFreeRtos,
+static inline uint16_t ushellOsalFreertosFindLockObjHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                            const UShellOsalLockObjHandle_t lockObjHandle);
-
-
-/**
- * @brief Find the semaphore handle in the semaphores table
- * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle - semaphore handle to be found
- * @return uint16_t - index of the semaphore handle in the table
- */
-static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_s * const osalFreeRtos,
-                                                             const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
 
 /**
  * @brief Find the thread handle in the thread objects table
@@ -325,9 +237,8 @@ static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_
  * @param[in] threadHandle - thread handle to be found
  * @return uint16_t - index of the thread handle in the table
  */
-static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s * const osalFreeRtos,
+static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                           const UShellOsalThreadHandle_t threadHandle);
-
 
 /**
  * @brief Perform thread parameters validation procedure
@@ -335,8 +246,7 @@ static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s *
  * @param[in] threadCfg - pointer to the thread configuration structure
  * @return bool - true if the parameters are valid, false otherwise
  */
-static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s *const threadCfg);
-
+static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const threadCfg);
 
 /**
  * @brief FreeRTOS priority levels hash-table.
@@ -345,14 +255,12 @@ static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s *const thre
  * to FreeRTOS-specific priority levels. The array size is determined by the enumeration
  * value `USHELL_OSAL_THREAD_PRIORITY_THE_LAST_ONE`.
  */
-static const UBaseType_t UShellOsalFreertosThreadPriority[USHELL_OSAL_THREAD_PRIORITY_THE_LAST_ONE] =
-{
-    USHELL_OSAL_FREERTOS_THREAD_PRIO_LOW,
-    USHELL_OSAL_FREERTOS_THREAD_PRIO_MIDDLE,
-    USHELL_OSAL_FREERTOS_THREAD_PRIO_HIGH,
-    USHELL_OSAL_FREERTOS_THREAD_PRIO_ULTRA
-};
-
+static const UBaseType_t UShellOsalFreertosThreadPriority [USHELL_OSAL_THREAD_PRIORITY_THE_LAST_ONE] =
+    {
+        USHELL_OSAL_FREERTOS_THREAD_PRIO_LOW,
+        USHELL_OSAL_FREERTOS_THREAD_PRIO_MIDDLE,
+        USHELL_OSAL_FREERTOS_THREAD_PRIO_HIGH,
+        USHELL_OSAL_FREERTOS_THREAD_PRIO_ULTRA};
 
 /**
  * @brief UShell FreeRTOS OSAL portable structure.
@@ -362,33 +270,27 @@ static const UBaseType_t UShellOsalFreertosThreadPriority[USHELL_OSAL_THREAD_PRI
  * queue management, lock management, semaphore management, thread management, and critical section handling.
  */
 static const UShellOsalPortable_s FreeRtosPortable =
-{
-    .queueCreate                = ushellOsalFreertosQueueCreate,
-    .queueDelete                = ushellOsalFreertosQueueDelete,
-    .queueItemPut               = ushellOsalFreertosQueueItemPut,
-    .queueItemPost              = ushellOsalFreertosQueueItemPost,
-    .queueItemGet               = ushellOsalFreertosQueueItemGet,
-    .queueItemWait              = ushellOsalFreertosQueueItemWait,
-    .queueItemPend              = ushellOsalFreertosQueueItemPend,
-    .queueReset                 = ushellOsalFreertosQueueReset,
-    .lockObjCreate              = ushellOsalFreertosLockObjCreate,
-    .lockObjDelete              = ushellOsalFreertosLockObjDelete,
-    .lock                       = ushellOsalFreertosLock,
-    .unlock                     = ushellOsalFreertosUnlock,
-    .semaphoreCreate            = ushellOsalFreertosSemaphoreCreate,
-    .semaphoreDelete            = ushellOsalFreertosSemaphoreDelete,
-    .semaphoreAcquire           = ushellOsalFreertosSemaphoreAcquire,
-    .semaphoreRelease           = ushellOsalFreertosSemaphoreRelease,
-    .semaphoreCountGet          = ushellOsalFreertosSemaphoreCountGet,
-    .threadCreate               = ushellOsalFreertosThreadCreate,
-    .threadDelete               = ushellOsalFreertosThreadDelete,
-    .threadSuspend              = ushellOsalFreertosThreadSuspend,
-    .threadResume               = ushellOsalFreertosThreadResume,
-    .threadDelay                = ushellOsalFreertosThreadDelay,
+    {
+        .queueCreate = ushellOsalFreertosQueueCreate,
+        .queueDelete = ushellOsalFreertosQueueDelete,
+        .queueItemPut = ushellOsalFreertosQueueItemPut,
+        .queueItemPost = ushellOsalFreertosQueueItemPost,
+        .queueItemGet = ushellOsalFreertosQueueItemGet,
+        .queueItemWait = ushellOsalFreertosQueueItemWait,
+        .queueItemPend = ushellOsalFreertosQueueItemPend,
+        .queueReset = ushellOsalFreertosQueueReset,
+        .lockObjCreate = ushellOsalFreertosLockObjCreate,
+        .lockObjDelete = ushellOsalFreertosLockObjDelete,
+        .lock = ushellOsalFreertosLock,
+        .unlock = ushellOsalFreertosUnlock,
+        .threadCreate = ushellOsalFreertosThreadCreate,
+        .threadDelete = ushellOsalFreertosThreadDelete,
+        .threadSuspend = ushellOsalFreertosThreadSuspend,
+        .threadResume = ushellOsalFreertosThreadResume,
+        .threadDelay = ushellOsalFreertosThreadDelay,
 };
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
-
 
 /**
  * @brief Initialize the UShell FreeRTOS osal instance
@@ -397,16 +299,16 @@ static const UShellOsalPortable_s FreeRtosPortable =
  * @param[in] parent       - pointer to a parent object [optional]
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s *const osalFreertos,
-                                       const char *name,
-                                       void *const parent)
+UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s* const osalFreertos,
+                                       const char* name,
+                                       void* const parent)
 {
     /* Check the input parameters */
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal         = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
 
     /* Initialize the UShell OSAL object */
     do
@@ -432,13 +334,12 @@ UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s *const osalFreertos,
     return status;
 }
 
-
 /**
  * @brief Deinitialize UShell FreeRTOS OSAL instance
  * @param[in] osalFreertos - pointer to osal FreeRTOS instance
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s *const osalFreertos)
+UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreertos)
 {
 
     /* Check input parameters */
@@ -446,7 +347,7 @@ UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s *const osalFreerto
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
 
     do
     {
@@ -467,54 +368,44 @@ UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s *const osalFreerto
         /* Suspend all threads */
         for (int i = 0; i < USHELL_OSAL_THREADS_NUM; i++)
         {
-            if (NULL != osal->threadObj[i].threadHandle)
+            if (NULL != osal->threadObj [i].threadHandle)
             {
-                vTaskSuspend((TaskHandle_t)osal->threadObj[i].threadHandle);
+                vTaskSuspend((TaskHandle_t) osal->threadObj [i].threadHandle);
             }
         }
 
         /* Delete all queues */
         for (int i = 0; i < USHELL_OSAL_QUEUE_SLOTS_NUM; i++)
         {
-            if (NULL != osal->queueHandle[i])
+            if (NULL != osal->queueHandle [i])
             {
-                vQueueDelete((QueueHandle_t)osal->queueHandle[i]);
-                osal->queueHandle[i] = NULL;
+                vQueueDelete((QueueHandle_t) osal->queueHandle [i]);
+                osal->queueHandle [i] = NULL;
             }
         }
 
         /* Delete all lock objects */
         for (int i = 0; i < USHELL_OSAL_LOCK_OBJS_NUM; i++)
         {
-            if (NULL != osal->lockObjHandle[i])
+            if (NULL != osal->lockObjHandle [i])
             {
-                vSemaphoreDelete(osal->lockObjHandle[i]);
-                osal->lockObjHandle[i] = NULL;
-            }
-        }
-
-        /* Delete all semaphores */
-        for (int i = 0; i < USHELL_OSAL_SEMAPHORE_OBJS_NUM; i++)
-        {
-            if (NULL != osal->semaphoreHandle[i])
-            {
-                vSemaphoreDelete(osal->semaphoreHandle[i]);
-                osal->semaphoreHandle[i] = NULL;
+                vSemaphoreDelete(osal->lockObjHandle [i]);
+                osal->lockObjHandle [i] = NULL;
             }
         }
 
         /* Delete all threads */
         for (int i = 0; i < USHELL_OSAL_THREADS_NUM; i++)
         {
-            if (NULL != osal->threadObj[i].threadHandle)
+            if (NULL != osal->threadObj [i].threadHandle)
             {
-                vTaskDelete((TaskHandle_t)osal->threadObj[i].threadHandle);
-                osal->threadObj[i].threadHandle             = NULL;
-                osal->threadObj[i].threadCfg.name           = NULL;
-                osal->threadObj[i].threadCfg.threadWorker   = NULL;
-                osal->threadObj[i].threadCfg.stackSize      = 0;
-                osal->threadObj[i].threadCfg.threadParam    = NULL;
-                osal->threadObj[i].threadCfg.threadPriority = 0;
+                vTaskDelete((TaskHandle_t) osal->threadObj [i].threadHandle);
+                osal->threadObj [i].threadHandle = NULL;
+                osal->threadObj [i].threadCfg.name = NULL;
+                osal->threadObj [i].threadCfg.threadWorker = NULL;
+                osal->threadObj [i].threadCfg.stackSize = 0;
+                osal->threadObj [i].threadCfg.threadParam = NULL;
+                osal->threadObj [i].threadCfg.threadPriority = 0;
             }
         }
 
@@ -535,7 +426,6 @@ UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s *const osalFreerto
 
 //============================================================================[PRIVATE FUNCTIONS]==================================================================================
 
-
 /**
  * @brief Create the queue
  * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
@@ -544,10 +434,10 @@ UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s *const osalFreerto
  * @param[out] queueHandle  - queue handle that was created
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueCreate(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueCreate(void* const osalFreertos,
                                                      const size_t queueItemSize,
                                                      const size_t queueDepth,
-                                                     UShellOsalQueueHandle_t * const queueHandle)
+                                                     UShellOsalQueueHandle_t* const queueHandle)
 {
     /* Check input parameters */
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -557,7 +447,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueCreate(void * const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     size_t queueIndexNum = 0;
     bool slotFound = false;
 
@@ -575,7 +465,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueCreate(void * const osalFreertos,
         /* : 1. check if there is a free slot in the queue handles table */
         for (int i = 0; i < USHELL_OSAL_QUEUE_SLOTS_NUM; i++)
         {
-            if (NULL == osal->queueHandle[i])
+            if (NULL == osal->queueHandle [i])
             {
                 slotFound = true;
                 queueIndexNum = i;
@@ -591,8 +481,8 @@ static UShellOsalErr_e ushellOsalFreertosQueueCreate(void * const osalFreertos,
         }
 
         /* : 3. create the FreeRTOS queue */
-        osal->queueHandle[queueIndexNum] = xQueueCreate(queueDepth, queueItemSize);
-        if (NULL == osal->queueHandle[queueIndexNum])
+        osal->queueHandle [queueIndexNum] = xQueueCreate(queueDepth, queueItemSize);
+        if (NULL == osal->queueHandle [queueIndexNum])
         {
             status = USHELL_OSAL_QUEUE_CREATE_ERR;
             break;
@@ -603,14 +493,13 @@ static UShellOsalErr_e ushellOsalFreertosQueueCreate(void * const osalFreertos,
     return status;
 }
 
-
 /**
  * @brief Delete the queue
  * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
  * @param[in] queueHandle   - queue handle to be deleted
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueDelete(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueDelete(void* const osalFreertos,
                                                      const UShellOsalQueueHandle_t queueHandle)
 {
     /* Check input parameters */
@@ -619,7 +508,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueDelete(void * const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
 
     do
@@ -654,16 +543,15 @@ static UShellOsalErr_e ushellOsalFreertosQueueDelete(void * const osalFreertos,
         }
 
         /* Delete the FreeRTOS queue */
-        vQueueDelete((QueueHandle_t)queueHandle);
+        vQueueDelete((QueueHandle_t) queueHandle);
 
         /* Clear the queue handle */
-        osal->queueHandle[queueIndexNum - 1] = NULL;
+        osal->queueHandle [queueIndexNum - 1] = NULL;
 
     } while (0);
 
     return status;
 }
-
 
 /**
  * @brief Put the item to the queue
@@ -672,9 +560,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueDelete(void * const osalFreertos,
  * @param[in] queueItemPtr  - pointer to the item source buff
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void* const osalFreertos,
                                                       const UShellOsalQueueHandle_t queueHandle,
-                                                      const void *const queueItemPtr)
+                                                      const void* const queueItemPtr)
 {
     /* Check input parameters */
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -683,7 +571,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void * const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     BaseType_t sendStatus = pdFALSE;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -710,17 +598,17 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void * const osalFreertos,
         if (xPortInsideInterrupt())
         {
             /* Put the item to the queue from ISR level */
-            sendStatus = xQueueSendFromISR((QueueHandle_t)queueHandle,
-                                           (const void *)queueItemPtr,
+            sendStatus = xQueueSendFromISR((QueueHandle_t) queueHandle,
+                                           (const void*) queueItemPtr,
                                            &xHigherPriorityTaskWoken);
             /* Switch context */
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         }
         else
         {
-            sendStatus = xQueueSend((QueueHandle_t)queueHandle,
-                                    (const void *)queueItemPtr,
-                                    pdMS_TO_TICKS(0));   // without waiting time
+            sendStatus = xQueueSend((QueueHandle_t) queueHandle,
+                                    (const void*) queueItemPtr,
+                                    pdMS_TO_TICKS(0));    // without waiting time
         }
 
         /* Check the status of the operation */
@@ -735,7 +623,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void * const osalFreertos,
     return status;
 }
 
-
 /**
  * @brief Put the item to the queue
  * \note  (BLOCKING CALL WITH SPECIFIED WAIT)
@@ -745,9 +632,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void * const osalFreertos,
  * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
-                                                       void * const queueItemPtr,
+                                                       void* const queueItemPtr,
                                                        const uint32_t timeoutMs)
 {
     /* Check input parameters */
@@ -757,7 +644,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void * const osalFreertos
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     TickType_t safeTimeoutInTicks = 0;
     BaseType_t sendStatus = pdFALSE;
@@ -800,9 +687,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void * const osalFreertos
         safeTimeoutInTicks = ushellOsalFreertosSafeTimeoutToTicks(timeoutMs);
 
         /* Put the item to the queue */
-        sendStatus = xQueueSend((QueueHandle_t)queueHandle,
-                                           (const void *)queueItemPtr,
-                                           safeTimeoutInTicks);   // with waiting time specified
+        sendStatus = xQueueSend((QueueHandle_t) queueHandle,
+                                (const void*) queueItemPtr,
+                                safeTimeoutInTicks);    // with waiting time specified
         if (sendStatus != pdTRUE)
         {
             status = USHELL_OSAL_QUEUE_OVERFLOW_ERR;
@@ -814,7 +701,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void * const osalFreertos
     return status;
 }
 
-
 /**
  * @brief Get the item from the queue [BLOCKING CALL]
  * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
@@ -822,9 +708,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void * const osalFreertos
  * @param[in] queueItemPtr  - tointer to the buffer into which the received item will be copied
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void* const osalFreertos,
                                                       const UShellOsalQueueHandle_t queueHandle,
-                                                      void *const queueItemPtr)
+                                                      void* const queueItemPtr)
 {
     /* Check input parameters */
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -833,7 +719,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void * const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     BaseType_t receiveStatus = pdFALSE;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -869,17 +755,17 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void * const osalFreertos,
         if (xPortInsideInterrupt())
         {
             /* Get the item from the queue from ISR level */
-            receiveStatus =  xQueueReceiveFromISR((QueueHandle_t)queueHandle,
-                                                  (void *)queueItemPtr,
-                                                  &xHigherPriorityTaskWoken);
+            receiveStatus = xQueueReceiveFromISR((QueueHandle_t) queueHandle,
+                                                 (void*) queueItemPtr,
+                                                 &xHigherPriorityTaskWoken);
             /* Switch context */
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         }
         else
         {
             /* Get the item from the FreeRTOS queue */
-            receiveStatus = xQueueReceive((QueueHandle_t)queueHandle,
-                                          (void *)queueItemPtr,
+            receiveStatus = xQueueReceive((QueueHandle_t) queueHandle,
+                                          (void*) queueItemPtr,
                                           pdMS_TO_TICKS(0));
         }
 
@@ -895,7 +781,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void * const osalFreertos,
     return status;
 }
 
-
 /**
  * @brief Get the item from the queue [BLOCKING CALL]
  * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
@@ -903,9 +788,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void * const osalFreertos,
  * @param[in] queueItemPtr  - pointer to the buffer into which the received item will be copied
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
-                                                       void *const queueItemPtr)
+                                                       void* const queueItemPtr)
 {
     /* Must be validated by the caller */
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -913,7 +798,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void * const osalFreertos
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     BaseType_t receiveStatus = pdFALSE;
 
@@ -952,8 +837,8 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void * const osalFreertos
         }
 
         /* Get the item from the FreeRTOS queue */
-        receiveStatus = xQueueReceive((QueueHandle_t)queueHandle,
-                                      (void *)queueItemPtr,
+        receiveStatus = xQueueReceive((QueueHandle_t) queueHandle,
+                                      (void*) queueItemPtr,
                                       portMAX_DELAY);
         if (receiveStatus != pdTRUE)
         {
@@ -966,7 +851,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void * const osalFreertos
     return status;
 }
 
-
 /**
  * @brief Get the item from the queue
  * \note  (BLOCKING CALL WITH SPECIFIED WAIT)
@@ -976,9 +860,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void * const osalFreertos
  * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
-                                                       void * const queueItemPtr,
+                                                       void* const queueItemPtr,
                                                        const uint32_t timeoutMs)
 {
     /*  Must be validated by the caller */
@@ -988,7 +872,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void * const osalFreertos
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     TickType_t safeTimeoutInTicks = 0;
     BaseType_t receiveStatus = pdFALSE;
@@ -997,9 +881,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void * const osalFreertos
     do
     {
         /* Check input parameters */
-        if((NULL == osalFreertos) ||
-           (NULL == queueHandle) ||
-           (NULL == queueItemPtr))
+        if ((NULL == osalFreertos) ||
+            (NULL == queueHandle) ||
+            (NULL == queueItemPtr))
         {
             status = USHELL_OSAL_INVALID_ARGS;
             break;
@@ -1031,9 +915,9 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void * const osalFreertos
         safeTimeoutInTicks = ushellOsalFreertosSafeTimeoutToTicks(timeoutMs);
 
         /* Get the item from the FreeRTOS queue */
-        receiveStatus = xQueueReceive((QueueHandle_t)queueHandle,
-                                      (void *)queueItemPtr,
-                                      safeTimeoutInTicks); // with waiting time specified
+        receiveStatus = xQueueReceive((QueueHandle_t) queueHandle,
+                                      (void*) queueItemPtr,
+                                      safeTimeoutInTicks);    // with waiting time specified
         if (receiveStatus != pdTRUE)
         {
             status = USHELL_OSAL_QUEUE_IS_EMPTY_ERR;
@@ -1045,14 +929,13 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void * const osalFreertos
     return status;
 }
 
-
 /**
  * @brief Reset the queue
  * @param[in][in]  osalFreertos  - pointer to FreeRTOS osal instance
  * @param[in][in]  queueHandle   - the handle the queue to reset .
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosQueueReset(void * const osalFreertos,
+static UShellOsalErr_e ushellOsalFreertosQueueReset(void* const osalFreertos,
                                                     const UShellOsalQueueHandle_t queueHandle)
 {
     /* Must be validated by the caller */
@@ -1061,7 +944,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueReset(void * const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     BaseType_t receiveStatus = pdFALSE;
 
@@ -1099,7 +982,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueReset(void * const osalFreertos,
         }
 
         /* Reset the FreeRTOS queue */
-        receiveStatus = xQueueReset((QueueHandle_t)queueHandle);
+        receiveStatus = xQueueReset((QueueHandle_t) queueHandle);
         if (receiveStatus != pdTRUE)
         {
             status = USHELL_OSAL_PORT_SPECIFIC_ERR;
@@ -1108,9 +991,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueReset(void * const osalFreertos,
     } while (0);
 
     return status;
-
 }
-
 
 /**
  * @brief Create the lock object
@@ -1118,8 +999,8 @@ static UShellOsalErr_e ushellOsalFreertosQueueReset(void * const osalFreertos,
  * @param[in] lockObjHandle - lock object handle that was created
  * @return UShellOsalErr_e error code.
  */
-static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void * const osalFreertos,
-                                                                   UShellOsalLockObjHandle_t * const lockObjHandle)
+static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void* const osalFreertos,
+                                                       UShellOsalLockObjHandle_t* const lockObjHandle)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -1131,19 +1012,19 @@ static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void * const osalFreertos
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
-    *lockObjHandle = NULL;  // Clear stored value
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
+    *lockObjHandle = NULL;    // Clear stored value
 
     // Create the FreeRTOS lock object (recursive mutex):
     // 1. check if there is a free slot
     for (int i = 0; i < USHELL_OSAL_LOCK_OBJS_NUM; i++)
     {
-        if (NULL == osal->lockObjHandle[i])
+        if (NULL == osal->lockObjHandle [i])
         {
             // Congratulations!
             // The free slot was found, create the lock object
-            osal->lockObjHandle[i] = xSemaphoreCreateRecursiveMutex();
-            if (NULL == osal->lockObjHandle[i])
+            osal->lockObjHandle [i] = xSemaphoreCreateRecursiveMutex();
+            if (NULL == osal->lockObjHandle [i])
             {
                 // Lock object was not created and must not be used
                 // Exit: error - the memory required to hold the mutex could not be allocated
@@ -1152,7 +1033,7 @@ static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void * const osalFreertos
 
             // We can only get there if the lock object was created
             // No additional checks needed
-            *lockObjHandle = osal->lockObjHandle[i];
+            *lockObjHandle = osal->lockObjHandle [i];
             // So break the loop
             break;
         }
@@ -1161,12 +1042,11 @@ static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void * const osalFreertos
     // 2. Check if the lock object was created
     if (NULL == *lockObjHandle)
     {
-        return USHELL_OSAL_LOCK_OBJ_CREATE_ERR;  // Exit: error - no free slots in the table
+        return USHELL_OSAL_LOCK_OBJ_CREATE_ERR;    // Exit: error - no free slots in the table
     }
 
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
-
 
 /**
  * @brief Delete the lock object
@@ -1174,8 +1054,8 @@ static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void * const osalFreertos
  * @param[in] lockObjHandle - lock object to deleted
  * @return UShellOsalErr_e error code.
  */
-static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void * const osalFreertos,
-                                                                   const UShellOsalLockObjHandle_t lockObjHandle)
+static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void* const osalFreertos,
+                                                       const UShellOsalLockObjHandle_t lockObjHandle)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -1187,7 +1067,7 @@ static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void * const osalFreertos
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
 
     uint16_t lockObjIndex = ushellOsalFreertosFindLockObjHandle(osalFreertos, lockObjHandle);
     if (0 == lockObjIndex)
@@ -1201,13 +1081,12 @@ static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void * const osalFreertos
     }
 
     // Delete the lock object
-    vSemaphoreDelete((SemaphoreHandle_t)lockObjHandle);
+    vSemaphoreDelete((SemaphoreHandle_t) lockObjHandle);
     // Clear the lock object slot in the table
-    osal->lockObjHandle[lockObjIndex - 1] = NULL;  // Subtract 1 because find function increasws actual index by 1
+    osal->lockObjHandle [lockObjIndex - 1] = NULL;    // Subtract 1 because find function increasws actual index by 1
 
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
-
 
 /**
  * @brief Lock the operation
@@ -1215,8 +1094,8 @@ static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void * const osalFreertos
  * @param[in] lockObjHandle - the lock object handle
  * @return UShellOsalErr_e error code.
  */
-static UShellOsalErr_e ushellOsalFreertosLock(void * const osalFreertos,
-                                                          const UShellOsalLockObjHandle_t lockObjHandle)
+static UShellOsalErr_e ushellOsalFreertosLock(void* const osalFreertos,
+                                              const UShellOsalLockObjHandle_t lockObjHandle)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -1240,7 +1119,7 @@ static UShellOsalErr_e ushellOsalFreertosLock(void * const osalFreertos,
     }
 
     // Lock
-    BaseType_t lockStatus = xSemaphoreTakeRecursive((SemaphoreHandle_t)lockObjHandle, portMAX_DELAY);
+    BaseType_t lockStatus = xSemaphoreTakeRecursive((SemaphoreHandle_t) lockObjHandle, portMAX_DELAY);
     if (pdTRUE != lockStatus)
     {
         USHELL_OSAL_FREERTOS_ASSERT(0);
@@ -1248,9 +1127,8 @@ static UShellOsalErr_e ushellOsalFreertosLock(void * const osalFreertos,
         return USHELL_OSAL_PORT_SPECIFIC_ERR;
     }
 
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
-
 
 /**
  * @brief Unlock the operation
@@ -1258,8 +1136,8 @@ static UShellOsalErr_e ushellOsalFreertosLock(void * const osalFreertos,
  * @param[in] lockObjHandle - the lock object handle
  * @return UShellOsalErr_e error code.
  */
-static UShellOsalErr_e ushellOsalFreertosUnlock(void * const osalFreertos,
-                                                            const UShellOsalLockObjHandle_t lockObjHandle)
+static UShellOsalErr_e ushellOsalFreertosUnlock(void* const osalFreertos,
+                                                const UShellOsalLockObjHandle_t lockObjHandle)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -1283,7 +1161,7 @@ static UShellOsalErr_e ushellOsalFreertosUnlock(void * const osalFreertos,
     }
 
     // Unlock
-    BaseType_t unlockStatus = xSemaphoreGiveRecursive((SemaphoreHandle_t)lockObjHandle);
+    BaseType_t unlockStatus = xSemaphoreGiveRecursive((SemaphoreHandle_t) lockObjHandle);
     if (pdTRUE != unlockStatus)
     {
         USHELL_OSAL_FREERTOS_ASSERT(0);
@@ -1291,254 +1169,8 @@ static UShellOsalErr_e ushellOsalFreertosUnlock(void * const osalFreertos,
         return USHELL_OSAL_PORT_SPECIFIC_ERR;
     }
 
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
-
-
-/**
- * @brief Create a counting semaphore
- * @param[in] osalFreertos      - pointer to FreeRTOS osal instance
- * @param[in] semaphoreCountMax - The maximum count value that can be reached.
- *                            When the semaphore reaches this value it can no longer be 'given'.
- * @param[in] semaphoreHandle   - semaphore handle by which created semaphore can be referenced
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreCreate(void * const osalFreertos,
-                                                                     const UShellOsalSemaphoreCount_t semaphoreCountMax,
-                                                                     const UShellOsalSemaphoreCount_t semaphoreInitVal,
-                                                                     UShellOsalSemaphoreHandle_t *const semaphoreHandle)
-{
-    // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
-    USHELL_OSAL_FREERTOS_ASSERT(0 != semaphoreCountMax);
-    USHELL_OSAL_FREERTOS_ASSERT(semaphoreCountMax >= semaphoreInitVal);
-
-    // Check the level at which the function was called
-    if (xPortInsideInterrupt())
-    {
-        return USHELL_OSAL_CALL_FROM_ISR_ERR;
-    }
-
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
-    *semaphoreHandle = NULL;
-
-    // Create the FreeRTOS semaphore object:
-    // 1. check if there is a free slot
-    for (int i = 0; i < USHELL_OSAL_SEMAPHORE_OBJS_NUM; i++)
-    {
-        if (NULL == osal->semaphoreHandle[i])
-        {
-            // Congratulations!
-            // The free slot was found, create the semaphore object
-            // Initial semaphore count value is 0!
-            osal->semaphoreHandle[i] = xSemaphoreCreateCounting(semaphoreCountMax, semaphoreInitVal);
-            if (NULL == osal->semaphoreHandle[i])
-            {
-                // Semaphore was not created and must not be used
-                // Exit: error - the RAM required to hold the semaphore cannot be allocated
-                return USHELL_OSAL_SEMAPHORE_MEM_ALLOC_ERR;
-            }
-
-            // We can only get there if the semaphore was created
-            // No additional checks needed
-            *semaphoreHandle = osal->semaphoreHandle[i];
-            // So break the loop
-            break;
-        }
-    }
-
-    // 2. Check if the semaphore object was created
-    if (NULL == *semaphoreHandle)
-    {
-        return USHELL_OSAL_SEMAPHORE_OBJ_CREATE_ERR;  // Exit: error - no free slots in the table
-    }
-
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
-}
-
-
-/**
- * @brief Delete a semaphore
- * @param[in] osalFreertos      - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle   - the handle of the semaphore being deleted
- * @return UShellOsalErr_e error code.
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreDelete(void * const osalFreertos,
-                                                                     const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
-
-    // Check the level at which the function was called
-    if (xPortInsideInterrupt())
-    {
-        return USHELL_OSAL_CALL_FROM_ISR_ERR;
-    }
-
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
-
-    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
-    if (0 == semaphoreIndex)
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    // Delete the semaphore
-    vSemaphoreDelete((SemaphoreHandle_t)semaphoreHandle);
-    // Clear the lock object slot in the table
-    osal->semaphoreHandle[semaphoreIndex - 1] = NULL;  // Subtract 1 because find function increases actual index by 1
-
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
-}
-
-
-/**
- * @brief Acquire a semaphore
- * @param[in] osalFreertos      - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle   - a handle to the semaphore being taken
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquire(void * const osalFreertos,
-                                                                      const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
-
-    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
-    if (0 == semaphoreIndex)
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    BaseType_t acquireStatus = pdFALSE;
-    // Check the level at which the function was called
-    if (xPortInsideInterrupt())
-    {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        // Acquire the semaphore from ISR
-        acquireStatus = xSemaphoreTakeFromISR(semaphoreHandle, &xHigherPriorityTaskWoken);
-        // and switch context
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    }
-
-    // Acquire the semaphore
-    else
-    {
-        acquireStatus = xSemaphoreTake(semaphoreHandle, portMAX_DELAY); // TODO: to change to 0 ?
-    }
-
-    if (pdTRUE != acquireStatus)
-    {
-        return USHELL_OSAL_SEMAPHORE_ACQUIRE_ERR;
-    }
-
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
-}
-
-
-/**
- * @brief Release a semaphore
- * @param[in] osalFreertos      - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle   - a handle to the semaphore being released
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreRelease(void * const osalFreertos,
-                                                                      const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
-
-    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
-    if (0 == semaphoreIndex)
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    BaseType_t releaseStatus = pdFALSE;
-    // Check the level at which the function was called
-    if (xPortInsideInterrupt())
-    {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        // Release the semaphore from ISR
-        releaseStatus = xSemaphoreGiveFromISR(semaphoreHandle, &xHigherPriorityTaskWoken);
-        // and switch context
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    }
-
-    // Release the semaphore
-    else
-    {
-        releaseStatus = xSemaphoreGive(semaphoreHandle);
-    }
-
-    if (pdTRUE != releaseStatus)
-    {
-        return USHELL_OSAL_SEMAPHORE_RELEASE_ERR;
-    }
-
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
-}
-
-
-/**
- * @brief Get the count of a semaphore
- * @param[in] osalFreertos      - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle   - a handle of the semaphore being queried
- * @param[in] semaphoreCount    - pointer to a destination buff
- * @return UShellOsalErr_e error code
- */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreCountGet(void * const osalFreertos,
-                                                                       const UShellOsalSemaphoreHandle_t semaphoreHandle,
-                                                                       UShellOsalSemaphoreCount_t *const semaphoreCount)
-{
-    // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreCount);
-
-    // Check the level at which the function was called
-    if (xPortInsideInterrupt())
-    {
-        return USHELL_OSAL_CALL_FROM_ISR_ERR;
-    }
-
-    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
-    if (0 == semaphoreIndex)
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    // Get the semaphore count
-    UBaseType_t currSemaphoreCount = uxSemaphoreGetCount(semaphoreHandle);
-    *semaphoreCount = (UShellOsalSemaphoreCount_t)currSemaphoreCount;
-
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
-}
-
 
 /**
  * @brief Create the thread
@@ -1547,9 +1179,9 @@ static UShellOsalErr_e ushellOsalFreertosSemaphoreCountGet(void * const osalFree
  * @param[in] threadCfg     - thread configuration
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosThreadCreate(void * const osalFreertos,
-                                                                  UShellOsalThreadHandle_t * const threadHandle,
-                                                                  UShellOsalThreadCfg_s threadCfg)
+static UShellOsalErr_e ushellOsalFreertosThreadCreate(void* const osalFreertos,
+                                                      UShellOsalThreadHandle_t* const threadHandle,
+                                                      UShellOsalThreadCfg_s threadCfg)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -1567,25 +1199,25 @@ static UShellOsalErr_e ushellOsalFreertosThreadCreate(void * const osalFreertos,
         return USHELL_OSAL_INVALID_ARGS;
     }
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
-    *threadHandle = NULL;  // clear stored object
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
+    *threadHandle = NULL;    // clear stored object
 
     // Create the FreeRTOS thread:
     // 1. check if there is a free slot
     for (int i = 0; i < USHELL_OSAL_THREADS_NUM; i++)
     {
-        if (NULL == osal->threadObj[i].threadHandle)
+        if (NULL == osal->threadObj [i].threadHandle)
         {
             // Congratulations!
             // The free slot was found, create the thread
-            UBaseType_t threadPrio = UShellOsalFreertosThreadPriority[threadCfg.threadPriority];
+            UBaseType_t threadPrio = UShellOsalFreertosThreadPriority [threadCfg.threadPriority];
 
             BaseType_t xReturned = xTaskCreate(threadCfg.threadWorker,
                                                threadCfg.name,
-                                               (threadCfg.stackSize / sizeof(UBaseType_t)),   // convert byte-size in words
+                                               (threadCfg.stackSize / sizeof(UBaseType_t)),    // convert byte-size in words
                                                threadCfg.threadParam,
                                                threadPrio,
-                                               (TaskHandle_t *)&osal->threadObj[i].threadHandle);
+                                               (TaskHandle_t*) &osal->threadObj [i].threadHandle);
             if (pdPASS != xReturned)
             {
                 // Thread was not created and must not be used
@@ -1593,12 +1225,12 @@ static UShellOsalErr_e ushellOsalFreertosThreadCreate(void * const osalFreertos,
                 return USHELL_OSAL_THREAD_MEM_ALLOCATION_ERR;
             }
 
-            USHELL_OSAL_FREERTOS_ASSERT(NULL != osal->threadObj[i].threadHandle);
+            USHELL_OSAL_FREERTOS_ASSERT(NULL != osal->threadObj [i].threadHandle);
 
             // We can only get there if the thread was created
             // No additional checks needed
-            osal->threadObj[i].threadCfg = threadCfg;
-            *threadHandle                = osal->threadObj[i].threadHandle;
+            osal->threadObj [i].threadCfg = threadCfg;
+            *threadHandle = osal->threadObj [i].threadHandle;
             // So break the loop
             break;
         }
@@ -1607,12 +1239,11 @@ static UShellOsalErr_e ushellOsalFreertosThreadCreate(void * const osalFreertos,
     // 2. Check if the thread was created
     if (NULL == *threadHandle)
     {
-        return USHELL_OSAL_THREAD_CREATE_ERR;  // Exit: error - no free slots in the table
+        return USHELL_OSAL_THREAD_CREATE_ERR;    // Exit: error - no free slots in the table
     }
 
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
-
 
 /**
  * @brief Delete the thread
@@ -1620,8 +1251,8 @@ static UShellOsalErr_e ushellOsalFreertosThreadCreate(void * const osalFreertos,
  * @param[in] threadHandle - the handle of the thread being deleted
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosThreadDelete(void * const osalFreertos,
-                                                                  const UShellOsalThreadHandle_t threadHandle)
+static UShellOsalErr_e ushellOsalFreertosThreadDelete(void* const osalFreertos,
+                                                      const UShellOsalThreadHandle_t threadHandle)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -1633,7 +1264,7 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelete(void * const osalFreertos,
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
 
     uint16_t threadObjIndex = ushellOsalFreertosFindThreadHandle(osalFreertos, threadHandle);
     if (0 == threadObjIndex)
@@ -1647,21 +1278,20 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelete(void * const osalFreertos,
     }
 
     // Delete the task
-    vTaskSuspend((TaskHandle_t)osal->threadObj[threadObjIndex - 1].threadHandle);
-    vTaskDelete((TaskHandle_t)osal->threadObj[threadObjIndex - 1].threadHandle);
+    vTaskSuspend((TaskHandle_t) osal->threadObj [threadObjIndex - 1].threadHandle);
+    vTaskDelete((TaskHandle_t) osal->threadObj [threadObjIndex - 1].threadHandle);
 
     // Clear the thread object slot in the table
-    osal->threadObj[threadObjIndex - 1].threadHandle = NULL;  // Subtract 1 because find function incrises actual index by 1
+    osal->threadObj [threadObjIndex - 1].threadHandle = NULL;    // Subtract 1 because find function incrises actual index by 1
     // Reset the parameters
-    osal->threadObj[threadObjIndex - 1].threadCfg.name           = NULL;
-    osal->threadObj[threadObjIndex - 1].threadCfg.threadWorker   = NULL;
-    osal->threadObj[threadObjIndex - 1].threadCfg.stackSize      = 0;
-    osal->threadObj[threadObjIndex - 1].threadCfg.threadParam    = NULL;
-    osal->threadObj[threadObjIndex - 1].threadCfg.threadPriority = 0;
+    osal->threadObj [threadObjIndex - 1].threadCfg.name = NULL;
+    osal->threadObj [threadObjIndex - 1].threadCfg.threadWorker = NULL;
+    osal->threadObj [threadObjIndex - 1].threadCfg.stackSize = 0;
+    osal->threadObj [threadObjIndex - 1].threadCfg.threadParam = NULL;
+    osal->threadObj [threadObjIndex - 1].threadCfg.threadPriority = 0;
 
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
-
 
 /**
  * @brief Suspend the thread
@@ -1669,8 +1299,8 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelete(void * const osalFreertos,
  * @param[in] threadObj     - the handle of the thread being suspend
  * @return UShellOsalErr_e error code
  */
-static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void * const osalFreertos,
-                                                                   const UShellOsalThreadHandle_t threadHandle)
+static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void* const osalFreertos,
+                                                       const UShellOsalThreadHandle_t threadHandle)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -1682,7 +1312,7 @@ static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void * const osalFreertos
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
 
     uint16_t threadObjIndex = ushellOsalFreertosFindThreadHandle(osalFreertos, threadHandle);
     if (0 == threadObjIndex)
@@ -1696,11 +1326,10 @@ static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void * const osalFreertos
     }
 
     // Suspend the thread
-    vTaskSuspend((TaskHandle_t)osal->threadObj[threadObjIndex - 1].threadHandle);
+    vTaskSuspend((TaskHandle_t) osal->threadObj [threadObjIndex - 1].threadHandle);
 
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
-
 
 /**
  * @brief Resume the thread
@@ -1708,8 +1337,8 @@ static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void * const osalFreertos
  * @param[in] threadObj     - the handle of the thread being resumed
  * @return UShellOsalErr_e error code.
  */
-static UShellOsalErr_e ushellOsalFreertosThreadResume(void * const osalFreertos,
-                                                                  const UShellOsalThreadHandle_t threadHandle)
+static UShellOsalErr_e ushellOsalFreertosThreadResume(void* const osalFreertos,
+                                                      const UShellOsalThreadHandle_t threadHandle)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -1721,7 +1350,7 @@ static UShellOsalErr_e ushellOsalFreertosThreadResume(void * const osalFreertos,
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreertos;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
 
     uint16_t threadObjIndex = ushellOsalFreertosFindThreadHandle(osalFreertos, threadHandle);
     if (0 == threadObjIndex)
@@ -1735,11 +1364,10 @@ static UShellOsalErr_e ushellOsalFreertosThreadResume(void * const osalFreertos,
     }
 
     // Resume the thread
-    vTaskResume((TaskHandle_t)osal->threadObj[threadObjIndex - 1].threadHandle);
+    vTaskResume((TaskHandle_t) osal->threadObj [threadObjIndex - 1].threadHandle);
 
-    return USHELL_OSAL_NO_ERR;  // Exit: no errors
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
-
 
 /**
  * @brief       Perform some delay
@@ -1748,17 +1376,17 @@ static UShellOsalErr_e ushellOsalFreertosThreadResume(void * const osalFreertos,
  * @param[in][out]  no;
  * @return      UShellOsalErr_e  - error code. non-zero = an error has occurred;
  */
-static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void * const osalFreertos,
-                                                                 const uint32_t msDelay)
+static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void* const osalFreertos,
+                                                     const uint32_t msDelay)
 {
     /* Checking of params */
     USHELL_OSAL_FREERTOS_ASSERT(osalFreertos);
-    (void)osalFreertos;
+    (void) osalFreertos;
 
     /* Check where the call is coming from */
     if (xPortInsideInterrupt())
     {
-        return USHELL_OSAL_CALL_FROM_ISR_ERR;  // Exit: Error: Call from isr
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;    // Exit: Error: Call from isr
     }
 
     vTaskDelay(pdMS_TO_TICKS(msDelay));
@@ -1766,27 +1394,26 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void * const osalFree
     return USHELL_OSAL_NO_ERR;
 }
 
-
 /**
  * @brief Find the queue handle in the queue handles table
  * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
  * @param[in] queueHandle  - queue handle to be found
  * @return uint16_t handle index + 1, 0 - if the handle wasn't found.
  */
-static inline uint16_t ushellOsalFreertosFindQueueHandle(UShellOsalFreertos_s * const osalFreeRtos,
-                                                               const UShellOsalQueueHandle_t queueHandle)
+static inline uint16_t ushellOsalFreertosFindQueueHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                         const UShellOsalQueueHandle_t queueHandle)
 {
     // Check income parameters
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);  // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != queueHandle);  // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != queueHandle);     // Must be validated by the caller
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreeRtos;
-    uint16_t handleIndex     = 0;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreeRtos;
+    uint16_t handleIndex = 0;
 
     // Try to find
     for (uint16_t i = 0; i < USHELL_OSAL_QUEUE_SLOTS_NUM; i++)
     {
-        if (queueHandle == osal->queueHandle[i])
+        if (queueHandle == osal->queueHandle [i])
         {
             handleIndex = i + 1;
             break;
@@ -1795,7 +1422,6 @@ static inline uint16_t ushellOsalFreertosFindQueueHandle(UShellOsalFreertos_s * 
 
     return handleIndex;
 }
-
 
 /**
  * @brief Find the lock object handle in the lock objects table
@@ -1803,20 +1429,20 @@ static inline uint16_t ushellOsalFreertosFindQueueHandle(UShellOsalFreertos_s * 
  * @param[in] lockObjHandle - lock object handle to be found
  * @return uint16_t handle index + 1, 0 - if the handle wasn't found.
  */
-static inline uint16_t ushellOsalFreertosFindLockObjHandle(UShellOsalFreertos_s * const osalFreeRtos,
-                                                                 const UShellOsalLockObjHandle_t lockObjHandle)
+static inline uint16_t ushellOsalFreertosFindLockObjHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                           const UShellOsalLockObjHandle_t lockObjHandle)
 {
     // Check income parameters
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);  // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != lockObjHandle);  // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);     // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != lockObjHandle);    // Must be validated by the caller
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreeRtos;
-    uint16_t handleIndex     = 0;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreeRtos;
+    uint16_t handleIndex = 0;
 
     // Try to find
     for (uint16_t i = 0; i < USHELL_OSAL_LOCK_OBJS_NUM; i++)
     {
-        if (lockObjHandle == osal->lockObjHandle[i])
+        if (lockObjHandle == osal->lockObjHandle [i])
         {
             handleIndex = i + 1;
             break;
@@ -1825,37 +1451,6 @@ static inline uint16_t ushellOsalFreertosFindLockObjHandle(UShellOsalFreertos_s 
 
     return handleIndex;
 }
-
-
-/**
- * @brief Find the semaphore handle in the semaphores table
- * @param[in] osalFreeRtos      - pointer to FreeRTOS osal instance
- * @param[in] semaphoreHandle   - semaphore handle to be found
- * @return uint16_t handle index + 1, 0 - if the handle wasn't found.
- */
-static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_s * const osalFreeRtos,
-                                                                   const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    // Check income parameters
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);  // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);  // Must be validated by the caller
-
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreeRtos;
-    uint16_t handleIndex     = 0;
-
-    // Try to find
-    for (uint16_t i = 0; i < USHELL_OSAL_SEMAPHORE_OBJS_NUM; i++)
-    {
-        if (semaphoreHandle == osal->semaphoreHandle[i])
-        {
-            handleIndex = i + 1;
-            break;
-        }
-    }
-
-    return handleIndex;
-}
-
 
 /**
  * @brief Find the thread handle in the thread objects table
@@ -1863,19 +1458,19 @@ static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_
  * @param[in] threadHandle - thread handle to be found
  * @return uint16_t handleIndex + 1, 0 - if the handle wasn't found.
  */
-static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s * const osalFreeRtos,
-                                                                const UShellOsalThreadHandle_t threadHandle)
+static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                          const UShellOsalThreadHandle_t threadHandle)
 {
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);  // Must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != threadHandle);  // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != threadHandle);    // Must be validated by the caller
 
-    UShellOsal_s *osal = (UShellOsal_s *)osalFreeRtos;
-    uint16_t handleIndex     = 0;
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreeRtos;
+    uint16_t handleIndex = 0;
 
     // Try to find
     for (uint16_t i = 0; i < USHELL_OSAL_THREADS_NUM; i++)
     {
-        if (threadHandle == osal->threadObj[i].threadHandle)
+        if (threadHandle == osal->threadObj [i].threadHandle)
         {
             handleIndex = i + 1;
             break;
@@ -1884,7 +1479,6 @@ static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s *
 
     return handleIndex;
 }
-
 
 /**
  * @brief Perform thread configuration parameters validation procedure
@@ -1893,7 +1487,7 @@ static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s *
  * @return true - if configuration is OK\
  * @return false - if not
  */
-static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s *const threadCfg)
+static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const threadCfg)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != threadCfg);
@@ -1903,27 +1497,27 @@ static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s *const thre
     const configSTACK_DEPTH_TYPE stackSize = (threadCfg->stackSize / (sizeof(UBaseType_t)));
     if (configMINIMAL_STACK_SIZE > stackSize)
     {
-        return false;  // Exit: error - stack size is less than the minimum allowed
+        return false;    // Exit: error - stack size is less than the minimum allowed
     }
 
     // Check thread  priority:
     // Check lower border
     if (USHELL_OSAL_THREAD_PRIORITY_LOW > threadCfg->threadPriority)
     {
-        return false;  // Exit: error - thread priority can't be less or equal to the idle task priority
+        return false;    // Exit: error - thread priority can't be less or equal to the idle task priority
     }
 
     // Check the higher border
     if (USHELL_OSAL_THREAD_PRIORITY_ULTRA < threadCfg->threadPriority)
     {
-        return false;  // Exit: error - thread priority can't be higher or equal to the max priority level
+        return false;    // Exit: error - thread priority can't be higher or equal to the max priority level
     }
 
     // Check the worker function
     if (NULL == threadCfg->threadWorker)
     {
-        return false;  // Exit: error - invalid worker function pointer
+        return false;    // Exit: error - invalid worker function pointer
     }
 
-    return true;  // Exit: no errors
+    return true;    // Exit: no errors
 }

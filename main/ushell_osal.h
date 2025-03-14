@@ -2,7 +2,7 @@
 #define USHELL_OSAL_H_
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 /*================================================================[INCLUDE]=================================================*/
@@ -12,16 +12,14 @@
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
-
 /**
  * @brief UShell OSAL queue slots number.
  *
  * Defines the number of queue slots available in the UShell OSAL.
  */
 #ifndef USHELL_OSAL_QUEUE_SLOTS_NUM
-    #define USHELL_OSAL_QUEUE_SLOTS_NUM          (8)
+    #define USHELL_OSAL_QUEUE_SLOTS_NUM (2)
 #endif
-
 
 /**
  * @brief UShell OSAL lock objects number.
@@ -29,19 +27,8 @@
  * Defines the number of lock objects available in the UShell OSAL.
  */
 #ifndef USHELL_OSAL_LOCK_OBJS_NUM
-    #define USHELL_OSAL_LOCK_OBJS_NUM            (8)
+    #define USHELL_OSAL_LOCK_OBJS_NUM (1)
 #endif
-
-
-/**
- * @brief UShell OSAL semaphore objects number.
- *
- * Defines the number of semaphore objects available in the UShell OSAL.
- */
-#ifndef USHELL_OSAL_SEMAPHORE_OBJS_NUM
-    #define USHELL_OSAL_SEMAPHORE_OBJS_NUM       (8)
-#endif
-
 
 /**
  * @brief UShell OSAL threads number.
@@ -49,11 +36,10 @@
  * Defines the number of threads available in the UShell OSAL.
  */
 #ifndef USHELL_OSAL_THREADS_NUM
-    #define USHELL_OSAL_THREADS_NUM              (8)
+    #define USHELL_OSAL_THREADS_NUM (1)
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
-
 
 /**
  * @brief UShell OSAL errors.
@@ -135,34 +121,6 @@ typedef enum
     USHELL_OSAL_LOCK_OBJ_MEM_ALLOCATION_ERR,
 
     /**
-     * @brief Semaphore memory allocation error.
-     *
-     * Indicates that an error occurred while allocating memory for a semaphore.
-     */
-    USHELL_OSAL_SEMAPHORE_MEM_ALLOC_ERR,
-
-    /**
-     * @brief Semaphore object creation error.
-     *
-     * Indicates that an error occurred while creating a semaphore object.
-     */
-    USHELL_OSAL_SEMAPHORE_OBJ_CREATE_ERR,
-
-    /**
-     * @brief Semaphore acquire error.
-     *
-     * Indicates that an error occurred while acquiring a semaphore.
-     */
-    USHELL_OSAL_SEMAPHORE_ACQUIRE_ERR,
-
-    /**
-     * @brief Semaphore release error.
-     *
-     * Indicates that an error occurred while releasing a semaphore.
-     */
-    USHELL_OSAL_SEMAPHORE_RELEASE_ERR,
-
-    /**
      * @brief Thread creation error.
      *
      * Indicates that an error occurred while creating a thread.
@@ -178,39 +136,19 @@ typedef enum
 
 } UShellOsalErr_e;
 
-
 /**
  * @brief UShell OSAL Queue handle type definition.
  *
  * This type defines a handle for a queue in the UShell OSAL.
  */
-typedef void *UShellOsalQueueHandle_t;
-
+typedef void* UShellOsalQueueHandle_t;
 
 /**
  * @brief UShell OSAL lock object type definition.
  *
  * This type defines a handle for a lock object in the UShell OSAL.
  */
-typedef void *UShellOsalLockObjHandle_t;
-
-
-/**
- * @brief UShell OSAL counting semaphore handle type definition.
- *
- * This type defines a handle for a counting semaphore in the UShell OSAL.
- */
-typedef void *UShellOsalSemaphoreHandle_t;
-
-
-/**
- * @brief UShell OSAL semaphore counter data type.
- *
- * This type defines the data type for the semaphore counter in the UShell OSAL.
- */
-typedef uint32_t UShellOsalSemaphoreCount_t;
-
-
+typedef void* UShellOsalLockObjHandle_t;
 /**
  * @brief UShell OSAL time in milliseconds type definition.
  *
@@ -219,14 +157,12 @@ typedef uint32_t UShellOsalSemaphoreCount_t;
  */
 typedef uint32_t UShellOsalTimeMs_t;
 
-
 /**
  * @brief UShell OSAL run-time Thread handle type definition.
  *
  * This type defines a handle for a thread in the UShell OSAL.
  */
-typedef void *UShellOsalThreadHandle_t;
-
+typedef void* UShellOsalThreadHandle_t;
 
 /**
  * @brief UShell OSAL thread worker prototype.
@@ -238,8 +174,7 @@ typedef void *UShellOsalThreadHandle_t;
  *
  * @param[in] threadParam Pointer to the parameter passed to the thread worker function.
  */
-typedef void (*UShellOsalThreadWorker_t)(void * const threadParam);
-
+typedef void (*UShellOsalThreadWorker_t)(void* const threadParam);
 
 /**
  * @brief Enumeration of thread priority levels for UShell OSAL.
@@ -289,7 +224,6 @@ typedef enum
 
 } UShellOsalThreadPriority_e;
 
-
 /**
  * @brief UShell OSAL thread parameters structure.
  *
@@ -310,7 +244,7 @@ typedef struct
      *
      * This is a pointer to a string that contains the name of the thread.
      */
-    const char *name;
+    const char* name;
 
     /**
      * @brief Stack size of the thread.
@@ -324,7 +258,7 @@ typedef struct
      *
      * This is a pointer to the parameter that will be passed to the thread worker function.
      */
-    void *threadParam;
+    void* threadParam;
 
     /**
      * @brief Priority of the thread.
@@ -334,7 +268,6 @@ typedef struct
     UShellOsalThreadPriority_e threadPriority;
 
 } UShellOsalThreadCfg_s;
-
 
 /**
  * @brief UShell OSAL thread object structure.
@@ -359,7 +292,6 @@ typedef struct
     UShellOsalThreadHandle_t threadHandle;
 
 } UShellOsalThread_s;
-
 
 /**
  * @brief UShell OSAL interface methods prototypes for a particular RTOS port.
@@ -409,7 +341,7 @@ typedef struct
      */
     UShellOsalErr_e (*queueItemPut)(void* const osal,
                                     const UShellOsalQueueHandle_t queueHandle,
-                                    const void *const queueItemPtr);
+                                    const void* const queueItemPtr);
 
     /**
      * @brief Post an item into a queue with timeout.
@@ -424,7 +356,7 @@ typedef struct
      */
     UShellOsalErr_e (*queueItemPost)(void* const osal,
                                      const UShellOsalQueueHandle_t queueHandle,
-                                     void *const queueItemPtr,
+                                     void* const queueItemPtr,
                                      const UShellOsalTimeMs_t time);
 
     /**
@@ -439,7 +371,7 @@ typedef struct
      */
     UShellOsalErr_e (*queueItemGet)(void* const osal,
                                     const UShellOsalQueueHandle_t queueHandle,
-                                    void *const queueItemPtr);
+                                    void* const queueItemPtr);
 
     /**
      * @brief Wait for an item from a queue (blocking).
@@ -453,7 +385,7 @@ typedef struct
      */
     UShellOsalErr_e (*queueItemWait)(void* const osal,
                                      const UShellOsalQueueHandle_t queueHandle,
-                                     void *const queueItemPtr);
+                                     void* const queueItemPtr);
 
     /**
      * @brief Pend for an item from a queue with timeout.
@@ -468,7 +400,7 @@ typedef struct
      */
     UShellOsalErr_e (*queueItemPend)(void* const osal,
                                      const UShellOsalQueueHandle_t queueHandle,
-                                     void *const queueItemPtr,
+                                     void* const queueItemPtr,
                                      const UShellOsalTimeMs_t timeoutMs);
 
     /**
@@ -540,7 +472,7 @@ typedef struct
     UShellOsalErr_e (*semaphoreCreate)(void* const osal,
                                        const UShellOsalSemaphoreCount_t semaphoreCountMax,
                                        const UShellOsalSemaphoreCount_t semaphoreInitValue,
-                                       UShellOsalSemaphoreHandle_t *const semaphoreHandle);
+                                       UShellOsalSemaphoreHandle_t* const semaphoreHandle);
 
     /**
      * @brief Delete a semaphore.
@@ -589,8 +521,8 @@ typedef struct
      * @return Error code indicating the result of the operation.
      */
     UShellOsalErr_e (*semaphoreCountGet)(void* const osal,
-                                        const UShellOsalSemaphoreHandle_t semaphoreHandle,
-                                        UShellOsalSemaphoreCount_t *const semaphoreCount);
+                                         const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                         UShellOsalSemaphoreCount_t* const semaphoreCount);
 
     /**
      * @brief Create a thread.
@@ -656,7 +588,6 @@ typedef struct
 
 } UShellOsalPortable_s;
 
-
 /**
  * @brief UShell OSAL interface descriptor.
  *
@@ -673,14 +604,14 @@ typedef struct
      *
      * This pointer references the parent object that contains or uses this OSAL object.
      */
-    void *parent;
+    void* parent;
 
     /**
      * @brief Name of the specific OSAL implementation.
      *
      * This is a pointer to a string that contains the name of the specific OSAL implementation.
      */
-    const char *name;
+    const char* name;
 
     /* Mandatory fields: */
 
@@ -689,40 +620,39 @@ typedef struct
      *
      * This array contains handles for the queues available in the OSAL.
      */
-    UShellOsalQueueHandle_t queueHandle[USHELL_OSAL_QUEUE_SLOTS_NUM];
+    UShellOsalQueueHandle_t queueHandle [USHELL_OSAL_QUEUE_SLOTS_NUM];
 
     /**
      * @brief Lock objects handles table.
      *
      * This array contains handles for the lock objects available in the OSAL.
      */
-    UShellOsalLockObjHandle_t lockObjHandle[USHELL_OSAL_LOCK_OBJS_NUM];
+    UShellOsalLockObjHandle_t lockObjHandle [USHELL_OSAL_LOCK_OBJS_NUM];
 
     /**
      * @brief Threads table.
      *
      * This array contains the thread objects available in the OSAL.
      */
-    UShellOsalThread_s threadObj[USHELL_OSAL_THREADS_NUM];
+    UShellOsalThread_s threadObj [USHELL_OSAL_THREADS_NUM];
 
     /**
      * @brief Semaphore handles table.
      *
      * This array contains handles for the semaphores available in the OSAL.
      */
-    UShellOsalSemaphoreHandle_t semaphoreHandle[USHELL_OSAL_SEMAPHORE_OBJS_NUM];
+    UShellOsalSemaphoreHandle_t semaphoreHandle [USHELL_OSAL_SEMAPHORE_OBJS_NUM];
 
     /**
      * @brief Portable methods table.
      *
      * This pointer references the table of portable methods needed to port the OSAL to different platforms.
      */
-    const UShellOsalPortable_s *portable;
+    const UShellOsalPortable_s* portable;
 
 } UShellOsal_s;
 
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
-
 
 /**
  * @brief Initialize UShell OSAL instance
@@ -734,11 +664,10 @@ typedef struct
  * @param[out] none
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalInit(UShellOsal_s *osal,
-                               const char *name,
-                               void *const parent,
-                               const UShellOsalPortable_s *portable);
-
+UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
+                               const char* name,
+                               void* const parent,
+                               const UShellOsalPortable_s* portable);
 
 /**
  * @brief Deinitialize UShell OSAL instance
@@ -746,8 +675,7 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s *osal,
  * @param[in] osal - pointer to OSAL instance
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalDeinit(UShellOsal_s *osal);
-
+UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal);
 
 /**
  * @brief Get pointer to a parent of the given OSAL object
@@ -755,8 +683,7 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s *osal);
  * @param[out] parent    - pointer to an object into which the current osal parent pointer will be copied
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalParentGet(UShellOsal_s *const osal, void **const parent);
-
+UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const parent);
 
 /**
  * @brief Set the parent object for the given OSAL instance
@@ -764,8 +691,7 @@ UShellOsalErr_e UShellOsalParentGet(UShellOsal_s *const osal, void **const paren
  * @param[in] parent    - pointer to parent object being set
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalParentSet(UShellOsal_s *const osal, void *const parent);
-
+UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent);
 
 /**
  * @brief Get pointer to the name field of the given OSAL instance
@@ -773,8 +699,7 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s *const osal, void *const parent
  * @param[out] name  - pointer to an object into which the current osal name will be copied
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalNameGet(UShellOsal_s *const osal, const char **const name);
-
+UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const name);
 
 /**
  * @brief Set name for the given OSAL instance
@@ -782,8 +707,7 @@ UShellOsalErr_e UShellOsalNameGet(UShellOsal_s *const osal, const char **const n
  * @param[in] name  - pointer to name string being set
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalNameSet(UShellOsal_s *const osal, char *const name);
-
+UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, char* const name);
 
 /**
  * @brief Create the queue
@@ -793,10 +717,10 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s *const osal, char *const name);
  * @param[out]  queueHandle   - the queue handle was created
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s *const osal, const size_t queueItemSize,
-                                                                const size_t queueDepth,
-                                                                UShellOsalQueueHandle_t * const queueHandle);
-
+UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s* const osal,
+                                      const size_t queueItemSize,
+                                      const size_t queueDepth,
+                                      UShellOsalQueueHandle_t* const queueHandle);
 
 /**
  * @brief Delete the queue
@@ -804,8 +728,8 @@ UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s *const osal, const size_t que
  * @param[in]   queueHandle   - the queue handle to delete
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle);
-
+UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s* const osal,
+                                      const UShellOsalQueueHandle_t queueHandle);
 
 /**
  * @brief Put item to the queue
@@ -814,9 +738,9 @@ UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s *const osal, const UShellOsal
  * @param[in] queueItemPtr  - pointer to the item source buffer
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
-                                                                 const void *const queueItemPtr);
-
+UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s* const osal,
+                                       const UShellOsalQueueHandle_t queueHandle,
+                                       const void* const queueItemPtr);
 
 /**
  * @brief Put item to the queue
@@ -827,10 +751,10 @@ UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s *const osal, const UShellOsa
  * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
-                                                                  void *const queueItemPtr,
-                                                                  const uint32_t timeoutMs);
-
+UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s* const osal,
+                                        const UShellOsalQueueHandle_t queueHandle,
+                                        void* const queueItemPtr,
+                                        const uint32_t timeoutMs);
 
 /**
  * @brief Get item from the queue
@@ -840,9 +764,9 @@ UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s *const osal, const UShellOs
  * @param[out]  queueItemPtr  - pointer to the destination buffer in which the item should be places
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
-                                                                 void *const queueItemPtr);
-
+UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s* const osal,
+                                       const UShellOsalQueueHandle_t queueHandle,
+                                       void* const queueItemPtr);
 
 /**
  * @brief Get item from the queue
@@ -852,9 +776,9 @@ UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s *const osal, const UShellOsa
  * @param[out] queueItemPtr  - pointer to the destination buffer in which the item should be places
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
-                                                                  void *const queueItemPtr);
-
+UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s* const osal,
+                                        const UShellOsalQueueHandle_t queueHandle,
+                                        void* const queueItemPtr);
 
 /**
  * @brief Get item from the queue
@@ -865,10 +789,10 @@ UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s *const osal, const UShellOs
  * @param[out] timeoutMs     - timeout in milliseconds to wait for the item
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e  ushellOsalQueueItemPend(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle,
-                                                                   void *const queueItemPtr,
-                                                                   const uint32_t timeoutMs);
-
+UShellOsalErr_e ushellOsalQueueItemPend(UShellOsal_s* const osal,
+                                        const UShellOsalQueueHandle_t queueHandle,
+                                        void* const queueItemPtr,
+                                        const uint32_t timeoutMs);
 
 /**
  * @brief Reset queue
@@ -876,8 +800,8 @@ UShellOsalErr_e  ushellOsalQueueItemPend(UShellOsal_s *const osal, const UShellO
  * @param[in] queueHandle   - the queue handle to reset
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s *const osal, const UShellOsalQueueHandle_t queueHandle);
-
+UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s* const osal,
+                                     const UShellOsalQueueHandle_t queueHandle);
 
 /**
  * @brief Create the lock object
@@ -885,8 +809,8 @@ UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s *const osal, const UShellOsalQ
  * @param[out]  lockObjHandle - lock object handle that was created
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s *const osal, UShellOsalLockObjHandle_t * const lockObjHandle);
-
+UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s* const osal,
+                                        UShellOsalLockObjHandle_t* const lockObjHandle);
 
 /**
  * @brief Delete the lock object
@@ -894,8 +818,8 @@ UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s *const osal, UShellOsalLock
  * @param[in]   lockObjHandle - lock object handle to delete
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s *const osal, const UShellOsalLockObjHandle_t lockObjHandle);
-
+UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s* const osal,
+                                        const UShellOsalLockObjHandle_t lockObjHandle);
 
 /**
  * @brief Lock access to the resource for third-party collaborators
@@ -903,8 +827,8 @@ UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s *const osal, const UShellOs
  * @param[in]   lockObjHandle - lock object handle
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalLock(UShellOsal_s *const osal, const UShellOsalLockObjHandle_t lockObjHandle);
-
+UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal,
+                               const UShellOsalLockObjHandle_t lockObjHandle);
 
 /**
  * @brief Unlock access to the resource for third-party collaborators
@@ -912,58 +836,8 @@ UShellOsalErr_e UShellOsalLock(UShellOsal_s *const osal, const UShellOsalLockObj
  * @param[in]   lockObjHandle - lock object handle
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalUnlock(UShellOsal_s *const osal, const UShellOsalLockObjHandle_t lockObjHandle);
-
-
-/**
- * @brief Create the semaphore object
- * @param[in] osal               - pointer to OSAL instance
- * @param[in] semaphoreCountMax  - the maximum count of the semaphore
- * @param[in] semaphoreInitValue - the initial value of the semaphore
- * @param[in] semaphoreHandle    - semaphore object handle that was created
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreCreate(UShellOsal_s *const osal, const UShellOsalSemaphoreCount_t semaphoreCountMax,
-                                                                    const UShellOsalSemaphoreCount_t semaphoreInitValue,
-                                                                    UShellOsalSemaphoreHandle_t *const semaphoreHandle);
-
-
-/**
- * @brief Delete the semaphore object
- * @param[in] osal              - pointer to OSAL instance
- * @param[in] semaphoreHandle   - semaphore object handle to delete
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreDelete(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-
-/**
- * @brief Acquire the semaphore
- * @param[in] osal              - pointer to OSAL instance
- * @param[in] semaphoreHandle   - semaphore object handle to acquire
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreAcquire(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-
-/**
- * @brief Release the semaphore
- * @param[in] osal              - pointer to OSAL instance
- * @param[in] semaphoreHandle   - semaphore object handle to release
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreRelease(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-
-/**
- * @brief Get the current count of the semaphore
- * @param[in] osal              - pointer to OSAL instance
- * @param[in] semaphoreHandle   - semaphore object handle
- * @param[in] semaphoreCount    - the current count of the semaphore
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle, UShellOsalSemaphoreCount_t *const semaphoreCount);
-
+UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal,
+                                 const UShellOsalLockObjHandle_t lockObjHandle);
 
 /**
  * @brief Create the thread
@@ -972,8 +846,9 @@ UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s *const osal, const UShe
  * @param[in]   threadCfg     - thread configuration
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s *const osal, UShellOsalThreadHandle_t * const threadHandle, UShellOsalThreadCfg_s threadCfg);
-
+UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s* const osal,
+                                       UShellOsalThreadHandle_t* const threadHandle,
+                                       UShellOsalThreadCfg_s threadCfg);
 
 /**
  * @brief Delete the thread
@@ -983,8 +858,8 @@ UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s *const osal, UShellOsalThrea
  * @param[in]   threadHandle  - the handle of the thread being deleted
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s *const osal, const UShellOsalThreadHandle_t threadHandle);
-
+UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s* const osal,
+                                       const UShellOsalThreadHandle_t threadHandle);
 
 /**
  * @brief Suspend the thread
@@ -992,8 +867,8 @@ UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s *const osal, const UShellOsa
  * @param[in] threadHandle  - the handle of the thread being suspend
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s *const osal, const UShellOsalThreadHandle_t threadHandle);
-
+UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s* const osal,
+                                        const UShellOsalThreadHandle_t threadHandle);
 
 /**
  * @brief Resume the thread
@@ -1001,8 +876,8 @@ UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s *const osal, const UShellOs
  * @param[in] threadHandle  - the handle of the thread being resumed
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s *const osal, const UShellOsalThreadHandle_t threadHandle);
-
+UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
+                                       const UShellOsalThreadHandle_t threadHandle);
 
 /**
  * @brief       Perform some delay
@@ -1011,10 +886,11 @@ UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s *const osal, const UShellOsa
  * @param[out]  no;
  * @return      MatrixKbdOsalErr_e  - error code. non-zero = an error has occurred;
  */
-UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal, const uint32_t msDelay);
+UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
+                                      const uint32_t msDelay);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 
-#endif // ifdef USHELL_OSAL_H_
+#endif    // ifdef USHELL_OSAL_H_

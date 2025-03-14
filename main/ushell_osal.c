@@ -7,7 +7,6 @@
  * \bug         Bug report may be placed here...
  */
 
-
 //===============================================================================[ INCLUDE ]=======================================================================================
 
 #include "ushell_osal.h"
@@ -29,12 +28,11 @@
  */
 #ifndef USHELL_OSAL_ASSERT
     #ifdef USHELL_ASSERT
-        #define USHELL_OSAL_ASSERT(cond)  USHELL_ASSERT(cond)
+        #define USHELL_OSAL_ASSERT(cond) USHELL_ASSERT(cond)
     #else
         #define USHELL_OSAL_ASSERT(cond)
     #endif
 #endif
-
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]==========================================================================
 
@@ -52,10 +50,10 @@
  * @param[out] none
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalInit(UShellOsal_s *osal,
-                               const char *name,
-                               void *const parent,
-                               const UShellOsalPortable_s *portable)
+UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
+                               const char* name,
+                               void* const parent,
+                               const UShellOsalPortable_s* portable)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -67,7 +65,7 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s *osal,
     do
     {
         /* Check input parameter */
-        if(osal == NULL)
+        if (osal == NULL)
         {
             status = USHELL_OSAL_INVALID_ARGS;
             break;
@@ -90,14 +88,13 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s *osal,
     return status;
 }
 
-
 /**
  * @brief Deinitialize UShell OSAL instance
  * @note  Call this function when all functionality has been stopped
  * @param[in] osal - pointer to OSAL instance
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalDeinit(UShellOsal_s *osal)
+UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -109,7 +106,7 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s *osal)
     do
     {
         /* Check input parameter */
-        if(osal == NULL)
+        if (osal == NULL)
         {
             status = USHELL_OSAL_INVALID_ARGS;
             break;
@@ -122,14 +119,13 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s *osal)
     return status;
 }
 
-
 /**
  * @brief Get pointer to a parent of the given OSAL object
  * @param[in]  osal      - pointer to osal instance which parent object will be returned
  * @param[out] parent    - pointer to an object into which the current osal parent pointer will be copied
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalParentGet(UShellOsal_s *const osal, void **const parent)
+UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const parent)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -142,8 +138,8 @@ UShellOsalErr_e UShellOsalParentGet(UShellOsal_s *const osal, void **const paren
     do
     {
         /* Check input parameter */
-        if((osal == NULL) ||
-           (parent == NULL))
+        if ((osal == NULL) ||
+            (parent == NULL))
         {
             status = USHELL_OSAL_INVALID_ARGS;
             break;
@@ -157,14 +153,13 @@ UShellOsalErr_e UShellOsalParentGet(UShellOsal_s *const osal, void **const paren
     return status;
 }
 
-
 /**
  * @brief Set the parent object for the given OSAL instance
  * @param[in] osal      - pointer to osal instance being modified
  * @param[in] parent    - pointer to parent object being set
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalParentSet(UShellOsal_s *const osal, void *const parent)
+UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -176,8 +171,8 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s *const osal, void *const parent
     do
     {
         /* Check input parameter */
-        if((osal == NULL) ||
-           (parent == NULL))
+        if ((osal == NULL) ||
+            (parent == NULL))
         {
             status = USHELL_OSAL_INVALID_ARGS;
             break;
@@ -191,14 +186,13 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s *const osal, void *const parent
     return status;
 }
 
-
 /**
  * @brief Get pointer to the name field of the given OSAL instance
  * @param[in] osal  - pointer to osal instance
  * @param[out] name  - pointer to an object into which the current osal name will be copied
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalNameGet(UShellOsal_s *const osal, const char **const name)
+UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const name)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -211,8 +205,8 @@ UShellOsalErr_e UShellOsalNameGet(UShellOsal_s *const osal, const char **const n
     do
     {
         /* Check input parameter */
-        if((osal == NULL) ||
-           (name == NULL))
+        if ((osal == NULL) ||
+            (name == NULL))
         {
             status = USHELL_OSAL_INVALID_ARGS;
             break;
@@ -232,7 +226,7 @@ UShellOsalErr_e UShellOsalNameGet(UShellOsal_s *const osal, const char **const n
  * @param[in] name  - pointer to name string being set
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalNameSet(UShellOsal_s *const osal, char *const name)
+UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, char* const name)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -244,8 +238,8 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s *const osal, char *const name)
     do
     {
         /* Check input parameter */
-        if((osal == NULL) ||
-           (name == NULL))
+        if ((osal == NULL) ||
+            (name == NULL))
         {
             status = USHELL_OSAL_INVALID_ARGS;
             break;
@@ -259,7 +253,6 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s *const osal, char *const name)
     return status;
 }
 
-
 /**
  * @brief Create the queue
  * @param[in]   osal          - OSAL descriptor;
@@ -268,10 +261,10 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s *const osal, char *const name)
  * @param[out]  queueHandle   - the queue handle was created
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s *const osal,
+UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s* const osal,
                                       const size_t queueItemSize,
                                       const size_t queueDepth,
-                                      UShellOsalQueueHandle_t * const queueHandle)
+                                      UShellOsalQueueHandle_t* const queueHandle)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -311,14 +304,13 @@ UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s *const osal,
     return status;
 }
 
-
 /**
  * @brief Delete the queue
  * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
  * @param[in]   queueHandle   - the queue handle to delete
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s *const osal,
+UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s* const osal,
                                       const UShellOsalQueueHandle_t queueHandle)
 {
     /* Checking of params */
@@ -353,7 +345,6 @@ UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s *const osal,
     return status;
 }
 
-
 /**
  * @brief Put item to the queue
  * @param[in] osal - OSAL descriptor;
@@ -361,9 +352,9 @@ UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s *const osal,
  * @param[in] queueItemPtr  - pointer to the item source buffer
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s *const osal,
+UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s* const osal,
                                        const UShellOsalQueueHandle_t queueHandle,
-                                       const void *const queueItemPtr)
+                                       const void* const queueItemPtr)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -393,11 +384,10 @@ UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s *const osal,
         /* Put item to the queue */
         status = osal->portable->queueItemPut(osal, queueHandle, queueItemPtr);
 
-    }while (0);
+    } while (0);
 
     return status;
 }
-
 
 /**
  * @brief Put item to the queue
@@ -408,12 +398,12 @@ UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s *const osal,
  * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s *const osal,
+UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s* const osal,
                                         const UShellOsalQueueHandle_t queueHandle,
-                                        void *const queueItemPtr,
+                                        void* const queueItemPtr,
                                         const UShellOsalTimeMs_t timeoutMs)
 {
-   /* Checking of params */
+    /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
     USHELL_OSAL_ASSERT(queueHandle != NULL);
     USHELL_OSAL_ASSERT(queueItemPtr != NULL);
@@ -447,7 +437,6 @@ UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s *const osal,
     return status;
 }
 
-
 /**
  * @brief Get item from the queue
  * @note  (NON-BLOCKING CALL)
@@ -456,9 +445,9 @@ UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s *const osal,
  * @param[out]  queueItemPtr  - pointer to the destination buffer in which the item should be places
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s *const osal,
+UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s* const osal,
                                        const UShellOsalQueueHandle_t queueHandle,
-                                       void *const queueItemPtr)
+                                       void* const queueItemPtr)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -494,7 +483,6 @@ UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s *const osal,
     return status;
 }
 
-
 /**
  * @brief Get item from the queue
  * @note  (BLOCKING CALL WITH INFINITE WAIT)
@@ -503,9 +491,9 @@ UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s *const osal,
  * @param[out] queueItemPtr  - pointer to the destination buffer in which the item should be places
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s *const osal,
+UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s* const osal,
                                         const UShellOsalQueueHandle_t queueHandle,
-                                        void *const queueItemPtr)
+                                        void* const queueItemPtr)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -541,7 +529,6 @@ UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s *const osal,
     return status;
 }
 
-
 /**
  * @brief Get item from the queue
  * @note  (BLOCKING CALL WITH SPECIFIED WAIT)
@@ -551,10 +538,10 @@ UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s *const osal,
  * @param[out] timeoutMs     - timeout in milliseconds to wait for the item
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e  ushellOsalQueueItemPend(UShellOsal_s *const osal,
-                                         const UShellOsalQueueHandle_t queueHandle,
-                                         void *const queueItemPtr,
-                                         const UShellOsalTimeMs_t timeoutMs)
+UShellOsalErr_e ushellOsalQueueItemPend(UShellOsal_s* const osal,
+                                        const UShellOsalQueueHandle_t queueHandle,
+                                        void* const queueItemPtr,
+                                        const UShellOsalTimeMs_t timeoutMs)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -590,14 +577,13 @@ UShellOsalErr_e  ushellOsalQueueItemPend(UShellOsal_s *const osal,
     return status;
 }
 
-
 /**
  * @brief Reset queue
  * @param[in] osal          - pointer to OSAL instance
  * @param[in] queueHandle   - the queue handle to reset
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s *const osal,
+UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s* const osal,
                                      const UShellOsalQueueHandle_t queueHandle)
 {
     /* Checking of params */
@@ -632,14 +618,14 @@ UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s *const osal,
     return status;
 }
 
-
 /**
  * @brief Create the lock object
  * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
  * @param[out]  lockObjHandle - lock object handle that was created
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s *const osal, UShellOsalLockObjHandle_t * const lockObjHandle)
+UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s* const osal,
+                                        UShellOsalLockObjHandle_t* const lockObjHandle)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -679,7 +665,7 @@ UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s *const osal, UShellOsalLock
  * @param[in]   lockObjHandle - lock object handle to delete
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s *const osal, const UShellOsalLockObjHandle_t lockObjHandle)
+UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s* const osal, const UShellOsalLockObjHandle_t lockObjHandle)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -713,14 +699,13 @@ UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s *const osal, const UShellOs
     return status;
 }
 
-
 /**
  * @brief Lock access to the resource for third-party collaborators
  * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
  * @param[in]   lockObjHandle - lock object handle
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalLock(UShellOsal_s *const osal, const UShellOsalLockObjHandle_t lockObjHandle)
+UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal, const UShellOsalLockObjHandle_t lockObjHandle)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -754,15 +739,13 @@ UShellOsalErr_e UShellOsalLock(UShellOsal_s *const osal, const UShellOsalLockObj
     return status;
 }
 
-
-
 /**
  * @brief Unlock access to the resource for third-party collaborators
  * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
  * @param[in]   lockObjHandle - lock object handle
  * @return UShellOsalErr_e error code.
  */
-UShellOsalErr_e UShellOsalUnlock(UShellOsal_s *const osal,
+UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal,
                                  const UShellOsalLockObjHandle_t lockObjHandle)
 {
     /* Checking of params */
@@ -797,222 +780,6 @@ UShellOsalErr_e UShellOsalUnlock(UShellOsal_s *const osal,
     return status;
 }
 
-
-/**
- * @brief Create the semaphore object
- * @param[in] osal               - pointer to OSAL instance
- * @param[in] semaphoreCountMax  - the maximum count of the semaphore
- * @param[in] semaphoreInitValue - the initial value of the semaphore
- * @param[in] semaphoreHandle    - semaphore object handle that was created
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreCreate(UShellOsal_s *const osal,
-                                          const UShellOsalSemaphoreCount_t semaphoreCountMax,
-                                          const UShellOsalSemaphoreCount_t semaphoreInitValue,
-                                          UShellOsalSemaphoreHandle_t *const semaphoreHandle)
-{
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(semaphoreHandle != NULL);
-
-    /* Local variables */
-    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-
-    /* Create the semaphore object */
-    do
-    {
-        /* Checking of params */
-        if ((NULL == osal) ||
-            (NULL == semaphoreHandle))
-        {
-            return USHELL_OSAL_INVALID_ARGS;
-        }
-
-        /* Checking is init obj */
-        if ((NULL == osal->portable) ||
-            (NULL == osal->portable->semaphoreCreate))
-        {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
-        }
-
-        /* Create the semaphore object */
-        status = osal->portable->semaphoreCreate(osal, semaphoreCountMax, semaphoreInitValue, semaphoreHandle);
-
-    } while (0);
-
-    return status;
-}
-
-
-/**
- * @brief Delete the semaphore object
- * @param[in] osal              - pointer to OSAL instance
- * @param[in] semaphoreHandle   - semaphore object handle to delete
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreDelete(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(semaphoreHandle != NULL);
-
-    /* Local variables */
-    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-
-    /* Delete the semaphore object */
-    do
-    {
-        /* Checking of params */
-        if ((NULL == osal) ||
-            (NULL == semaphoreHandle))
-        {
-            return USHELL_OSAL_INVALID_ARGS;
-        }
-
-        /* Checking is init obj */
-        if ((NULL == osal->portable) ||
-            (NULL == osal->portable->semaphoreDelete))
-        {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
-        }
-
-        /* Delete the semaphore object */
-        status = osal->portable->semaphoreDelete(osal, semaphoreHandle);
-
-    } while (0);
-
-    return status;
-}
-
-
-/**
- * @brief Acquire the semaphore
- * @param[in] osal              - pointer to OSAL instance
- * @param[in] semaphoreHandle   - semaphore object handle to acquire
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreAcquire(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(semaphoreHandle != NULL);
-
-    /* Local variables */
-    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-
-    /* Acquire the semaphore */
-    do
-    {
-        /* Checking of params */
-        if ((NULL == osal) ||
-            (NULL == semaphoreHandle))
-        {
-            return USHELL_OSAL_INVALID_ARGS;
-        }
-
-        /* Checking is init obj */
-        if ((NULL == osal->portable) ||
-            (NULL == osal->portable->semaphoreAcquire))
-        {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
-        }
-
-        /* Acquire the semaphore */
-        status = osal->portable->semaphoreAcquire(osal, semaphoreHandle);
-
-    } while (0);
-
-    return status;
-}
-
-
-/**
- * @brief Release the semaphore
- * @param[in] osal              - pointer to OSAL instance
- * @param[in] semaphoreHandle   - semaphore object handle to release
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreRelease(UShellOsal_s *const osal, const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(semaphoreHandle != NULL);
-
-    /* Local variables */
-    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-
-    /* Release the semaphore */
-    do
-    {
-        /* Checking of params */
-        if ((NULL == osal) ||
-            (NULL == semaphoreHandle))
-        {
-            return USHELL_OSAL_INVALID_ARGS;
-        }
-
-        /* Checking is init obj */
-        if ((NULL == osal->portable) ||
-            (NULL == osal->portable->semaphoreRelease))
-        {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
-        }
-
-        /* Release the semaphore */
-        status = osal->portable->semaphoreRelease(osal, semaphoreHandle);
-
-    } while (0);
-
-    return status;
-}
-
-
-/**
- * @brief Get the current count of the semaphore
- * @param[in] osal              - pointer to OSAL instance
- * @param[in] semaphoreHandle   - semaphore object handle
- * @param[in] semaphoreCount    - the current count of the semaphore
- * @return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s *const osal,
-                                            const UShellOsalSemaphoreHandle_t semaphoreHandle,
-                                            UShellOsalSemaphoreCount_t *const semaphoreCount)
-{
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(semaphoreHandle != NULL);
-    USHELL_OSAL_ASSERT(semaphoreCount != NULL);
-
-    /* Local variables */
-    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-
-    /* Get the current count of the semaphore */
-    do
-    {
-        /* Checking of params */
-        if ((NULL == osal) ||
-            (NULL == semaphoreHandle) ||
-            (NULL == semaphoreCount))
-        {
-            return USHELL_OSAL_INVALID_ARGS;
-        }
-
-        /* Checking is init obj */
-        if ((NULL == osal->portable) ||
-            (NULL == osal->portable->semaphoreCountGet))
-        {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
-        }
-
-        /* Get the current count of the semaphore */
-        status = osal->portable->semaphoreCountGet(osal, semaphoreHandle, semaphoreCount);
-
-    } while (0);
-
-    return status;
-}
-
-
 /**
  * @brief Create the thread
  * @param[in]   osal - OSAL descriptor;
@@ -1020,8 +787,8 @@ UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s *const osal,
  * @param[in]   threadCfg     - thread configuration
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s *const osal,
-                                       UShellOsalThreadHandle_t * const threadHandle,
+UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s* const osal,
+                                       UShellOsalThreadHandle_t* const threadHandle,
                                        UShellOsalThreadCfg_s threadCfg)
 {
     /* Checking of params */
@@ -1056,7 +823,6 @@ UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s *const osal,
     return status;
 }
 
-
 /**
  * @brief Delete the thread
  * @note The operation must be stopped before deleting the thread
@@ -1065,7 +831,7 @@ UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s *const osal,
  * @param[in]   threadHandle  - the handle of the thread being deleted
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s *const osal,
+UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s* const osal,
                                        const UShellOsalThreadHandle_t threadHandle)
 {
     /* Checking of params */
@@ -1106,7 +872,8 @@ UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s *const osal,
  * @param[in] threadHandle  - the handle of the thread being suspend
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s *const osal, const UShellOsalThreadHandle_t threadHandle)
+UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s* const osal,
+                                        const UShellOsalThreadHandle_t threadHandle)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -1140,7 +907,6 @@ UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s *const osal, const UShellOs
     return status;
 }
 
-
 /**
  * @brief       Perform some delay
  * @param[in]   osal - OSAL descriptor;
@@ -1148,7 +914,8 @@ UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s *const osal, const UShellOs
  * @param[out]  no;
  * @return      MatrixKbdOsalErr_e  - error code. non-zero = an error has occurred;
  */
-UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal, const UShellOsalTimeMs_t msDelay)
+UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
+                                      const UShellOsalTimeMs_t msDelay)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
@@ -1180,14 +947,14 @@ UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal, const UShe
     return status;
 }
 
-
 /**
  * @brief Resume the thread
  * @param[in] osal - OSAL descriptor;
  * @param[in] threadHandle  - the handle of the thread being resumed
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s *const osal, const UShellOsalThreadHandle_t threadHandle)
+UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
+                                       const UShellOsalThreadHandle_t threadHandle)
 {
     /* Checking of params */
     USHELL_OSAL_ASSERT(osal != NULL);
