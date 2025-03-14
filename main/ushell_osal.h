@@ -459,72 +459,6 @@ typedef struct
     UShellOsalErr_e (*unlock)(void* const osal, const UShellOsalLockObjHandle_t lockObjHandle);
 
     /**
-     * @brief Create a semaphore.
-     *
-     * This function creates a semaphore with the specified maximum count and initial value.
-     *
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] semaphoreCountMax Maximum count of the semaphore.
-     * @param[in] semaphoreInitValue Initial value of the semaphore.
-     * @param[out] semaphoreHandle Pointer to store the handle of the created semaphore.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*semaphoreCreate)(void* const osal,
-                                       const UShellOsalSemaphoreCount_t semaphoreCountMax,
-                                       const UShellOsalSemaphoreCount_t semaphoreInitValue,
-                                       UShellOsalSemaphoreHandle_t* const semaphoreHandle);
-
-    /**
-     * @brief Delete a semaphore.
-     *
-     * This function deletes the specified semaphore.
-     *
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] semaphoreHandle Handle of the semaphore to be deleted.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*semaphoreDelete)(void* const osal,
-                                       const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-    /**
-     * @brief Acquire a semaphore.
-     *
-     * This function acquires the specified semaphore.
-     *
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] semaphoreHandle Handle of the semaphore to be acquired.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*semaphoreAcquire)(void* const osal,
-                                        const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-    /**
-     * @brief Release a semaphore.
-     *
-     * This function releases the specified semaphore.
-     *
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] semaphoreHandle Handle of the semaphore to be released.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*semaphoreRelease)(void* const osal,
-                                        const UShellOsalSemaphoreHandle_t semaphoreHandle);
-
-    /**
-     * @brief Get the count of a semaphore.
-     *
-     * This function gets the current count of the specified semaphore.
-     *
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] semaphoreHandle Handle of the semaphore.
-     * @param[out] semaphoreCount Pointer to store the current count of the semaphore.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*semaphoreCountGet)(void* const osal,
-                                         const UShellOsalSemaphoreHandle_t semaphoreHandle,
-                                         UShellOsalSemaphoreCount_t* const semaphoreCount);
-
-    /**
      * @brief Create a thread.
      *
      * This function creates a thread with the specified configuration.
@@ -635,13 +569,6 @@ typedef struct
      * This array contains the thread objects available in the OSAL.
      */
     UShellOsalThread_s threadObj [USHELL_OSAL_THREADS_NUM];
-
-    /**
-     * @brief Semaphore handles table.
-     *
-     * This array contains handles for the semaphores available in the OSAL.
-     */
-    UShellOsalSemaphoreHandle_t semaphoreHandle [USHELL_OSAL_SEMAPHORE_OBJS_NUM];
 
     /**
      * @brief Portable methods table.
