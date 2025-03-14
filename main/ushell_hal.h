@@ -3,7 +3,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif  /* __cplusplus */
+#endif /* __cplusplus */
 
 /*================================================================[INCLUDE]================================================*/
 
@@ -13,7 +13,6 @@ extern "C" {
 #include <stdbool.h>
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
-
 
 /**
  * @brief Enumeration of possible error codes returned by the UShell HAL module.
@@ -63,7 +62,6 @@ typedef enum
 
 } UShellHalErr_e;
 
-
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
@@ -72,7 +70,6 @@ typedef enum
  * This type defines the size of one item in the UShell Hardware Abstraction Layer (HAL).
  */
 typedef char UShellHalItem_t;
-
 
 /**
  * @brief Structure defining the function table for UShell HAL portability.
@@ -140,8 +137,28 @@ typedef struct
      */
     UShellHalErr_e (*flush)(void* const hal);
 
-} UShellHalPortableTable_s;
+    /**
+     * @brief Set Tx mode
+     *
+     * This function tx mode
+     *
+     * @param[in] hal Pointer to the HAL instance.
+     * @return Error code indicating the result of the operation.
+     *
+     */
+    UShellHalErr_e (*setTxMode)(void* const hal);
 
+    /**
+     * @brief Set Rx mode
+     *
+     * This function rx mode
+     *
+     * @param[in] hal Pointer to the HAL instance.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellHalErr_e (*setRxMode)(void* const hal);
+
+} UShellHalPortableTable_s;
 
 /**
  * @brief Enumeration of possible callback types for the UShell HAL module.
@@ -188,7 +205,6 @@ typedef enum
 
 } UShellHalCallback_e;
 
-
 /**
  * @brief Type definition for UShell HAL callback function.
  *
@@ -199,8 +215,8 @@ typedef enum
  * @param[in] hal Pointer to the HAL instance.
  * @param[in] cbType Type of the callback event.
  */
-typedef void(*UShellHalCb)(const void* const hal, const UShellHalCallback_e cbType);
-
+typedef void (*UShellHalCb)(const void* const hal,
+                            const UShellHalCallback_e cbType);
 
 /**
  * @brief Describe UShellHal object.
@@ -257,7 +273,6 @@ typedef struct
 
 } UShellHal_s;
 
-
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
@@ -269,28 +284,26 @@ typedef struct
  * \param[in] portTable Pointer to the port table
  * \param[out] none
  * @return UShellHalErr_e Error code. UShell_NO_ERR if success, otherwise error code
-*/
+ */
 UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
                              const void* const parent,
                              const char* const name,
                              const UShellHalPortableTable_s* const portTable);
-
 
 /**
  * \brief Deinitialize the UShellHal object
  * \param[in] hal - pointer to the UShellHal object to be deinitialized
  * \param[out] none
  * @return UShellHalErr_e Error code. UShell_NO_ERR if success, otherwise error code
-*/
+ */
 UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal);
 
-
 /**
-* @brief Set the parent of the UShellHal object
-* @param[in] hal - UShellHal object to set the parent
-* @param[in] parent - pointer to the parent object
-* @param[out] none
-* @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * @brief Set the parent of the UShellHal object
+ * @param[in] hal - UShellHal object to set the parent
+ * @param[in] parent - pointer to the parent object
+ * @param[out] none
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal, const void* const parent);
 
@@ -299,18 +312,16 @@ UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal, const void* const pare
  * \param[in] hal - UShellHal object to get the parent
  * \param[out] parent - pointer to store the parent
  * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
-*/
+ */
 UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal, void** const parent);
-
 
 /**
  * \brief Get the name of the UShellHal object
  * \param[in] hal - UShellHal object to get the name
  * \param[out] name - pointer to store the name
  * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
-*/
+ */
 UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal, const char** const name);
-
 
 /**
  * \brief Attach callback to the UShellHal object
@@ -319,11 +330,10 @@ UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal, const char** const name)
  * \param[in] cb - callback to attach
  * \param[out] none
  * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
-*/
+ */
 UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
                                  const UShellHalCallback_e cbType,
                                  const UShellHalCb cb);
-
 
 /**
  * \brief Detach callback from the UShellHal object
@@ -331,54 +341,65 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
  * \param[in] cbType - type of the callback to detach
  * \param[out] none
  * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
-*/
+ */
 UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
                                  const UShellHalCallback_e cbType);
 
-
 /**
-* @brief  Open the UShellHal object
-* @param[in] hal - UShellHal object to open
-* @param[out] none
-* @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * @brief  Open the UShellHal object
+ * @param[in] hal - UShellHal object to open
+ * @param[out] none
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalOpen(UShellHal_s* const hal);
 
-
 /**
-* @brief Close the UShellHal object
-* @param[in] hal - UShellHal object to close
-* @param[out] none
-* @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * @brief Close the UShellHal object
+ * @param[in] hal - UShellHal object to close
+ * @param[out] none
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalClose(UShellHal_s* const hal);
 
-
 /**
-* @brief Write data to the UShellHal object
-* @param[in] hal - UShellHal object to write
-* @param[in] data - pointer to the data to write
-* @param[in] size - size of the data to write
-* @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * @brief Write data to the UShellHal object
+ * @param[in] hal - UShellHal object to write
+ * @param[in] data - pointer to the data to write
+ * @param[in] size - size of the data to write
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
                               const UShellHalItem_t* const data,
                               const size_t size);
 
-
 /**
-* @brief Read data from the UShellHal object
-* @param[in] hal - UShellHal object to read
-* @param[in] data - pointer to the data to read
-* @param[in] size - size of the data to read
-* @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * @brief Read data from the UShellHal object
+ * @param[in] hal - UShellHal object to read
+ * @param[in] data - pointer to the data to read
+ * @param[in] size - size of the data to read
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
                              UShellHalItem_t* const data,
                              const size_t size);
 
+/**
+ * @brief Set the tx mode of the UShellHal object
+ * @param[in] hal - UShellHal object to set the tx mode
+ * @param[out] none
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal);
+
+/**
+ * @brief Set the rx mode of the UShellHal object
+ * @param[in] hal - UShellHal object to set the rx mode
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalSetRxMode(UShellHal_s* const hal);
+
 #ifdef __cplusplus
 }
-#endif  /* __cplusplus */
+#endif /* __cplusplus */
 
-#endif  /* USHELL_HAL_H_ */
+#endif /* USHELL_HAL_H_ */
