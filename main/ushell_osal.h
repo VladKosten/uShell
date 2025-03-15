@@ -412,7 +412,8 @@ typedef struct
      * @param[in] queueHandle Handle of the queue to be reset.
      * @return Error code indicating the result of the operation.
      */
-    UShellOsalErr_e (*queueReset)(void* const osal, const UShellOsalQueueHandle_t queueHandle);
+    UShellOsalErr_e (*queueReset)(void* const osal,
+                                  const UShellOsalQueueHandle_t queueHandle);
 
     /**
      * @brief Create a lock object.
@@ -423,7 +424,8 @@ typedef struct
      * @param[out] lockObjHandle Pointer to store the handle of the created lock object.
      * @return Error code indicating the result of the operation.
      */
-    UShellOsalErr_e (*lockObjCreate)(void* const osal, UShellOsalLockObjHandle_t* const lockObjHandle);
+    UShellOsalErr_e (*lockObjCreate)(void* const osal,
+                                     UShellOsalLockObjHandle_t* const lockObjHandle);
 
     /**
      * @brief Delete a lock object.
@@ -434,7 +436,8 @@ typedef struct
      * @param[in] lockObjHandle Handle of the lock object to be deleted.
      * @return Error code indicating the result of the operation.
      */
-    UShellOsalErr_e (*lockObjDelete)(void* const osal, const UShellOsalLockObjHandle_t lockObjHandle);
+    UShellOsalErr_e (*lockObjDelete)(void* const osal,
+                                     const UShellOsalLockObjHandle_t lockObjHandle);
 
     /**
      * @brief Acquire a lock.
@@ -445,7 +448,8 @@ typedef struct
      * @param[in] lockObjHandle Handle of the lock object to be acquired.
      * @return Error code indicating the result of the operation.
      */
-    UShellOsalErr_e (*lock)(void* const osal, const UShellOsalLockObjHandle_t lockObjHandle);
+    UShellOsalErr_e (*lock)(void* const osal,
+                            const UShellOsalLockObjHandle_t lockObjHandle);
 
     /**
      * @brief Release a lock.
@@ -456,7 +460,8 @@ typedef struct
      * @param[in] lockObjHandle Handle of the lock object to be released.
      * @return Error code indicating the result of the operation.
      */
-    UShellOsalErr_e (*unlock)(void* const osal, const UShellOsalLockObjHandle_t lockObjHandle);
+    UShellOsalErr_e (*unlock)(void* const osal,
+                              const UShellOsalLockObjHandle_t lockObjHandle);
 
     /**
      * @brief Create a thread.
@@ -610,7 +615,8 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal);
  * @param[out] parent    - pointer to an object into which the current osal parent pointer will be copied
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const parent);
+UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal,
+                                    void** const parent);
 
 /**
  * @brief Set the parent object for the given OSAL instance
@@ -618,7 +624,8 @@ UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const paren
  * @param[in] parent    - pointer to parent object being set
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent);
+UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal,
+                                    void* const parent);
 
 /**
  * @brief Get pointer to the name field of the given OSAL instance
@@ -626,7 +633,8 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent
  * @param[out] name  - pointer to an object into which the current osal name will be copied
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const name);
+UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal,
+                                  const char** const name);
 
 /**
  * @brief Set name for the given OSAL instance
@@ -634,7 +642,8 @@ UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const n
  * @param[in] name  - pointer to name string being set
  * @return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, char* const name);
+UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal,
+                                  char* const name);
 
 /**
  * @brief Create the queue
