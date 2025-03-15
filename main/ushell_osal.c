@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 
 //=====================================================================[ INTERNAL MACRO DEFENITIONS ]==============================================================================
 
@@ -114,6 +115,7 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal)
 
         /* Clear the OSAL object */
         memset(osal, 0, sizeof(UShellOsal_s));
+
     } while (0);
 
     return status;
