@@ -3,7 +3,7 @@
  * @brief        The file contains the implementation of the UShell hardware abstraction layer module.
  *               The module is interface between the UShell and the hardware.
  * \authors      Vladislav Kosten (vladkosten@gmail.com)
- * \copyright
+ * \copyright    MIT License (c) 2025
  * \warning      A warning may be placed here...
  * \bug          Bug report may be placed here...
  */

@@ -3,7 +3,7 @@
  * @brief        The file contains the implementation of the UShell command module.
  *               Object UShellCmd is a parent object for the command objects.
  * \authors      Vladislav Kosten (vladkosten@gmail.com)
- * \copyright
+ * \copyright    MIT License (c) 2025
  * \warning      A warning may be placed here...
  * \bug          Bug report may be placed here...
  */

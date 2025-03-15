@@ -4,7 +4,7 @@
  * \warning      A warning may be placed here...
  * \bug          Bug report may be placed here...
  * \authors      Vladislav Kosten (vladkosten@gmail.com)
- * \copyright    MIT License (c) 2021
+ * \copyright    MIT License (c) 2025
  */
 //===============================================================================[ INCLUDE ]========================================================================================
 

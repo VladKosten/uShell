@@ -2,7 +2,7 @@
  * \file       ushell_osal_freertos.c
  * @brief      UShell OSAL FreeRTOS portable layer
  * \author     Vladislav Kosten (vladkosten@gmail.com)
- * \copyright  Copyright (c) 2024 Vlad Kosten. All rights reserved.
+ * \copyright    MIT License (c) 2025
  * \warning    A warning may be placed here...
  * \bug        Bug report may be placed here...
  */

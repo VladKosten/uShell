@@ -49,7 +49,6 @@ typedef struct
  */
 UShellAuthErr_e UShellAuthInit(UShellAuth_s* const auth,
                                const void* const parent,
-                               const char* const name,
                                const char* const password);
 
 /**

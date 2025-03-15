@@ -1,8 +1,8 @@
 /**
- * \file      uShell_hal_port.c
- * \brief     The uShell HAL port layer implementation for STM32 HAL library.
+ * \file      ushell_hal_port.c
+ * \brief     The uShell HAL port layer implementation for the Atmel Start framework.
  * \authors   Vladislav Kosten (vladkosten@gmail.com)
- * \copyright Copyright (c) 2024. Vlad Kosten. All rights reserved.
+ * \copyright    MIT License (c) 2025
  * \warning   A warning may be placed here...
  * \bug       Bug report may be placed here...
  */

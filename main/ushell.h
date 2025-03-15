@@ -17,6 +17,8 @@ extern "C" {
 #include "ushell_cmd.h"
 #include "ushell_hal.h"
 #include "ushell_osal.h"
+#include "ushell_auth.h"
+#include "ushell_history.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -31,7 +33,26 @@ extern "C" {
  * @brief Description of the maximum size of the buffer in the UShell
  */
 #ifndef USHELL_BUFFER_SIZE
-    #define USHELL_BUFFER_SIZE 128
+    #define USHELL_BUFFER_SIZE 64
+#endif
+
+/**
+ * @brief Description of the default password in the UShell
+ */
+#ifndef USHELL_AUTH_PASSWORD
+    #define USHELL_AUTH_PASSWORD "admin"
+#endif
+
+#ifndef USHELL_THREAD_NAME
+    #define USHELL_THREAD_NAME "USHELL"
+#endif
+
+#ifndef USHELL_THREAD_STACK_SIZE
+    #define USHELL_THREAD_STACK_SIZE 1024U
+#endif
+
+#ifndef USHELL_THREAD_PRIORITY
+    #define USHELL_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -40,6 +61,11 @@ extern "C" {
  * @brief Describe size of one item in the UShell
  */
 typedef char UShellItem_t;
+
+/**
+ * @brief Describe feature of the UShell
+ */
+typedef bool UShellFeature_b;
 
 /**
  * @brief Enumeration of possible error codes returned by the UShell Hal module.
@@ -56,17 +82,6 @@ typedef enum
 } UShellErr_e;
 
 /**
- * @brief Description of the uShell authentefiaction object
- */
-typedef struct
-{
-    const char* name;        ///< Name of the object
-    const char* password;    ///< Password of the object
-    const bool isAuth;       ///< Is object authenticated
-
-} UShellAuth_s;
-
-/**
  * @brief Description of the uShell IO object
  * @note This object is used to store the buffer for input/output operations in the uShell
  */
@@ -74,22 +89,56 @@ typedef struct
 {
     UShellItem_t buffer [USHELL_BUFFER_SIZE];    ///< Buffer for commands
     size_t ind;                                  ///< Size of the buffer
+
 } UShellIo_s;
+
+/**
+ * @brief Description of the uShell object
+ */
+typedef enum
+{
+    USHELL_FEATURE_AUTH = 0,    ///< Enable authentication
+    USHELL_FEATURE_ECHO,        ///< Enable echo feature
+    USHELL_FEATURE_PROMPT,      ///< Enable prompt display
+    USHELL_FEATURE_HISTORY,     ///< Enable command history
+
+} UShellFeature_e;
+
+/**
+ * \brief Configuration settings for the uShell.
+ *
+ * This structure holds Boolean flags that enable or disable
+ * various uShell features, such as authentication, echo, prompt,
+ * and command history.
+ */
+typedef struct
+{
+    UShellFeature_b authIsEn;       ///< Enable authentication.
+    UShellFeature_b echoIsEn;       ///< Enable echo feature.
+    UShellFeature_b promptIsEn;     ///< Enable prompt display.
+    UShellFeature_b historyIsEn;    ///< Enable command history.
+
+} UShellCfg_s;
 
 /**
  * @brief Description of the uShell object
  */
 typedef struct
 {
+    /* Non-optional fields */
     const void* parent;    ///< Parent object
     const char* name;      ///< Name of the object
 
+    /* Dependencies */
     const UShellOsal_s* osal;    ///< OSAL object
     const UShellHal_s* hal;      ///< HAL object
 
-    const UShellCmd_s* cmd [USHELL_MAX_CMD];    ///< Commands array
-    UShellAuth_s auth;                          ///< Authentication object
-    UShellIo_s io;                              ///< IO object
+    /* Optional fields */
+    UShellCfg_s cfg;                      ///< Configuration object
+    UShellCmd_s* cmd [USHELL_MAX_CMD];    ///< Commands array
+    UShellAuth_s auth;                    ///< Authentication object
+    UShellHistory_s history;              ///< History object
+    UShellIo_s io;                        ///< IO object
 
 } UShell_s;
 
@@ -108,7 +157,8 @@ typedef struct
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
                        const UShellHal_s* const hal,
-                       const void* const parent,
+                       const UShellCfg_s cfg,
+                       void* const parent,
                        const char* const name);
 
 /**
