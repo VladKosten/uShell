@@ -158,7 +158,7 @@ typedef struct
      */
     UShellHalErr_e (*setRxMode)(void* const hal);
 
-} UShellHalPortableTable_s;
+} UShellHalPortTable_s;
 
 /**
  * @brief Enumeration of possible callback types for the UShell HAL module.
@@ -246,7 +246,7 @@ typedef struct
      * This pointer references the port table that contains function pointers
      * for operations needed to port the UShell HAL to different platforms.
      */
-    const UShellHalPortableTable_s* port;
+    const UShellHalPortTable_s* port;
 
     /* Callback functions */
 
@@ -288,7 +288,7 @@ typedef struct
 UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
                              const void* const parent,
                              const char* const name,
-                             const UShellHalPortableTable_s* const portTable);
+                             const UShellHalPortTable_s* const portTable);
 
 /**
  * \brief Deinitialize the UShellHal object

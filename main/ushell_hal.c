@@ -43,7 +43,7 @@
 UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
                              const void* const parent,
                              const char* const name,
-                             const UShellHalPortableTable_s* const portTable)
+                             const UShellHalPortTable_s* const portTable)
 {
     /* Check input parameter */
     USHELL_HAL_ASSERT(hal != NULL);
@@ -118,7 +118,8 @@ UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal)
  * @param[out] none
  * @return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
-UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal, const void* const parent)
+UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
+                                  const void* const parent)
 {
     /* Check input parameter */
     USHELL_HAL_ASSERT(hal != NULL);
@@ -152,7 +153,8 @@ UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal, const void* const pare
  * \param[out] parent - pointer to store the parent
  * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
  */
-UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal, void** const parent)
+UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal,
+                                  void** const parent)
 {
     /* Check input parameter */
     USHELL_HAL_ASSERT(hal != NULL);
@@ -186,7 +188,8 @@ UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal, void** const parent)
  * \param[out] name - pointer to store the name
  * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
  */
-UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal, const char** const name)
+UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal,
+                                const char** const name)
 {
     /* Check input parameter */
     USHELL_HAL_ASSERT(hal != NULL);
