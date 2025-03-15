@@ -1,12 +1,12 @@
 /**
-* \file         UShell_hal.c
-* \brief        The file contains the implementation of the UShell hardware abstraction layer module.
-*               The module is interface between the UShell and the hardware.
-* \authors      Vladislav Kosten (vladkosten@gmail.com)
-* \copyright
-* \warning      A warning may be placed here...
-* \bug          Bug report may be placed here...
-*/
+ * \file         UShell_hal.c
+ * @brief        The file contains the implementation of the UShell hardware abstraction layer module.
+ *               The module is interface between the UShell and the hardware.
+ * \authors      Vladislav Kosten (vladkosten@gmail.com)
+ * \copyright
+ * \warning      A warning may be placed here...
+ * \bug          Bug report may be placed here...
+ */
 //===============================================================================[ INCLUDE ]========================================================================================
 
 #include "ushell_hal.h"
@@ -14,8 +14,8 @@
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
 /**
-* \brief Assert macro for the UShellHal module.
-*/
+ * @brief Assert macro for the UShellHal module.
+ */
 #ifndef USHELL_HAL_ASSERT
     #ifdef USHELL_ASSERT
         #define USHELL_HAL_ASSERT(cond) USHELL_ASSERT(cond)
@@ -30,280 +30,564 @@
 
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
-
 /**
- * \brief Initialize the UShellHal object
+ * @brief Initialize the UShellHal object
  * \param[in] hal - pointer to the UShellHal object to be initialized
  * \param[in] parent - pointer to the parent object (e.g. UShellHalStm32)
  * \param[in] name - pointer to the name of the object (e.g. "UShellHal")
  * \param[in] cbTable - pointer to the callback table to be used ()
  * \param[in] portTable Pointer to the port table
  * \param[out] none
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success, otherwise error code
-*/
-UShellHalErr_e UShellHalInit(UShellHal_s* const hal, const void* const parent, const char* const name,
-                                                  const UShellHalPortableTable_s* const portTable)
+ * @return UShellHalErr_e Error code. UShell_NO_ERR if success, otherwise error code
+ */
+UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
+                             const void* const parent,
+                             const char* const name,
+                             const UShellHalPortableTable_s* const portTable)
 {
-    /* Check input param */
-    if((NULL == hal)    ||
-       (NULL == parent) ||
-       (NULL == portTable))
-    {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+    /* Check input parameter */
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(portTable != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
     /* Initialize the UShellHal object */
-    hal->parent = parent;
-    hal->name = name;
-    hal->portTable = portTable;
-    hal->rxReceivedCb = NULL;
-    hal->txCompleteCb = NULL;
-    hal->rxTxErrorCb = NULL;
+    do
+    {
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (portTable == NULL))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
 
-    return USHELL_HAL_NO_ERR;                   // Exit: success
+        /* Initialize the UShellHal object */
+        memset(hal, 0, sizeof(UShellHal_s));
+
+        /* Set the parent object */
+        hal->parent = parent;
+
+        /* Set the name of the object */
+        hal->name = name;
+
+        /* Set the port table */
+        hal->port = portTable;
+
+    } while (0);
+
+    return status;
 }
 
 /**
- * \brief Deinitialize the UShellHal object
+ * @brief Deinitialize the UShellHal object
  * \param[in] hal - pointer to the UShellHal object to be deinitialized
  * \param[out] none
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success, otherwise error code
-*/
+ * @return UShellHalErr_e Error code. UShell_NO_ERR if success, otherwise error code
+ */
 UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal)
 {
-    /* Check input param */
-    if(NULL == hal)
-    {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+    /* Check input parameter */
+    USHELL_HAL_ASSERT(hal != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
     /* Deinitialize the UShellHal object */
-    hal->parent = NULL;
-    hal->name = NULL;
-    hal->portTable = NULL;
-    hal->rxReceivedCb = NULL;
-    hal->txCompleteCb = NULL;
-    hal->rxTxErrorCb = NULL;
+    do
+    {
+        /* Check input parameter */
+        if (hal == NULL)
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
 
-    return USHELL_HAL_NO_ERR;                   // Exit: success
+        memset(hal, 0, sizeof(UShellHal_s));
+
+    } while (0);
+
+    return status;
 }
 
 /**
- * \brief Send data to the port
- * \param[in] hal - UShellHal object to set parent
- * \param[in] parent - parent to be set to the hal object
- * \param[out] none
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
-*/
+ * @brief Set the parent of the UShellHal object
+ * @param[in] hal - UShellHal object to set the parent
+ * @param[in] parent - pointer to the parent object
+ * @param[out] none
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
 UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal, const void* const parent)
 {
     /* Check input parameter */
-    if((hal == NULL) || (parent == NULL))
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(parent != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
     {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (parent == NULL))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Set parent to the UShellHal object */
-    hal->parent = parent;
+        /* Set the parent object */
+        hal->parent = parent;
 
-    return USHELL_HAL_NO_ERR;                   // Exit: success
+    } while (0);
+
+    return USHELL_HAL_NO_ERR;
 }
 
 /**
- * \brief Get parent from the UShellHal object
+ * @brief Get parent from the UShellHal object
  * \param[in] hal - UShellHal object to get the parent
  * \param[out] parent - pointer to store the parent
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
-*/
+ * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ */
 UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal, void** const parent)
 {
     /* Check input parameter */
-    if((hal == NULL) || (parent == NULL))
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(parent != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
     {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (parent == NULL))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Get parent from the UShellHal object */
-    *parent = hal->parent;
+        /* Get the parent object */
+        *parent = hal->parent;
 
-    return USHELL_HAL_NO_ERR;                   // Exit: success
+    } while (0);
+
+    return status;
 }
 
 /**
- * \brief Set the name of the UShellHal object
- * \param[in] hal - UShellHal object to set the name
- * \param[in] name - name to be set
- * \param[out] none
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
-*/
-UShellHalErr_e UShellHalNameSet(UShellHal_s* const hal, const char* const name)
-{
-    /* Check input parameter */
-    if((hal == NULL) || (name == NULL))
-    {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
-
-    /* Set the name of the UShellHal object */
-    hal->name = name;
-
-    return USHELL_HAL_NO_ERR;                   // Exit: success
-
-}
-
-/**
- * \brief Get the name of the UShellHal object
+ * @brief Get the name of the UShellHal object
  * \param[in] hal - UShellHal object to get the name
  * \param[out] name - pointer to store the name
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
-*/
+ * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ */
 UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal, const char** const name)
 {
     /* Check input parameter */
-    if((hal == NULL) || (name == NULL))
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(name != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
     {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (name == NULL))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Get the name of the UShellHal object */
-    *name = hal->name;
+        /* Get the name of the object */
+        *name = hal->name;
 
-    return USHELL_HAL_NO_ERR;                   // Exit: success
+    } while (0);
 
+    return status;
 }
 
 /**
- * \brief Attach callback to the UShellHal object
+ * @brief Attach callback to the UShellHal object
  * \param[in] hal - UShellHal object to attach the callback
  * \param[in] cbType - type of the callback to attach
  * \param[in] cb - callback to attach
  * \param[out] none
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
-*/
-UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal, const UShellHalCallback_e cbType, const UShellHalCb cb)
+ * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ */
+UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
+                                 const UShellHalCallback_e cbType,
+                                 const UShellHalCb cb)
 {
     /* Check input parameter */
-    if((hal == NULL) || (cb == NULL))
-    {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(cb != NULL);
+    USHELL_HAL_ASSERT(cbType & USHELL_HAL_CB_ALL != 0);
 
-    /* Attach callback to the UShellHal object */
-    switch(cbType )
-    {
-        case USHELL_HAL_CB_RX_RECEIVED:
-            hal->rxReceivedCb = cb;
-            break;
-        case USHELL_HAL_CB_TX_COMPLETE:
-            hal->txCompleteCb = cb;
-            break;
-        case USHELL_HAL_CB_RX_TX_ERROR:
-            hal->rxTxErrorCb = cb;
-            break;
-        case USHELL_HAL_CB_ALL:
-            hal->rxReceivedCb = cb;
-            hal->txCompleteCb = cb;
-            hal->rxTxErrorCb = cb;
-            break;
-        default:
-            return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+    bool cbAttached = false;
 
-    return USHELL_HAL_NO_ERR;                   // Exit: success
+    /* Process */
+    do
+    {
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (cb == NULL) ||
+            (cbType & USHELL_HAL_CB_ALL == 0))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check is rx/tx error callback attached */
+        if (cbType & USHELL_HAL_CB_RX_TX_ERROR)
+        {
+            hal->rxTxErrorCb = cb;
+            cbAttached = true;
+        }
+
+        /* Check is tx complete callback attached */
+        if (cbType & USHELL_HAL_CB_TX_COMPLETE)
+        {
+            hal->txCompleteCb = cb;
+            cbAttached = true;
+        }
+
+        /* Check is rx received callback attached */
+        if (cbType & USHELL_HAL_CB_RX_RECEIVED)
+        {
+            hal->rxReceivedCb = cb;
+            cbAttached = true;
+        }
+
+        /* Check if callback was attached */
+        if (!cbAttached)
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+    } while (0);
+
+    return status;
 }
+
 /**
- * \brief Detach callback from the UShellHal object
+ * @brief Detach callback from the UShellHal object
  * \param[in] hal - UShellHal object to detach the callback
  * \param[in] cbType - type of the callback to detach
  * \param[out] none
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
-*/
-UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal, const UShellHalCallback_e cbType)
+ * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ */
+UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
+                                 const UShellHalCallback_e cbType)
 {
     /* Check input parameter */
-    if(hal == NULL)
-    {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(cbType & USHELL_HAL_CB_ALL != 0);
 
-    /* Detach callback from the UShellHal object */
-    switch(cbType )
-    {
-        case USHELL_HAL_CB_RX_RECEIVED:
-            hal->rxReceivedCb = NULL;
-            break;
-        case USHELL_HAL_CB_TX_COMPLETE:
-            hal->txCompleteCb = NULL;
-            break;
-        case USHELL_HAL_CB_RX_TX_ERROR:
-            hal->rxTxErrorCb = NULL;
-            break;
-        case USHELL_HAL_CB_ALL:
-            hal->rxReceivedCb = NULL;
-            hal->txCompleteCb = NULL;
-            hal->rxTxErrorCb = NULL;
-            break;
-        default:
-            return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+    bool cbDetached = false;
 
-    return USHELL_HAL_NO_ERR;                   // Exit: success
+    /* Process */
+    do
+    {
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (cbType & USHELL_HAL_CB_ALL == 0))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check is rx/tx error callback attached */
+        if (cbType & USHELL_HAL_CB_RX_TX_ERROR)
+        {
+            hal->rxTxErrorCb = NULL;
+            cbDetached = true;
+        }
+
+        /* Check is tx complete callback attached */
+        if (cbType & USHELL_HAL_CB_TX_COMPLETE)
+        {
+            hal->txCompleteCb = NULL;
+            cbDetached = true;
+        }
+
+        /* Check is rx received callback attached */
+        if (cbType & USHELL_HAL_CB_RX_RECEIVED)
+        {
+            hal->rxReceivedCb = NULL;
+            cbDetached = true;
+        }
+
+        /* Check if callback was detached */
+        if (!cbDetached)
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+    } while (0);
+
+    return status;
 }
 
 /**
- * \brief Send data
- * \param[in] hal - UShellHal object to send data
- * \param[in] item - pointer to the data to be sent
- * \param[out] none
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
-*/
-UShellHalErr_e UShellHalCharSend(UShellHal_s* const hal, const UShellHalItem_t* const item)
+ * @brief  Open the UShellHal object
+ * @param[in] hal - UShellHal object to open
+ * @param[out] none
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
 {
     /* Check input parameter */
-    if((hal == NULL) ||
-       (item == NULL))
+    USHELL_HAL_ASSERT(hal != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
     {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+        /* Check input parameter */
+        if (hal == NULL)
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Check init state */
-    if((hal->portTable == NULL) || (hal->portTable->charSend == NULL))
-    {
-        return USHELL_HAL_NOT_INIT_ERR;         // Exit: not initialized
-    }
+        /* Check is init */
+        if ((hal->port == NULL) ||
+            (hal->port->open == NULL))
+        {
+            status = USHELL_HAL_PORT_ERR;
+            break;
+        }
 
-    /* Send data */
-    UShellHalErr_e status = hal->portTable->charSend(hal, item);
+        /* Open the port */
+        status = hal->port->open(hal);
 
-    return status;                              // Exit: success
+    } while (0);
+
+    return status;
 }
 
 /**
- * \brief Receive data
- * \param[in] hal - UShellHal object to receive data
- * \param[out] item - pointer to the data to be received
- * \return UShellHalErr_e Error code. USHELL_HAL_NO_ERR if success otherwise, error code
-*/
-UShellHalErr_e UShellHalCharReceive(UShellHal_s* const hal, const UShellHalItem_t* const symbol)
+ * @brief Close the UShellHal object
+ * @param[in] hal - UShellHal object to close
+ * @param[out] none
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalClose(UShellHal_s* const hal)
 {
     /* Check input parameter */
-    if((hal == NULL) ||
-       (symbol == NULL))
+    USHELL_HAL_ASSERT(hal != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
     {
-        return USHELL_HAL_INVALID_ARGS_ERR;     // Exit: error in input arguments
-    }
+        /* Check input parameter */
+        if (hal == NULL)
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Check init state */
-    if((hal->portTable == NULL) || (hal->portTable->charReceive == NULL))
-    {
-        return USHELL_HAL_NOT_INIT_ERR;         // Exit: not initialized
-    }
+        /* Check is init */
+        if ((hal->port == NULL) ||
+            (hal->port->close == NULL))
+        {
+            status = USHELL_HAL_PORT_ERR;
+            break;
+        }
 
-    /* Receive data */
-    UShellHalErr_e status = hal->portTable->charReceive(hal, symbol);
+        /* Close the port */
+        status = hal->port->close(hal);
 
-    return status;                              // Exit: success
+    } while (0);
+
+    return status;
 }
 
+/**
+ * @brief Write data to the UShellHal object
+ * @param[in] hal - UShellHal object to write
+ * @param[in] data - pointer to the data to write
+ * @param[in] size - size of the data to write
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
+                              const UShellHalItem_t* const data,
+                              const size_t size)
+{
+    /* Check input parameter */
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(data != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
+    {
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (data == NULL))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check is init */
+        if ((hal->port == NULL) ||
+            (hal->port->write == NULL))
+        {
+            status = USHELL_HAL_PORT_ERR;
+            break;
+        }
+
+        /* Close the port */
+        status = hal->port->write(hal, data, size);
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Read data from the UShellHal object
+ * @param[in] hal - UShellHal object to read
+ * @param[in] data - pointer to the data to read
+ * @param[in] size - size of the data to read
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
+                             UShellHalItem_t* const data,
+                             const size_t size)
+{
+    /* Check input parameter */
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(data != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
+    {
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (data == NULL))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check is init */
+        if ((hal->port == NULL) ||
+            (hal->port->read == NULL))
+        {
+            status = USHELL_HAL_PORT_ERR;
+            break;
+        }
+
+        /* Close the port */
+        status = hal->port->read(hal, data, size);
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Set the tx mode of the UShellHal object
+ * @param[in] hal - UShellHal object to set the tx mode
+ * @param[out] none
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
+{
+    /* Check input parameter */
+    USHELL_HAL_ASSERT(hal != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
+    {
+        /* Check input parameter */
+        if (hal == NULL)
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check is init */
+        if ((hal->port == NULL) ||
+            (hal->port->setTxMode == NULL))
+        {
+            status = USHELL_HAL_PORT_ERR;
+            break;
+        }
+
+        /* Set the tx mode */
+        status = hal->port->setTxMode(hal);
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Set the rx mode of the UShellHal object
+ * @param[in] hal - UShellHal object to set the rx mode
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalSetRxMode(UShellHal_s* const hal)
+{
+    /* Check input parameter */
+    USHELL_HAL_ASSERT(hal != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
+    {
+        /* Check input parameter */
+        if (hal == NULL)
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+        }
+
+        /* Check is init */
+        if ((hal->port == NULL) ||
+            (hal->port->setRxMode == NULL))
+        {
+            status = USHELL_HAL_PORT_ERR;
+            break;
+        }
+
+        /* Set the rx mode */
+        status = hal->port->setRxMode(hal);
+
+    } while (0);
+
+    return status;
+}
 
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
