@@ -123,7 +123,6 @@ UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
 {
     /* Check input parameter */
     USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(parent != NULL);
 
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -132,8 +131,7 @@ UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
     do
     {
         /* Check input parameter */
-        if ((hal == NULL) ||
-            (parent == NULL))
+        if ((hal == NULL))
         {
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;

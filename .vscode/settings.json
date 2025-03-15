@@ -10,7 +10,9 @@
         "ushell_osal.h": "c",
         "ushell_osal_freertos.h": "c",
         "typeinfo": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "system_error": "c",
+        "ushell_history.h": "c"
     },
     "terminal.integrated.defaultProfile.linux": "zsh"
 }
