@@ -17,7 +17,6 @@ extern "C" {
 #include "ushell_cmd.h"
 #include "ushell_hal.h"
 #include "ushell_osal.h"
-#include "ushell_vt100.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -35,11 +34,10 @@ extern "C" {
     #define USHELL_BUFFER_SIZE 128
 #endif
 
-
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
- * @brief Descriibe size of one item in the UShell
+ * @brief Describe size of one item in the UShell
  */
 typedef char UShellItem_t;
 

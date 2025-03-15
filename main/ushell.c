@@ -162,10 +162,10 @@ UShellErr_e UShellDeInit(UShell_s* const uShell)
 
     /* Check RTE state */
     UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
-    if (uShell->osal->portTable != NULL)
+    if (uShell->osal->portable != NULL)
     {
         /* Stop the thread */
-        if (uShell->osal->portTable->threadStop != NULL)
+        if (uShell->osal->portable->threadStop != NULL)
         {
             osalErr = uShell->osal->portTable->threadStop(uShell);
             USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
