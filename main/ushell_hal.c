@@ -469,6 +469,45 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
 }
 
 /**
+ * @brief Flush the UShellHal object
+ * @param[in] hal - UShellHal object to flush
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalFlush(UShellHal_s* const hal)
+{
+    /* Check input parameter */
+    USHELL_HAL_ASSERT(hal != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
+    {
+        /* Check input parameter */
+        if (hal == NULL)
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check is init */
+        if ((hal->port == NULL) ||
+            (hal->port->flush == NULL))
+        {
+            status = USHELL_HAL_PORT_ERR;
+            break;
+        }
+
+        /* Close the port */
+        status = hal->port->flush(hal);
+
+    } while (0);
+
+    return status;
+}
+
+/**
  * @brief Read data from the UShellHal object
  * @param[in] hal - UShellHal object to read
  * @param[in] data - pointer to the data to read

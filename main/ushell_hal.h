@@ -385,6 +385,13 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
                              const size_t size);
 
 /**
+ * @brief Flush the UShellHal object
+ * @param[in] hal - UShellHal object to flush
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellHalErr_e UShellHalFlush(UShellHal_s* const hal);
+
+/**
  * @brief Set the tx mode of the UShellHal object
  * @param[in] hal - UShellHal object to set the tx mode
  * @param[out] none

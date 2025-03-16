@@ -55,13 +55,17 @@ extern "C" {
     #define USHELL_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
 #endif
 
+#ifndef USHELL_SEND_TIMEOUT_MS
+    #define USHELL_SEND_TIMEOUT_MS 1000U
+#endif
+
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
  * @brief Describe size of one item in the UShell
  */
-typedef char UShellItem_t;
 
+typedef char UShellItem_t;
 /**
  * @brief Describe feature of the UShell
  */

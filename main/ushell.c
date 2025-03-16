@@ -99,7 +99,16 @@ static void uShellXferErrorCb(const void* const hal);
  * \param[out] none
  * \return USHELL_NO_ERR if success, otherwise error code
  */
-static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const str);
+static UShellErr_e uShellPrint(const UShell_s* const uShell,
+                               const char* const str);
+/**
+ * @brief Get char from the input
+ * @param uShell - uShell object
+ * @param ch - pointer to the char
+ * @return USHELL_NO_ERR if success, otherwise error code
+ */
+static UShellErr_e uShellScanChar(const UShell_s* const uShell,
+                                  UShellItem_t* const ch);
 
 /**
  * \brief Find command
@@ -205,6 +214,17 @@ static UShellErr_e uShellQueueMsgSend(UShell_s* const dio,
  * @return UShellErr_e - error code. non-zero = an error has occurred;
  */
 static UShellErr_e uShellQueueMsgFlush(UShell_s* const dio);
+
+/**
+ * @brief Pend for the message in the queue
+ * @param[in] dio - pointer to a UShell instance;
+ * @param msg - message;
+ * @param timeMs - time in milliseconds;
+ * @return UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellQueueMsgPend(UShell_s* const dio,
+                                      UShellMsg_e* const msg,
+                                      const uint32_t timeMs);
 
 /**
  * @brief Wait for the message in the queue
@@ -512,75 +532,92 @@ static void uShellWorker(void* const uShell)
 
     /* Local variables */
     UShell_s* const ushell = (UShell_s*) uShell;
-    UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
-    (void) osalErr;
-    UShellHalErr_e halErr = USHELL_HAL_NO_ERR;
-    (void) halErr;
-    UShellItem_t item = 0;
-
-    /* Check RTE state */
-    USHELL_ASSERT(ushell->hal != NULL);
-    USHELL_ASSERT(ushell->hal->rxReceivedCb != NULL);
-    USHELL_ASSERT(ushell->hal->txCompleteCb != NULL);
-    USHELL_ASSERT(ushell->hal->rxTxErrorCb != NULL);
-    USHELL_ASSERT(ushell->osal != NULL);
+    UShellErr_e status = USHELL_NO_ERR;
+    UShellItem_t item [100];
 
     /* First msg */
+    /* Open the hal */
+    UShellHalErr_e halStatus = UShellHalOpen(ushell->hal);
+    if (halStatus != USHELL_HAL_NO_ERR)
+    {
+        return;
+    }
 
     /* Main loop */
     while (1)
     {
 
-        // /* Get data*/
-        // halErr = UShellHalReceive(ushell->hal, &item);
-        // USHELL_ASSERT(halErr == USHELL_HAL_NO_ERR);
-
-        /* Process the data */
-        switch (item)
+        while (1)
         {
-            /* Carriage return (\r) */
-            case USHELL_ASCII_CHAR_CR :
-            case USHELL_ASCII_CHAR_LF :
+            /* Print data */
+            strcpy(item, "Enter command: ");
+            status = uShellPrint(ushell, item);
+            if (status != USHELL_NO_ERR)
             {
-
-                /* Find command */
-                uint8_t ind = 0;
-                UShellErr_e ushellErr = uShellFindCmd(ushell, ushell->io.buffer, &ind);
-                if (ushellErr != USHELL_NO_ERR)
-                {
-                    break;
-                }
-
-                break;
-            }
-
-            /* Backspace  */
-            case USHELL_ASCII_CHAR_BS :
-            case USHELL_ASCII_CHAR_DEL :
-            {
-                /* Process the command */
-                break;
-            }
-
-            /* Horizontal tab */
-            case USHELL_ASCII_CHAR_TAB :
-            {
-                /* Process the command */
-                break;
-            }
-
-            /* Acknowledge */
-            default :
-            {
-                /* Store the data */
-                if (ushell->io.ind < USHELL_BUFFER_SIZE)
-                {
-                    ushell->io.buffer [ushell->io.ind++] = item;
-                }
-
-                break;
+                continue;
             }
         }
+
+        /* Get data*/
+        status = uShellScanChar(ushell, &item);
+        if (status != USHELL_NO_ERR)
+        {
+            continue;
+        }
+
+        /* Print data */
+        status = uShellPrint(ushell, &item);
+        if (status != USHELL_NO_ERR)
+        {
+            continue;
+        }
+
+        // /* Process the data */
+        // switch (item)
+        // {
+        //     /* Carriage return (\r) */
+        //     case USHELL_ASCII_CHAR_CR :
+        //     case USHELL_ASCII_CHAR_LF :
+        //     {
+
+        //    /* Find command */
+        //    uint8_t ind = 0;
+        //    UShellErr_e ushellErr = uShellFindCmd(ushell, ushell->io.buffer, &ind);
+        //    if (ushellErr != USHELL_NO_ERR)
+        //    {
+        //        break;
+        //    }
+
+        //    break;
+        // }
+
+        //    /* Backspace  */
+        //    case USHELL_ASCII_CHAR_BS :
+        //    case USHELL_ASCII_CHAR_DEL :
+        //    {
+        //        /* Process the command */
+        //        break;
+        //    }
+
+        //    /* Horizontal tab */
+        //    case USHELL_ASCII_CHAR_TAB :
+        //    {
+        //        /* Process the command */
+        //        break;
+        //    }
+
+        //    /* Acknowledge */
+        //    default :
+        //    {
+        //        /* Store the data */
+        //        if (ushell->io.ind < USHELL_BUFFER_SIZE)
+        //        {
+        //            ushell->io.buffer [ushell->io.ind++] = item;
+        //        }
+
+        //    break;
+        // }
+        // }
     }
 }
 
@@ -695,7 +732,161 @@ static void uShellXferErrorCb(const void* const hal)
  */
 static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const str)
 {
-    return USHELL_NO_ERR;
+    /* Check input */
+    USHELL_ASSERT(uShell != NULL);
+    USHELL_ASSERT(str != NULL);
+
+    /* Local variables */
+    UShellErr_e status = USHELL_NO_ERR;
+    UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
+    size_t len = 0;
+    UShellMsg_e msg = USHELL_MSG_NONE;
+
+    /* Printf */
+    do
+    {
+        /* Check input parameters */
+        if ((uShell == NULL) ||
+            (str == NULL))
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Get length */
+        len = strlen(str);
+        if (len == 0)
+        {
+            break;
+        }
+
+        /* Set the tx mode */
+        halStatus = UShellHalSetTxMode(uShell->hal);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Flush the queue */
+        status = uShellQueueMsgFlush(uShell);
+        if (status != USHELL_NO_ERR)
+        {
+            break;
+        }
+
+        /* Flush the buffers */
+        halStatus = UShellHalFlush(uShell->hal);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Send the data */
+        halStatus = UShellHalWrite(uShell->hal, (uint8_t*) str, len);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Wait the message */
+        UShellMsg_e msg = USHELL_MSG_NONE;
+        status = uShellQueueMsgPend(uShell,
+                                    &msg,
+                                    USHELL_SEND_TIMEOUT_MS);
+        if ((status != USHELL_NO_ERR) ||
+            (msg != USHELL_MSG_TX_COMPLETE))
+        {
+            status = USHELL_XFER_ERR;
+            break;
+        }
+
+        /* Success */
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Get char from the input
+ * @param uShell - uShell object
+ * @param ch - pointer to the char
+ * @return USHELL_NO_ERR if success, otherwise error code
+ */
+static UShellErr_e uShellScanChar(const UShell_s* const uShell,
+                                  UShellItem_t* const ch)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(uShell != NULL);
+    USHELL_ASSERT(ch != NULL);
+
+    /* Local variables */
+    UShellErr_e status = USHELL_NO_ERR;
+    UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
+    UShellMsg_e msg = USHELL_MSG_NONE;
+    char item = 0;
+
+    /* Get the char */
+    do
+    {
+        /* Check input parameters */
+        if ((uShell == NULL) ||
+            (ch == NULL))
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Flush the queue */
+        status = uShellQueueMsgFlush(uShell);
+        if (status != USHELL_NO_ERR)
+        {
+            break;
+        }
+
+        /* Flush the buffers */
+        halStatus = UShellHalFlush(uShell->hal);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Set the rx mode */
+        halStatus = UShellHalSetRxMode(uShell->hal);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Wait the message */
+        status = uShellQueueMsgWait(uShell,
+                                    &msg);
+        if ((status != USHELL_NO_ERR) ||
+            (msg != USHELL_MSG_RX_RECEIVED))
+        {
+            status = USHELL_XFER_ERR;
+            break;
+        }
+
+        /* Get the char */
+        halStatus = UShellHalRead(uShell->hal, &item, 1U);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Set the char */
+        *ch = item;
+
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -1455,6 +1646,73 @@ static UShellErr_e uShellQueueMsgFlush(UShell_s* const dio)
             status = USHELL_PORT_ERR;
             break;
         }
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Wait for the message in the queue
+ * @param[in] dio - pointer to a UShell instance;
+ * @param msg - message;
+ * @return UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellQueueMsgPend(UShell_s* const dio,
+                                      UShellMsg_e* const msg,
+                                      const uint32_t timeMs)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(dio != NULL);
+
+    /* Local variable */
+    UShellErr_e status = USHELL_NO_ERR;
+
+    /* Wait for the message in the queue */
+    do
+    {
+        /* Check input parameters */
+        if ((dio == NULL) ||
+            (dio->osal == NULL))
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Cast */
+        UShellOsal_s* osal = (UShellOsal_s*) dio->osal;
+
+        /* Get the queue handle */
+        UShellOsalQueueHandle_t queue = NULL;
+        UShellOsalErr_e osalStatus = UShellOsalQueueHandleGet(osal, 0U, &queue);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (queue == NULL))
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Wait for the message in the queue */
+        UShellMsg_e localMsg = USHELL_MSG_NONE;
+        osalStatus = ushellOsalQueueItemPend(osal, queue, &localMsg, timeMs);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Check msg */
+        if (!(localMsg == USHELL_MSG_RX_RECEIVED) &&
+            !(localMsg == USHELL_MSG_TX_COMPLETE) &&
+            !(localMsg == USHELL_MSG_NONE) &&
+            !(localMsg == USHELL_MSG_RX_TX_ERROR))
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Set the message */
+        *msg = localMsg;
 
     } while (0);
 
