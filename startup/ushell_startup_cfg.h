@@ -46,14 +46,6 @@
  */
 // #define USHELL_STARTUP_HAL_PORT_ATMEL
 
-/**
- * \brief CMOCK HAL port
- * \note Uncomment this line to use the CMOCK HAL port
- *      Recommended use CMake to define this option
- *
- */
-// #define USHELL_STARTUP_HAL_PORT_CMOCK
-
 
 /* Include port-specific headers: */
 

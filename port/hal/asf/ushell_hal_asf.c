@@ -170,7 +170,7 @@ static UShellHalPortTable_s ushellHalPortTable = {
 /**
  * @brief For store context from interrupt
  */
-static USHellPortLink_s ushellPortLink = {
+static USHellPortLink_s uShellPortLink = {
     .parent = NULL,
     .uart = NULL};
 
@@ -227,7 +227,7 @@ UShellHalPortErr_e UShellHalPortInit(UShellHalPort_s* const halPort,
         halPort->uart = (struct usart_async_descriptor*) uart;
 
         /* Create link in the pool */
-        UShellHalPortErr_e statusHalPort = dwinHalPortPoolAdd(halPort, halPort->uart);
+        UShellHalPortErr_e statusHalPort = uShellHalPortPoolAdd(halPort, halPort->uart);
         if (statusHalPort != USHELL_HAL_PORT_NO_ERR)
         {
             status = USHELL_HAL_PORT_INIT_ERR;
@@ -333,16 +333,16 @@ static UShellHalPortErr_e uShellHalPortPoolAdd(const void* const parent,
         }
 
         /* Add new link to the pool */
-        if ((ushellPortLink.uart != NULL) ||
-            (ushellPortLink.parent != NULL))
+        if ((uShellPortLink.uart != NULL) ||
+            (uShellPortLink.parent != NULL))
         {
             status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
 
         /* Add new link to the pool */
-        ushellPortLink.uart = uart;
-        ushellPortLink.parent = parent;
+        uShellPortLink.uart = uart;
+        uShellPortLink.parent = parent;
 
     } while (0);
 
@@ -374,14 +374,14 @@ static UShellHalPortErr_e uShellHalPortPoolRemoveByParent(const void* const pare
         }
 
         /* Check parent is the same */
-        if (ushellPortLink.parent != parent)
+        if (uShellPortLink.parent != parent)
         {
             break;
         }
 
         /* Remove link from the pool */
-        ushellPortLink.uart = NULL;
-        ushellPortLink.parent = NULL;
+        uShellPortLink.uart = NULL;
+        uShellPortLink.parent = NULL;
 
     } while (0);
 
@@ -416,14 +416,14 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
         }
 
         /* Check uart is the same */
-        if (ushellPortLink.uart != uart)
+        if (uShellPortLink.uart != uart)
         {
             status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
 
         /* Get parent */
-        *parent = ushellPortLink.parent;
+        *parent = (void*) uShellPortLink.parent;
 
     } while (0);
 
@@ -703,7 +703,7 @@ static UShellHalErr_e uShellHalPortSetTxMode(void* const hal)
     do
     {
         /* Check input parameters */
-        if ((halPort == NULL) ||)
+        if ((halPort == NULL))
         {
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;

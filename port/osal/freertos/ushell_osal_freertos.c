@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 
 /* Port includes */
 #include "ushell_osal_freertos.h"
@@ -39,6 +40,12 @@
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]==========================================================================
 
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]====================================================================
+
+/**
+ * \brief Safely converts timeout in ms to FreeRTOS ticks
+ * handling potential integer overflow in pdMS_TO_TICKS(timeoutMs) FreeRTOS macro
+ */
+static TickType_t uShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs);
 
 /**
  * @brief Create the queue
@@ -359,7 +366,7 @@ UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreerto
         }
 
         /* Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             status = USHELL_OSAL_CALL_FROM_ISR_ERR;
             break;
@@ -427,6 +434,23 @@ UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreerto
 //============================================================================[PRIVATE FUNCTIONS]==================================================================================
 
 /**
+ * \brief Safely converts timeout in ms to FreeRTOS ticks handling potential integer overflow in pdMS_TO_TICKS() FreeRTOS macro
+ * \param timeoutMs     - timeout in ms to be checked for integer overflow and safely converted to FreeRTOS ticks
+ * \return TickType_t   - timeout in FreeRTOS ticks
+ */
+static TickType_t uShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs)
+{
+    // Make sure there is no integer overflow while using incoming value of timeoutMs
+    // in the default implementation of FreeRTOS pdMS_TO_TICKS() macro
+    USHELL_OSAL_FREERTOS_ASSERT((timeoutMs / configTICK_RATE_HZ) <= (UINT32_MAX / configTICK_RATE_HZ));
+
+    // Convert timeout in ms to FreeRTOS ticks or use portMAX_DELAY for infinity timeout value
+    TickType_t safeTickCount = (USHELL_OSAL_FREERTOS_INFINITY_TIMEOUT == timeoutMs) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMs);
+
+    return safeTickCount;
+}
+
+/**
  * @brief Create the queue
  * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
  * @param[in] queueItemSize - the size of the queue item
@@ -455,7 +479,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueCreate(void* const osalFreertos,
     do
     {
         /* Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             status = USHELL_OSAL_CALL_FROM_ISR_ERR;
             break;
@@ -522,7 +546,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueDelete(void* const osalFreertos,
         }
 
         /* Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             status = USHELL_OSAL_CALL_FROM_ISR_ERR;
             break;
@@ -571,7 +595,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void* const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     BaseType_t sendStatus = pdFALSE;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -595,7 +618,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPut(void* const osalFreertos,
         }
 
         /* Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             /* Put the item to the queue from ISR level */
             sendStatus = xQueueSendFromISR((QueueHandle_t) queueHandle,
@@ -644,7 +667,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void* const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     TickType_t safeTimeoutInTicks = 0;
     BaseType_t sendStatus = pdFALSE;
@@ -662,7 +684,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void* const osalFreertos,
         }
 
         /* Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             status = USHELL_OSAL_CALL_FROM_ISR_ERR;
             break;
@@ -684,7 +706,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void* const osalFreertos,
         }
 
         /* Convert the timeout in milliseconds to the ticks */
-        safeTimeoutInTicks = ushellOsalFreertosSafeTimeoutToTicks(timeoutMs);
+        safeTimeoutInTicks = uShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
 
         /* Put the item to the queue */
         sendStatus = xQueueSend((QueueHandle_t) queueHandle,
@@ -719,7 +741,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void* const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     BaseType_t receiveStatus = pdFALSE;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -752,7 +773,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemGet(void* const osalFreertos,
         }
 
         /* Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             /* Get the item from the queue from ISR level */
             receiveStatus = xQueueReceiveFromISR((QueueHandle_t) queueHandle,
@@ -798,7 +819,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void* const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     BaseType_t receiveStatus = pdFALSE;
 
@@ -815,7 +835,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemWait(void* const osalFreertos,
         }
 
         /*  Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             status = USHELL_OSAL_CALL_FROM_ISR_ERR;
             break;
@@ -872,7 +892,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void* const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     TickType_t safeTimeoutInTicks = 0;
     BaseType_t receiveStatus = pdFALSE;
@@ -890,7 +909,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void* const osalFreertos,
         }
 
         /* Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             status = USHELL_OSAL_CALL_FROM_ISR_ERR;
             break;
@@ -912,7 +931,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void* const osalFreertos,
         }
 
         /* Safely convert timeout in ms to FreeRTOS ticks */
-        safeTimeoutInTicks = ushellOsalFreertosSafeTimeoutToTicks(timeoutMs);
+        safeTimeoutInTicks = uShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
 
         /* Get the item from the FreeRTOS queue */
         receiveStatus = xQueueReceive((QueueHandle_t) queueHandle,
@@ -944,7 +963,6 @@ static UShellOsalErr_e ushellOsalFreertosQueueReset(void* const osalFreertos,
 
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
     uint16_t queueIndexNum = 0;
     BaseType_t receiveStatus = pdFALSE;
 
@@ -960,7 +978,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueReset(void* const osalFreertos,
         }
 
         /* Check the level at which the function was called */
-        if (xPortInsideInterrupt())
+        if (xPortIsInsideInterrupt())
         {
             status = USHELL_OSAL_CALL_FROM_ISR_ERR;
             break;
@@ -1007,7 +1025,7 @@ static UShellOsalErr_e ushellOsalFreertosLockObjCreate(void* const osalFreertos,
     USHELL_OSAL_FREERTOS_ASSERT(NULL != lockObjHandle);
 
     // Check the level at which the function was called
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
@@ -1062,7 +1080,7 @@ static UShellOsalErr_e ushellOsalFreertosLockObjDelete(void* const osalFreertos,
     USHELL_OSAL_FREERTOS_ASSERT(NULL != lockObjHandle);
 
     // Check the level at which the function was called
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
@@ -1102,7 +1120,7 @@ static UShellOsalErr_e ushellOsalFreertosLock(void* const osalFreertos,
     USHELL_OSAL_FREERTOS_ASSERT(NULL != lockObjHandle);
 
     // Check the level at which the function was called
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
@@ -1144,7 +1162,7 @@ static UShellOsalErr_e ushellOsalFreertosUnlock(void* const osalFreertos,
     USHELL_OSAL_FREERTOS_ASSERT(NULL != lockObjHandle);
 
     // Check the level at which the function was called
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
@@ -1188,7 +1206,7 @@ static UShellOsalErr_e ushellOsalFreertosThreadCreate(void* const osalFreertos,
     USHELL_OSAL_FREERTOS_ASSERT(NULL != threadHandle);
 
     // Check the level at which the function was called
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
@@ -1259,7 +1277,7 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelete(void* const osalFreertos,
     USHELL_OSAL_FREERTOS_ASSERT(NULL != threadHandle);
 
     // Check the level at which the function was called
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
@@ -1307,7 +1325,7 @@ static UShellOsalErr_e ushellOsalFreertosThreadSuspend(void* const osalFreertos,
     USHELL_OSAL_FREERTOS_ASSERT(NULL != threadHandle);
 
     // Check the level at which the function was called
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
@@ -1345,7 +1363,7 @@ static UShellOsalErr_e ushellOsalFreertosThreadResume(void* const osalFreertos,
     USHELL_OSAL_FREERTOS_ASSERT(NULL != threadHandle);
 
     // Check the level at which the function was called
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;
     }
@@ -1384,7 +1402,7 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void* const osalFreer
     (void) osalFreertos;
 
     /* Check where the call is coming from */
-    if (xPortInsideInterrupt())
+    if (xPortIsInsideInterrupt())
     {
         return USHELL_OSAL_CALL_FROM_ISR_ERR;    // Exit: Error: Call from isr
     }

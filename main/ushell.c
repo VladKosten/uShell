@@ -16,7 +16,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
-#include <assert.h>
 
 /* Project includes */
 #include "ushell.h"
@@ -27,8 +26,8 @@
  * \brief Assert macro for the UShell module.
  */
 #ifndef USHELL_ASSERT
+    #define USHELL_ASSERT(cond)
 #endif
-#define USHELL_ASSERT(cond) assert(cond)
 
 typedef enum
 {
@@ -532,9 +531,9 @@ static void uShellWorker(void* const uShell)
     while (1)
     {
 
-        /* Get data*/
-        halErr = UShellHalReceive(ushell->hal, &item);
-        USHELL_ASSERT(halErr == USHELL_HAL_NO_ERR);
+        // /* Get data*/
+        // halErr = UShellHalReceive(ushell->hal, &item);
+        // USHELL_ASSERT(halErr == USHELL_HAL_NO_ERR);
 
         /* Process the data */
         switch (item)
@@ -1044,7 +1043,7 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
 
     if (osalStatus != USHELL_OSAL_NO_ERR)
     {
-        uShellMonitorRtOsalDeInit(uShell);
+        uShellRtEnvOsalDeInit(uShell);
         return USHELL_PORT_ERR;
     }
 

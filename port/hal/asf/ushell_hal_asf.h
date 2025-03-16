@@ -9,6 +9,7 @@ extern "C" {
 
 /* Project includes */
 #include "ushell_hal.h"    ///< UShell HAL layer
+#include "atmel_start.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 

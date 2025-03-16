@@ -9,15 +9,17 @@ set(CMAKE_C_STANDARD 99)
 # Export compile database
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Add subdirectories
-add_subdirectory(main)
-add_subdirectory(port)
-add_subdirectory(test)
-
 # If the standalone build option is enabled, add the test subdirectory
 if(USHELL_UNIT_TEST_BUILD OR USHELL_UNIT_TEST_BUILD)
     option(HAL_PORT_CMOCK "Use CMOCK HAL port" ON)
     option(OSAL_PORT_POSIX "Use POSIX OSAL port" ON)
+    add_subdirectory(test)
 else()
-    message("-- DIO_MONITOR INCLUDE IN APPLICATION")
+    message("-- UShell INCLUDE IN APPLICATION")
+    option(HAL_PORT_ASF "Use ASF HAL port" ON)
+    option(OSAL_PORT_FREERTOS "Use FreeRTOS OSAL port" ON)
 endif()
+
+# Add subdirectories
+add_subdirectory(main)
+add_subdirectory(port)
