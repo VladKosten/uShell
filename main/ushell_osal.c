@@ -990,4 +990,74 @@ UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
     return status;
 }
 
+/**
+ * \brief Get a queue handle of the given OSAL object
+ * \param[in] osal          - pointer to OSAL instance
+ * \param[in] queueSlotInd  - index of queue slot
+ * \param[out] queuehandle  - pointer to an object into which the current queue handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalQueueHandleGet(UShellOsal_s* const osal,
+                                         const size_t queueSlotInd,
+                                         UShellOsalQueueHandle_t* const queueHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == queueHandle) ||
+        (USHELL_OSAL_QUEUE_SLOTS_NUM <= queueSlotInd))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    *queueHandle = osal->queueHandle [queueSlotInd];
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+/**
+ * \brief Get a lockobj handle of the given OSAL object
+ * \param[in]   osal            - pointer to OSAL instance
+ * \param[in]   lockObjSlotInd  - index of lockobj slots
+ * \param[out]  lockObjhandle   - pointer to an object into which the lockobj handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalLockObjHandleGet(UShellOsal_s* const osal,
+                                           const size_t lockObjSlotInd,
+                                           UShellOsalLockObjHandle_t* const lockObjHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == lockObjHandle) ||
+        (USHELL_OSAL_LOCK_OBJS_NUM <= lockObjSlotInd) ||
+        (NULL == osal->lockObjHandle [lockObjSlotInd]))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    *lockObjHandle = osal->lockObjHandle [lockObjSlotInd];
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+/**
+ * \brief Get a thread handle of the given OSAL object
+ * \param[in]   osal            - pointer to OSAL instance
+ * \param[in]   threadSlotInd   - index of thread slots
+ * \param[out]  threadHandle	- pointer to an object into which the thread handle handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalThreadHandleGet(UShellOsal_s* const osal,
+                                          const size_t threadSlotInd,
+                                          UShellOsalThreadHandle_t* const threadHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == threadHandle) ||
+        (USHELL_OSAL_THREADS_NUM <= threadSlotInd))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    *threadHandle = osal->threadObj [threadSlotInd].threadHandle;
+
+    return USHELL_OSAL_NO_ERR;
+}
+
 //============================================================================[PRIVATE FUNCTIONS]==================================================================================

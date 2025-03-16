@@ -38,11 +38,10 @@ extern "C" {
  */
 typedef enum
 {
-    USHELL_HISTORY_NO_ERR = 0,          ///< Exit: no errors (success)
-    USHELL_HISTORY_INVALID_ARGS_ERR,    ///< Exit: error - invalid pointers (e.g. null pointers)
-    USHELL_HISTORY_NOT_INIT_ERR,        ///< Exit: error - not initialized
-    USHELL_HISTORY_CMD_NOT_FOUND_ERR,   ///< Exit: error - command not found
-    
+    USHELL_HISTORY_NO_ERR = 0,           ///< Exit: no errors (success)
+    USHELL_HISTORY_INVALID_ARGS_ERR,     ///< Exit: error - invalid pointers (e.g. null pointers)
+    USHELL_HISTORY_NOT_INIT_ERR,         ///< Exit: error - not initialized
+    USHELL_HISTORY_CMD_NOT_FOUND_ERR,    ///< Exit: error - command not found
 
 } UShellHistoryErr_e;
 

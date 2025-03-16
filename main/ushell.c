@@ -20,8 +20,6 @@
 
 /* Project includes */
 #include "ushell.h"
-#include "ushell_hal.h"
-#include "ushell_osal.h"
 
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
@@ -235,48 +233,59 @@ static void uShellUnlock(const UShell_s* const dio);
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
- * \brief Init uShell object
+ * @brief Init uShell object
  * \param[in] uShell - uShell object to be initialized
  * \param[in] osal - osal object
  * \param[in] hal - hal object
  * \param[in] parent - parent object
  * \param[in] name - name of the object
  * \param[out] none
- * \return USHELL_NO_ERR if success, otherwise error code
+ * @return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
                        const UShellHal_s* const hal,
-                       const void* const parent,
+                       const UShellCfg_s cfg,
+                       void* const parent,
                        const char* const name)
 {
+
     /* Check input parameters */
-    if ((uShell == NULL) || (osal == NULL) || (hal == NULL))
+    USHELL_ASSERT(uShell != NULL);
+    USHELL_ASSERT(osal != NULL);
+    USHELL_ASSERT(hal != NULL);
+
+    /* Local variable */
+    UShellErr_e status = USHELL_NO_ERR;
+
+    do
     {
-        return USHELL_INVALID_ARGS_ERR;
-    }
+        /* Initialize the runtime environment */
+        if ((uShell == NULL) ||
+            (osal == NULL) ||
+            (hal == NULL))
+        {
+            return USHELL_INVALID_ARGS_ERR;
+        }
 
-    /* Set the parent object */
-    uShell->parent = parent;
+        /* Flush the objects */
+        memset(uShell, 0, sizeof(UShell_s));
 
-    /* Set the name of the object */
-    uShell->name = name;
+        /* Set the parent object */
+        uShell->parent = parent;
+        uShell->name = name;
 
-    /* Set the osal object */
-    uShell->osal = osal;
+        /* Initialize the runtime environment */
+        status = uShellRtEnvInit(uShell,
+                                 osal,
+                                 hal,
+                                 &cfg);
+        if (status != USHELL_NO_ERR)
+        {
+            break;
+        }
 
-    /* Set the hal object */
-    uShell->hal = hal;
-
-    /* Initialize the commands */
-    for (uint8_t i = 0; i < USHELL_MAX_CMD; i++)
-    {
-        uShell->cmd [i] = NULL;
-    }
-
-    /* Attach worker */
-    UShellOsalErr_e osalErr = UShellOsalWorkerAttach(uShell->osal, uShellWorker);
-    USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
+    } while (0);
 
     return USHELL_NO_ERR;
 }
@@ -289,47 +298,32 @@ UShellErr_e UShellInit(UShell_s* const uShell,
  */
 UShellErr_e UShellDeInit(UShell_s* const uShell)
 {
+
     /* Check input parameters */
-    if (uShell == NULL)
-    {
-        return USHELL_INVALID_ARGS_ERR;
-    }
+    USHELL_ASSERT(uShell != NULL);
 
-    /* Check RTE state */
-    UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
-    if (uShell->osal->portable != NULL)
+    /* Local variable */
+    UShellErr_e status = USHELL_NO_ERR;
+
+    /* Check input parameter */
+    do
     {
-        /* Stop the thread */
-        if (uShell->osal->portable->threadStop != NULL)
+        /* Check input parameter */
+        if (uShell == NULL)
         {
-            osalErr = uShell->osal->portTable->threadStop(uShell);
-            USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
         }
 
-        /* Detach worker */
-        if (uShell->osal->worker != NULL)
-        {
-            osalErr = UShellOsalWorkerDetach(uShell->osal);
-            USHELL_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
-        }
-    }
+        /* Deinitialize the runtime environment */
+        uShellRtEnvDeInit(uShell);
 
-    /* Deinitialize the commands */
-    for (uint8_t i = 0; i < USHELL_MAX_CMD; i++)
-    {
-        if (uShell->cmd [i] != NULL)
-        {
-            UShellCmdDeInit(uShell->cmd [i]);
-        }
-    }
+        /* Clear the object */
+        memset(uShell, 0, sizeof(UShell_s));
 
-    /* Remove obj */
-    uShell->parent = NULL;
-    uShell->name = NULL;
-    uShell->osal = NULL;
-    uShell->hal = NULL;
+    } while (0);
 
-    return USHELL_NO_ERR;
+    return status;
 }
 
 /**
@@ -342,26 +336,48 @@ UShellErr_e UShellDeInit(UShell_s* const uShell)
 UShellErr_e UShellRun(UShell_s* const uShell)
 {
     /* Check input parameters */
-    if (uShell == NULL)
-    {
-        return USHELL_INVALID_ARGS_ERR;
-    }
+    USHELL_ASSERT(uShell != NULL);
 
-    /* Flush event */
-    UShellOsalErr_e osalErr = UShellOsalEventFlush(uShell->osal);
-    if (osalErr != USHELL_OSAL_NO_ERR)
-    {
-        return USHELL_PORT_ERR;
-    }
+    /* Local variable */
+    UShellErr_e status = USHELL_NO_ERR;
 
-    /* Start thread */
-    osalErr = UShellOsalThreadStart(uShell->osal);
-    if (osalErr != USHELL_OSAL_NO_ERR)
+    /* Check input parameter */
+    do
     {
-        return USHELL_PORT_ERR;
-    }
+        /* Check input parameter */
+        if (uShell == NULL)
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
 
-    return USHELL_NO_ERR;
+        /* Flush the queue msg */
+        status = uShellQueueMsgFlush(uShell);
+        if (status != USHELL_NO_ERR)
+        {
+            break;
+        }
+
+        /* Find the thread handle */
+        UShellOsalThread_s* thread = NULL;
+        UShellOsalErr_e osalStatus = UShellOsalThreadHandleGet(uShell->osal, 0U, &thread);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Start the thread */
+        osalStatus = UShellOsalThreadResume(uShell->osal, thread->threadHandle);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -373,19 +389,41 @@ UShellErr_e UShellRun(UShell_s* const uShell)
 UShellErr_e UShellStop(UShell_s* const uShell)
 {
     /* Check input parameters */
-    if (uShell == NULL)
-    {
-        return USHELL_INVALID_ARGS_ERR;
-    }
+    USHELL_ASSERT(uShell != NULL);
 
-    /* Check RTE state */
-    UShellOsalErr_e osalErr = UShellOsalThreadStop(uShell->osal);
-    if (osalErr != USHELL_OSAL_NO_ERR)
-    {
-        return USHELL_PORT_ERR;
-    }
+    /* Local variable */
+    UShellErr_e status = USHELL_NO_ERR;
 
-    return USHELL_NO_ERR;
+    /* Check input parameter */
+    do
+    {
+        /* Check input parameter */
+        if (uShell == NULL)
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Find the thread handle */
+        UShellOsalThread_s* thread = NULL;
+        UShellOsalErr_e osalStatus = UShellOsalThreadHandleGet(uShell->osal, 0U, &thread);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Start the thread */
+        osalStatus = UShellOsalThreadResume(uShell->osal, thread->threadHandle);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+    } while (0);
+
+    return status;
 }
 
 /**

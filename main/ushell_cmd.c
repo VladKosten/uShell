@@ -109,7 +109,7 @@ UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd,
     }
 
     /* Get the name */
-    *name = cmd->name;
+    *name = (char*) cmd->name;
 
     return USHELL_CMD_NO_ERR;
 }
@@ -130,7 +130,7 @@ UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const 
     }
 
     /* Get the help string */
-    *help = cmd->help;
+    *help = (char*) cmd->help;
 
     return USHELL_CMD_NO_ERR;    //< Success
 }

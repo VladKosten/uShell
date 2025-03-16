@@ -825,6 +825,39 @@ UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
                                       const uint32_t msDelay);
 
+/**
+ * \brief Get a queue handle of the given OSAL object
+ * \param[in] osal          - pointer to OSAL instance
+ * \param[in] queueSlotInd  - index of queue slot
+ * \param[out] queuehandle  - pointer to an object into which the current queue handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalQueueHandleGet(UShellOsal_s* const osal,
+                                         const size_t queueSlotInd,
+                                         UShellOsalQueueHandle_t* const queueHandle);
+
+/**
+ * \brief Get a lockobj handle of the given OSAL object
+ * \param[in]   osal            - pointer to OSAL instance
+ * \param[in]   lockObjSlotInd  - index of lockobj slots
+ * \param[out]  lockObjhandle   - pointer to an object into which the lockobj handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalLockObjHandleGet(UShellOsal_s* const osal,
+                                           const size_t lockObjSlotInd,
+                                           UShellOsalLockObjHandle_t* const lockObjHandle);
+
+/**
+ * \brief Get a thread handle of the given OSAL object
+ * \param[in]   osal            - pointer to OSAL instance
+ * \param[in]   threadSlotInd   - index of thread slots
+ * \param[out]  threadHandle	- pointer to an object into which the thread handle handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalThreadHandleGet(UShellOsal_s* const osal,
+                                          const size_t threadSlotInd,
+                                          UShellOsalThreadHandle_t* const threadHandle);
+
 #ifdef __cplusplus
 }
 #endif
