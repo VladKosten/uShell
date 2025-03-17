@@ -108,13 +108,6 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
                                         const size_t size);
 
 /**
- * @brief Flush function.
- * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
- */
-static UShellHalErr_e uShellHalPortFlush(void* const hal);
-
-/**
  * @brief Set Tx mode
  * @param[in] hal Pointer to the HAL instance.
  * @return Error code indicating the result of the operation.
@@ -162,7 +155,6 @@ static UShellHalPortTable_s ushellHalPortTable = {
     .close = uShellHalPortClose,
     .write = uShellHalPortWrite,
     .read = uShellHalPortRead,
-    .flush = uShellHalPortFlush,
     .setTxMode = uShellHalPortSetTxMode,
     .setRxMode = uShellHalPortSetRxMode,
 };
@@ -637,43 +629,6 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
                                     (uint8_t*) data,
                                     size);
         if (asfStatus != size)
-        {
-            status = USHELL_HAL_PORT_ERR;
-            break;
-        }
-
-    } while (0);
-
-    return status;
-}
-
-/**
- * @brief Flush function.
- * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
- */
-static UShellHalErr_e uShellHalPortFlush(void* const hal)
-{
-    /* Check input parameter */
-    USHELL_HAL_PORT_ASSERT(hal != NULL);
-
-    /* Local variable */
-    UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
-    UShellHalErr_e status = USHELL_HAL_NO_ERR;
-
-    do
-    {
-        /* Check input parameters */
-        if ((halPort == NULL) ||
-            (halPort->uart == NULL))
-        {
-            status = USHELL_HAL_INVALID_ARGS_ERR;
-            break;
-        }
-
-        /* Flush the port */
-        int32_t asfStatus = usart_async_flush_rx_buffer((struct usart_async_descriptor*) halPort->uart);
-        if (asfStatus != ERR_NONE)
         {
             status = USHELL_HAL_PORT_ERR;
             break;

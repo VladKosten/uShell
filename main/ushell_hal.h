@@ -129,16 +129,6 @@ typedef struct
                            const size_t size);
 
     /**
-     * @brief Flush function.
-     *
-     * This function flushes the HAL buffers.
-     *
-     * @param[in] hal Pointer to the HAL instance.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellHalErr_e (*flush)(void* const hal);
-
-    /**
      * @brief Set Tx mode
      *
      * This function tx mode
@@ -383,13 +373,6 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
 UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
                              UShellHalItem_t* const data,
                              const size_t sizeBuffer);
-
-/**
- * @brief Flush the UShellHal object
- * @param[in] hal - UShellHal object to flush
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
- */
-UShellHalErr_e UShellHalFlush(UShellHal_s* const hal);
 
 /**
  * @brief Set the tx mode of the UShellHal object

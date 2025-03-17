@@ -142,7 +142,7 @@ UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
 
     } while (0);
 
-    return USHELL_HAL_NO_ERR;
+    return status;
 }
 
 /**
@@ -173,7 +173,7 @@ UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal,
         }
 
         /* Get the parent object */
-        *parent = hal->parent;
+        *parent = (void*) hal->parent;
 
     } while (0);
 
@@ -241,8 +241,7 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
     {
         /* Check input parameter */
         if ((hal == NULL) ||
-            (cb == NULL) ||
-            (cbType & USHELL_HAL_CB_ALL == 0))
+            (cb == NULL))
         {
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
@@ -303,8 +302,7 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
     do
     {
         /* Check input parameter */
-        if ((hal == NULL) ||
-            (cbType & USHELL_HAL_CB_ALL == 0))
+        if (hal == NULL)
         {
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
@@ -462,45 +460,6 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
 
         /* Close the port */
         status = hal->port->write(hal, data, size);
-
-    } while (0);
-
-    return status;
-}
-
-/**
- * @brief Flush the UShellHal object
- * @param[in] hal - UShellHal object to flush
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
- */
-UShellHalErr_e UShellHalFlush(UShellHal_s* const hal)
-{
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-
-    /* Local variable */
-    UShellHalErr_e status = USHELL_HAL_NO_ERR;
-
-    /* Process */
-    do
-    {
-        /* Check input parameter */
-        if (hal == NULL)
-        {
-            status = USHELL_HAL_INVALID_ARGS_ERR;
-            break;
-        }
-
-        /* Check is init */
-        if ((hal->port == NULL) ||
-            (hal->port->flush == NULL))
-        {
-            status = USHELL_HAL_PORT_ERR;
-            break;
-        }
-
-        /* Close the port */
-        status = hal->port->flush(hal);
 
     } while (0);
 
