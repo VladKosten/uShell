@@ -55,12 +55,16 @@ extern "C" {
     #define USHELL_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
 #endif
 
-#ifndef USHELL_SEND_TIMEOUT_MS
-    #define USHELL_SEND_TIMEOUT_MS 1000U
+#ifndef USHELL_CLI_UPDATE_TIMEOUT_MS
+    #define USHELL_CLI_UPDATE_TIMEOUT_MS 3000U
 #endif
 
-#ifndef USHELL_HELLO_MSG
-    #define USHELL_HELLO_MSG "Hello from UShell!, please press enter to continue...\r\n"
+#ifndef USHELL_CLI_TX_TIMEOUT_MS
+    #define USHELL_CLI_TX_TIMEOUT_MS 1000U
+#endif
+
+#ifndef USHELL_USER_PROMPT
+    #define USHELL_USER_PROMPT "uShell> "
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -86,6 +90,7 @@ typedef enum
     USHELL_PORT_ERR,            ///< Exit: error - port error (e.g. port layer error)
     USHELL_CMD_ERR,             ///< Exit: error - no space for command
     USHELL_XFER_ERR,            ///< Exit: error - transfer error
+    USHELL_TIMEOUT_ERR,         ///< Exit: error - timeout error
 
 } UShellErr_e;
 

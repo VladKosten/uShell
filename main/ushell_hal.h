@@ -382,7 +382,7 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
  */
 UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
                              UShellHalItem_t* const data,
-                             const size_t size);
+                             const size_t sizeBuffer);
 
 /**
  * @brief Flush the UShellHal object

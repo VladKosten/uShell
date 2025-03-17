@@ -241,10 +241,18 @@ static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquire(void* const osalFreert
                                                           const UShellOsalSemaphoreHandle_t semaphoreHandle);
 
 /**
+ * @brief Acquire a semaphore with timeout
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquirePend(void* const osalFreertos,
+                                                              const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                                              const UShellOsalTimeMs_t timeoutMs);
+
+/**
  * \brief Release a semaphore
  */
-static UShellOsalErr_e ushellOsalFreertosSemaphoreRelease(void* const osalFreertos,
-                                                          const UShellOsalSemaphoreHandle_t semaphoreHandle);
+static UShellOsalErr_e
+ushellOsalFreertosSemaphoreRelease(void* const osalFreertos,
+                                   const UShellOsalSemaphoreHandle_t semaphoreHandle);
 
 /**
  * \brief Get the count of a semaphore
@@ -339,6 +347,7 @@ static const UShellOsalPortable_s FreeRtosPortable =
         .semaphoreAcquire = ushellOsalFreertosSemaphoreAcquire,
         .semaphoreRelease = ushellOsalFreertosSemaphoreRelease,
         .semaphoreCountGet = ushellOsalFreertosSemaphoreCountGet,
+        .semaphoreAcquirePend = ushellOsalFreertosSemaphoreAcquirePend,
 };
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
@@ -1597,6 +1606,49 @@ static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquire(void* const osalFreert
     else
     {
         acquireStatus = xSemaphoreTake(semaphoreHandle, portMAX_DELAY);    // TODO: to change to 0 ?
+    }
+
+    if (pdTRUE != acquireStatus)
+    {
+        return USHELL_OSAL_SEMAPHORE_ACQUIRE_ERR;
+    }
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * @brief Acquire a semaphore with timeout
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquirePend(void* const osalFreertos,
+                                                              const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                                              const UShellOsalTimeMs_t timeoutMs)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
+
+    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
+    if (0 == semaphoreIndex)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    BaseType_t acquireStatus = pdFALSE;
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    // Acquire the semaphore
+    else
+    {
+        acquireStatus = xSemaphoreTake(semaphoreHandle, timeoutMs);    // TODO: to change to 0 ?
     }
 
     if (pdTRUE != acquireStatus)

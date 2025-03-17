@@ -65,13 +65,16 @@ typedef struct
  * \param name Pointer to the name of the command.
  * \param help Pointer to the help string (must be a valid string).
  */
-typedef struct
+typedef struct UShellCmd_t
 {
     /* Mandatory */
     const void* parent;                      ///< Pointer to the parent object
     const char* name;                        ///< Pointer to the name of the object (aka command)
+    bool isSudo;                             ///< Cmd is sudo(Execute with root privilege)
     const UShellCmdHelp_t* help;             ///< Pointer to the help string (Must be string)
     const UShellCmdPortTable_s* portable;    ///< Pointer to the port table
+
+    struct UShellCmd_t* next;
 
 } UShellCmd_s;
 
@@ -119,6 +122,18 @@ UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd,
 UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd,
                                 UShellCmdHelp_t** const help);
 
+UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
+                                UShellCmd_s* const cmd);
+
+UShellCmdErr_e UShellCmdListRemove(UShellCmd_s* const cmdRoot,
+                                   UShellCmd_s* const cmd);
+
+UShellCmdErr_e UShellCmdIsInList(UShellCmd_s* const cmdRoot,
+                                 UShellCmd_s* const cmd,
+                                 bool* const isInList);
+
+UShellCmdErr_e UShellCmdListNextGet(UShellCmd_s* const cmdRoot,
+                                    UShellCmd_s** const cmd);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

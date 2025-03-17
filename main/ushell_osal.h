@@ -613,6 +613,20 @@ typedef struct
                                         const UShellOsalSemaphoreHandle_t semaphoreHandle);
 
     /**
+     * @brief Acquire Pend for a semaphore with timeout.
+     *
+     * This function acquires the specified semaphore, blocking for the specified timeout if necessary.
+     *
+     * @param[in] osal Pointer to the osal instance
+     * @param[in] semaphoreHandle Handle of the semaphore to be acquired
+     * @param[in] timeoutMs Timeout in milliseconds
+     * @return Error code indicating the result of the operation
+     */
+    UShellOsalErr_e (*semaphoreAcquirePend)(void* const osal,
+                                            const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                            const UShellOsalTimeMs_t timeoutMs);
+
+    /**
      * @brief Release a semaphore.
      *
      * This function releases the specified semaphore.
@@ -974,6 +988,17 @@ UShellOsalErr_e UShellOsalSemaphoreDelete(UShellOsal_s* const osal,
  */
 UShellOsalErr_e UShellOsalSemaphoreAcquire(UShellOsal_s* const osal,
                                            const UShellOsalSemaphoreHandle_t semaphoreHandle);
+
+/**
+ * @brief Acquire the semaphore
+ * @param osal             - pointer to OSAL instance
+ * @param semaphoreHandle   - semaphore object handle to acquire
+ * @param timeoutMs       - timeout in milliseconds to wait for the semaphore
+ * @return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreAcquirePend(UShellOsal_s* const osal,
+                                               const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                               const UShellOsalTimeMs_t timeoutMs);
 
 /**
  * \brief Release the semaphore

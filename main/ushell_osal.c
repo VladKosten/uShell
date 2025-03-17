@@ -1080,6 +1080,33 @@ UShellOsalErr_e UShellOsalSemaphoreAcquire(UShellOsal_s* const osal,
 }
 
 /**
+ * @brief Acquire the semaphore
+ * @param osal             - pointer to OSAL instance
+ * @param semaphoreHandle   - semaphore object handle to acquire
+ * @param timeoutMs       - timeout in milliseconds to wait for the semaphore
+ * @return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreAcquirePend(UShellOsal_s* const osal,
+                                               const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                               const UShellOsalTimeMs_t timeoutMs)
+{
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->semaphoreAcquirePend))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->semaphoreAcquirePend(osal, semaphoreHandle, timeoutMs);
+
+    return retStatus;
+}
+
+/**
  * \brief Release the semaphore
  * \param osal              - pointer to OSAL instance
  * \param semaphoreHandle   - semaphore object handle to release
