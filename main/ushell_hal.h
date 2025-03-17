@@ -195,14 +195,14 @@ typedef enum
      *
      * Indicates that a callback should be invoked when an RX operation is complete.
      */
-    USHELL_HAL_CB_RX_RECEIVED = 0x03,
+    USHELL_HAL_CB_RX_RECEIVED = 0x04,
 
     /**
      * @brief All callbacks.
      *
      * Indicates that all callbacks are set.
      */
-    USHELL_HAL_CB_ALL = 0x06,
+    USHELL_HAL_CB_ALL = 0x07,
 
 } UShellHalCallback_e;
 

@@ -837,7 +837,7 @@ static void uShellHalPortRxReceiveCb(const struct usart_async_descriptor* const 
         }
 
         /* Call error callback */
-        halPort->base.rxTxErrorCb((void*) halPort, USHELL_HAL_CB_RX_RECEIVED);
+        halPort->base.rxReceivedCb((void*) halPort, USHELL_HAL_CB_RX_RECEIVED);
 
     } while (0);
 }
@@ -876,7 +876,7 @@ static void uShellHalPortTxCompleteCb(const struct usart_async_descriptor* const
         }
 
         /* Call error callback */
-        halPort->base.rxTxErrorCb((void*) halPort, USHELL_HAL_CB_TX_COMPLETE);
+        halPort->base.txCompleteCb((void*) halPort, USHELL_HAL_CB_TX_COMPLETE);
 
     } while (0);
 }

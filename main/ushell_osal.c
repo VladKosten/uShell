@@ -991,6 +991,150 @@ UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
 }
 
 /**
+ * \brief Create the semaphore object
+ * \param osal               - pointer to OSAL instance
+ * \param semaphoreCountMax  - the maximum count of the semaphore
+ * \param semaphoreInitValue - the initial value of the semaphore
+ * \param semaphoreHandle    - semaphore object handle that was created
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreCreate(UShellOsal_s* const osal,
+                                          const UShellOsalSemaphoreCount_t semaphoreCountMax,
+                                          const UShellOsalSemaphoreCount_t semaphoreInitValue,
+                                          UShellOsalSemaphoreHandle_t* const semaphoreHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle) ||
+        (0 == semaphoreCountMax) ||
+        (semaphoreInitValue > semaphoreCountMax))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->semaphoreCreate))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    if (UINT32_MAX < semaphoreCountMax)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->semaphoreCreate(osal,
+                                                                semaphoreCountMax,
+                                                                semaphoreInitValue,
+                                                                semaphoreHandle);
+
+    return retStatus;
+}
+
+/**
+ * \brief Delete the semaphore object
+ * \param osal              - pointer to OSAL instance
+ * \param semaphoreHandle   - semaphore object handle to delete
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreDelete(UShellOsal_s* const osal,
+                                          const UShellOsalSemaphoreHandle_t semaphoreHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->semaphoreDelete))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->semaphoreDelete(osal, semaphoreHandle);
+
+    return retStatus;
+}
+
+/**
+ * \brief Acquire the semaphore
+ * \param osal              - pointer to OSAL instance
+ * \param semaphoreHandle   - semaphore object handle to acquire
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreAcquire(UShellOsal_s* const osal,
+                                           const UShellOsalSemaphoreHandle_t semaphoreHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->semaphoreAcquire))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->semaphoreAcquire(osal, semaphoreHandle);
+
+    return retStatus;
+}
+
+/**
+ * \brief Release the semaphore
+ * \param osal              - pointer to OSAL instance
+ * \param semaphoreHandle   - semaphore object handle to release
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreRelease(UShellOsal_s* const osal,
+                                           const UShellOsalSemaphoreHandle_t semaphoreHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->semaphoreRelease))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->semaphoreRelease(osal, semaphoreHandle);
+
+    return retStatus;
+}
+
+/**
+ * \brief Get the current count of the semaphore
+ * \param osal              - pointer to OSAL instance
+ * \param semaphoreHandle   - semaphore object handle
+ * \param semaphoreCount    - the current count of the semaphore
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s* const osal,
+                                            const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                            UShellOsalSemaphoreCount_t* const semaphoreCount)
+{
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle) ||
+        (NULL == semaphoreCount))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->semaphoreCountGet))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->semaphoreCountGet(osal,
+                                                                  semaphoreHandle,
+                                                                  semaphoreCount);
+
+    return retStatus;
+}
+
+/**
  * \brief Get a queue handle of the given OSAL object
  * \param[in] osal          - pointer to OSAL instance
  * \param[in] queueSlotInd  - index of queue slot
@@ -1056,6 +1200,29 @@ UShellOsalErr_e UShellOsalThreadHandleGet(UShellOsal_s* const osal,
     }
 
     *threadHandle = osal->threadObj [threadSlotInd].threadHandle;
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+/**
+ * \brief Get a semaphore handle of the given OSAL object
+ * \param[in]   osal                - pointer to OSAL instance
+ * \param[in]   semaphoreSlotInd    - index of semaphore slots
+ * \param[out]  semaphoreHandle	    - pointer to an object into which the semaphore handle handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalSemaphoreHandleGet(UShellOsal_s* const osal,
+                                             const size_t semaphoreSlotInd,
+                                             UShellOsalSemaphoreHandle_t* const semaphoreHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == semaphoreHandle) ||
+        (USHELL_OSAL_SEMAPHORE_OBJS_NUM <= semaphoreSlotInd))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    *semaphoreHandle = osal->semaphoreHandle [semaphoreSlotInd];
 
     return USHELL_OSAL_NO_ERR;
 }

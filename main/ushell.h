@@ -59,6 +59,10 @@ extern "C" {
     #define USHELL_SEND_TIMEOUT_MS 1000U
 #endif
 
+#ifndef USHELL_HELLO_MSG
+    #define USHELL_HELLO_MSG "Hello from UShell!, please press enter to continue...\r\n"
+#endif
+
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
@@ -97,9 +101,28 @@ typedef struct
 } UShellIo_s;
 
 /**
+ * @brief Enumeration of the uShell finite state machine states.
+ *
+ * This enumeration defines the different states in which the uShell can operate.
+ * These states include:
+ * - USHELL_STATE_IDLE: The shell is idle.
+ * - USHELL_STATE_AUTH: The shell is waiting for authentication.
+ * - USHELL_STATE_RUN: The shell is actively running commands.
+ * - USHELL_STATE_ERROR: The shell encountered an error.
+ */
+typedef enum
+{
+    USHELL_STATE_IDLE = 0,    ///< uShell is idle
+    USHELL_STATE_AUTH,        ///< uShell is in authentication state
+    USHELL_STATE_RUN,         ///< uShell is running
+    USHELL_STATE_ERROR,       ///< uShell is in error state
+} UShellFsmState_e;
+
+/**
  * @brief Description of the uShell object
  */
 typedef enum
+
 {
     USHELL_FEATURE_AUTH = 0,    ///< Enable authentication
     USHELL_FEATURE_ECHO,        ///< Enable echo feature
@@ -138,6 +161,7 @@ typedef struct
     const UShellHal_s* hal;      ///< HAL object
 
     /* Optional fields */
+    UShellFsmState_e fsmState;            ///< Finite state machine state
     UShellCfg_s cfg;                      ///< Configuration object
     UShellCmd_s* cmd [USHELL_MAX_CMD];    ///< Commands array
     UShellAuth_s auth;                    ///< Authentication object

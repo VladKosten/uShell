@@ -221,6 +221,39 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void* const osalFreer
                                                      const uint32_t msDelay);
 
 /**
+ * \brief Create a counting semaphore
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreCreate(void* const osalFreertos,
+                                                         const UShellOsalSemaphoreCount_t semaphoreCountMax,
+                                                         const UShellOsalSemaphoreCount_t semaphoreInitVal,
+                                                         UShellOsalSemaphoreHandle_t* const semaphoreHandle);
+
+/**
+ * \brief Delete a semaphore
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreDelete(void* const osalFreertos,
+                                                         const UShellOsalSemaphoreHandle_t semaphoreHandle);
+
+/**
+ * \brief Acquire a semaphore
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquire(void* const osalFreertos,
+                                                          const UShellOsalSemaphoreHandle_t semaphoreHandle);
+
+/**
+ * \brief Release a semaphore
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreRelease(void* const osalFreertos,
+                                                          const UShellOsalSemaphoreHandle_t semaphoreHandle);
+
+/**
+ * \brief Get the count of a semaphore
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreCountGet(void* const osalFreertos,
+                                                           const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                                           UShellOsalSemaphoreCount_t* const semaphoreCount);
+
+/**
  * @brief Find the queue handle in the queue handles table
  * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
  * @param[in] queueHandle  - queue handle to be found
@@ -254,6 +287,12 @@ static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s* 
  * @return bool - true if the parameters are valid, false otherwise
  */
 static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const threadCfg);
+
+/**
+ * \brief Find the semaphore handle in the semaphores table
+ */
+static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                             const UShellOsalSemaphoreHandle_t semaphoreHandle);
 
 /**
  * @brief FreeRTOS priority levels hash-table.
@@ -295,6 +334,11 @@ static const UShellOsalPortable_s FreeRtosPortable =
         .threadSuspend = ushellOsalFreertosThreadSuspend,
         .threadResume = ushellOsalFreertosThreadResume,
         .threadDelay = ushellOsalFreertosThreadDelay,
+        .semaphoreCreate = ushellOsalFreertosSemaphoreCreate,
+        .semaphoreDelete = ushellOsalFreertosSemaphoreDelete,
+        .semaphoreAcquire = ushellOsalFreertosSemaphoreAcquire,
+        .semaphoreRelease = ushellOsalFreertosSemaphoreRelease,
+        .semaphoreCountGet = ushellOsalFreertosSemaphoreCountGet,
 };
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
@@ -1413,6 +1457,246 @@ static UShellOsalErr_e ushellOsalFreertosThreadDelay(const void* const osalFreer
 }
 
 /**
+ * \brief Create a counting semaphore
+ * \param osalFreertos      - pointer to FreeRTOS osal instance
+ * \param semaphoreCountMax - The maximum count value that can be reached.
+ *                            When the semaphore reaches this value it can no longer be 'given'.
+ * \param semaphoreHandle   - semaphore handle by which created semaphore can be referenced
+ * \return UShellOsalErr_e error code
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreCreate(void* const osalFreertos,
+                                                         const UShellOsalSemaphoreCount_t semaphoreCountMax,
+                                                         const UShellOsalSemaphoreCount_t semaphoreInitVal,
+                                                         UShellOsalSemaphoreHandle_t* const semaphoreHandle)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
+    USHELL_OSAL_FREERTOS_ASSERT(0 != semaphoreCountMax);
+    USHELL_OSAL_FREERTOS_ASSERT(semaphoreCountMax >= semaphoreInitVal);
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
+    *semaphoreHandle = NULL;
+
+    // Create the FreeRTOS semaphore object:
+    // 1. check if there is a free slot
+    for (int i = 0; i < USHELL_OSAL_SEMAPHORE_OBJS_NUM; i++)
+    {
+        if (NULL == osal->semaphoreHandle [i])
+        {
+            // Congratulations!
+            // The free slot was found, create the semaphore object
+            // Initial semaphore count value is 0!
+            osal->semaphoreHandle [i] = xSemaphoreCreateCounting(semaphoreCountMax, semaphoreInitVal);
+            if (NULL == osal->semaphoreHandle [i])
+            {
+                // Semaphore was not created and must not be used
+                // Exit: error - the RAM required to hold the semaphore cannot be allocated
+                return USHELL_OSAL_SEMAPHORE_MEM_ALLOC_ERR;
+            }
+
+            // We can only get there if the semaphore was created
+            // No additional checks needed
+            *semaphoreHandle = osal->semaphoreHandle [i];
+            // So break the loop
+            break;
+        }
+    }
+
+    // 2. Check if the semaphore object was created
+    if (NULL == *semaphoreHandle)
+    {
+        return USHELL_OSAL_SEMAPHORE_OBJ_CREATE_ERR;    // Exit: error - no free slots in the table
+    }
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * \brief Delete a semaphore
+ * \param osalFreertos      - pointer to FreeRTOS osal instance
+ * \param semaphoreHandle   - the handle of the semaphore being deleted
+ * \return UShellOsalErr_e error code.
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreDelete(void* const osalFreertos,
+                                                         const UShellOsalSemaphoreHandle_t semaphoreHandle)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
+
+    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
+    if (0 == semaphoreIndex)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    // Delete the semaphore
+    vSemaphoreDelete((SemaphoreHandle_t) semaphoreHandle);
+    // Clear the lock object slot in the table
+    osal->semaphoreHandle [semaphoreIndex - 1] = NULL;    // Subtract 1 because find function increases actual index by 1
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * \brief Acquire a semaphore
+ * \param osalFreertos      - pointer to FreeRTOS osal instance
+ * \param semaphoreHandle   - a handle to the semaphore being taken
+ * \return UShellOsalErr_e error code
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquire(void* const osalFreertos,
+                                                          const UShellOsalSemaphoreHandle_t semaphoreHandle)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
+
+    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
+    if (0 == semaphoreIndex)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    BaseType_t acquireStatus = pdFALSE;
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        // Acquire the semaphore from ISR
+        acquireStatus = xSemaphoreTakeFromISR(semaphoreHandle, &xHigherPriorityTaskWoken);
+        // and switch context
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+
+    // Acquire the semaphore
+    else
+    {
+        acquireStatus = xSemaphoreTake(semaphoreHandle, portMAX_DELAY);    // TODO: to change to 0 ?
+    }
+
+    if (pdTRUE != acquireStatus)
+    {
+        return USHELL_OSAL_SEMAPHORE_ACQUIRE_ERR;
+    }
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * \brief Release a semaphore
+ * \param osalFreertos      - pointer to FreeRTOS osal instance
+ * \param semaphoreHandle   - a handle to the semaphore being released
+ * \return UShellOsalErr_e error code
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreRelease(void* const osalFreertos,
+                                                          const UShellOsalSemaphoreHandle_t semaphoreHandle)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
+
+    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
+    if (0 == semaphoreIndex)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    BaseType_t releaseStatus = pdFALSE;
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        // Release the semaphore from ISR
+        releaseStatus = xSemaphoreGiveFromISR(semaphoreHandle, &xHigherPriorityTaskWoken);
+        // and switch context
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+
+    // Release the semaphore
+    else
+    {
+        releaseStatus = xSemaphoreGive(semaphoreHandle);
+    }
+
+    if (pdTRUE != releaseStatus)
+    {
+        return USHELL_OSAL_SEMAPHORE_RELEASE_ERR;
+    }
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * \brief Get the count of a semaphore
+ * \param osalFreertos      - pointer to FreeRTOS osal instance
+ * \param semaphoreHandle   - a handle of the semaphore being queried
+ * \param semaphoreCount    - pointer to a destination buff
+ * \return UShellOsalErr_e error code
+ */
+static UShellOsalErr_e ushellOsalFreertosSemaphoreCountGet(void* const osalFreertos,
+                                                           const UShellOsalSemaphoreHandle_t semaphoreHandle,
+                                                           UShellOsalSemaphoreCount_t* const semaphoreCount)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreCount);
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    uint16_t semaphoreIndex = ushellOsalFreertosFindSemaphoreHandle(osalFreertos, semaphoreHandle);
+    if (0 == semaphoreIndex)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_SEMAPHORE_OBJS_NUM < semaphoreIndex)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    // Get the semaphore count
+    UBaseType_t currSemaphoreCount = uxSemaphoreGetCount(semaphoreHandle);
+    *semaphoreCount = (UShellOsalSemaphoreCount_t) currSemaphoreCount;
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
  * @brief Find the queue handle in the queue handles table
  * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
  * @param[in] queueHandle  - queue handle to be found
@@ -1538,4 +1822,33 @@ static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const thre
     }
 
     return true;    // Exit: no errors
+}
+
+/**
+ * \brief Find the semaphore handle in the semaphores table
+ * \param osalFreeRtos      - pointer to FreeRTOS osal instance
+ * \param semaphoreHandle   - semaphore handle to be found
+ * \return uint16_t handle index + 1, 0 - if the handle wasn't found.
+ */
+static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                             const UShellOsalSemaphoreHandle_t semaphoreHandle)
+{
+    // Check income parameters
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);       // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != semaphoreHandle);    // Must be validated by the caller
+
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreeRtos;
+    uint16_t handleIndex = 0;
+
+    // Try to find
+    for (uint16_t i = 0; i < USHELL_OSAL_SEMAPHORE_OBJS_NUM; i++)
+    {
+        if (semaphoreHandle == osal->semaphoreHandle [i])
+        {
+            handleIndex = i + 1;
+            break;
+        }
+    }
+
+    return handleIndex;
 }

@@ -29,6 +29,12 @@
     #define USHELL_ASSERT(cond)
 #endif
 
+/**
+ * @brief Enumeration of ASCII control characters used in uShell.
+ *
+ * This enumeration defines several ASCII control characters that are used
+ * to manage user input, such as carriage return, line feed, backspace, etc.
+ */
 typedef enum
 {
     USHELL_ASCII_CHAR_CR = 0x0D,       ///< Carriage Return
@@ -36,9 +42,12 @@ typedef enum
     USHELL_ASCII_CHAR_BS = 0x08,       ///< Backspace
     USHELL_ASCII_CHAR_DEL = 0x7F,      ///< Delete
     USHELL_ASCII_CHAR_SPACE = 0x20,    ///< Space
-    USHELL_ASCII_CHAR_TAB = 0x09       ///< Tab
+    USHELL_ASCII_CHAR_TAB = 0x09,      ///< Tab
+    USHELL_ASCII_CHAR_ENTER = 0x0D     ///< Enter
 
 } UShellAsciiChar_e;
+
+#define USHELL_CLEAR_SCREEN "\033[2J\033[1;1H"    ///< Clear screen command
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
 
@@ -48,7 +57,6 @@ typedef enum
 typedef enum
 {
     USHELL_MSG_NONE = 0,       // No message
-    USHELL_MSG_RX_RECEIVED,    // RX received
     USHELL_MSG_TX_COMPLETE,    // Output changed
     USHELL_MSG_RX_TX_ERROR     // Error
 
@@ -64,6 +72,34 @@ typedef enum
  * \note This function is the main loop of the UShell module. It is responsible for the processing of the commands and the interaction with the user.
  */
 static void uShellWorker(void* const uShell);
+
+/**
+ * @brief Process the idle state of uShell
+ * @param uShell - the ushell object
+ * @return - UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellIdleStateProcess(UShell_s* const uShell);
+
+/**
+ * @brief Process the authentication state of uShell
+ * @param uShell - the ushell object
+ * @return - UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellAuthStateProcess(UShell_s* const uShell);
+
+/**
+ * @brief Process the run state of uShell
+ * @param uShell - the ushell object
+ * @return - UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellRunStateProcess(UShell_s* const uShell);
+
+/**
+ * @brief Process the error state of uShell
+ * @param uShell - the ushell object
+ * @return - UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellErrStateProcess(UShell_s* const uShell);
 
 /**
  * \brief Callback for the received data
@@ -107,8 +143,19 @@ static UShellErr_e uShellPrint(const UShell_s* const uShell,
  * @param ch - pointer to the char
  * @return USHELL_NO_ERR if success, otherwise error code
  */
-static UShellErr_e uShellScanChar(const UShell_s* const uShell,
+static UShellErr_e uShellScanCharWait(const UShell_s* const uShell,
                                   UShellItem_t* const ch);
+
+/**
+ * @brief Get char from the input with timeout
+ * @param uShell - uShell object
+  * @param ch - pointer to the char
+  * @param timeMs - timeout in milliseconds
+ * @return
+ */
+static UShellErr_e uShellScanCharPend(const UShell_s* const uShell,
+                                      UShellItem_t* const ch,
+                                      const uint32_t timeMs);
 
 /**
  * \brief Find command
@@ -236,6 +283,20 @@ static UShellErr_e uShellQueueMsgWait(UShell_s* const dio,
                                       UShellMsg_e* const msg);
 
 /**
+ * @brief Set the semaphore for the RX event
+ * @param[in] dio - pointer to a UShell instance;
+ * @return UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellSemaphoreRxEventSet(UShell_s* const dio);
+
+/**
+ * @brief Wait for the semaphore for the RX event
+ * @param[in] dio - pointer to a UShell instance;
+ * @return UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellSemaphoreRxEventWait(UShell_s* const dio);
+
+/**
  * \brief Lock the dio monitor
  * \param[in] dio - pointer to a UShell_s instance;
  * \return no;
@@ -296,13 +357,16 @@ UShellErr_e UShellInit(UShell_s* const uShell,
 
         /* Initialize the runtime environment */
         status = uShellRtEnvInit(uShell,
-                                 osal,
-                                 hal,
-                                 &cfg);
+                                 (UShellOsal_s*) osal,
+                                 (UShellHal_s*) hal,
+                                 (UShellCfg_s*) &cfg);
         if (status != USHELL_NO_ERR)
         {
             break;
         }
+
+        /* Set init state */
+        uShell->fsmState = USHELL_STATE_IDLE;
 
     } while (0);
 
@@ -379,7 +443,7 @@ UShellErr_e UShellRun(UShell_s* const uShell)
 
         /* Find the thread handle */
         UShellOsalThread_s* thread = NULL;
-        UShellOsalErr_e osalStatus = UShellOsalThreadHandleGet(uShell->osal, 0U, &thread);
+        UShellOsalErr_e osalStatus = UShellOsalThreadHandleGet((UShellOsal_s*) uShell->osal, 0U, &thread);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             status = USHELL_PORT_ERR;
@@ -387,7 +451,7 @@ UShellErr_e UShellRun(UShell_s* const uShell)
         }
 
         /* Start the thread */
-        osalStatus = UShellOsalThreadResume(uShell->osal, thread->threadHandle);
+        osalStatus = UShellOsalThreadResume((UShellOsal_s*) uShell->osal, thread->threadHandle);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             status = USHELL_PORT_ERR;
@@ -425,7 +489,7 @@ UShellErr_e UShellStop(UShell_s* const uShell)
 
         /* Find the thread handle */
         UShellOsalThread_s* thread = NULL;
-        UShellOsalErr_e osalStatus = UShellOsalThreadHandleGet(uShell->osal, 0U, &thread);
+        UShellOsalErr_e osalStatus = UShellOsalThreadHandleGet((UShellOsal_s*) uShell->osal, 0U, &thread);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             status = USHELL_PORT_ERR;
@@ -433,7 +497,7 @@ UShellErr_e UShellStop(UShell_s* const uShell)
         }
 
         /* Start the thread */
-        osalStatus = UShellOsalThreadResume(uShell->osal, thread->threadHandle);
+        osalStatus = UShellOsalThreadResume((UShellOsal_s*) uShell->osal, thread->threadHandle);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             status = USHELL_PORT_ERR;
@@ -533,92 +597,187 @@ static void uShellWorker(void* const uShell)
     /* Local variables */
     UShell_s* const ushell = (UShell_s*) uShell;
     UShellErr_e status = USHELL_NO_ERR;
-    UShellItem_t item [100];
-
-    /* First msg */
-    /* Open the hal */
-    UShellHalErr_e halStatus = UShellHalOpen(ushell->hal);
-    if (halStatus != USHELL_HAL_NO_ERR)
-    {
-        return;
-    }
 
     /* Main loop */
     while (1)
     {
 
-        while (1)
+        /* Process the fsm state */
+        switch (ushell->fsmState)
         {
-            /* Print data */
-            strcpy(item, "Enter command: ");
-            status = uShellPrint(ushell, item);
-            if (status != USHELL_NO_ERR)
-            {
-                continue;
-            }
+            case USHELL_STATE_IDLE :
+                status = uShellIdleStateProcess(uShell);
+                break;
+            case USHELL_STATE_AUTH :
+                status = uShellAuthStateProcess(uShell);
+                break;
+            case USHELL_STATE_RUN :
+                status = uShellRunStateProcess(uShell);
+                break;
+            case USHELL_STATE_ERROR :
+                status = uShellErrStateProcess(uShell);
+                break;
         }
 
-        /* Get data*/
-        status = uShellScanChar(ushell, &item);
+    //     /* Get data*/
+    //     status = uShellScanCharWait(ushell, &item);
+    //     if (status != USHELL_NO_ERR)
+    //     {
+    //         continue;
+    //     }
+
+    //     /* Process the data */
+    //     switch (item)
+    //     {
+    //         /* Carriage return (\r) */
+    //         case USHELL_ASCII_CHAR_CR :
+    //         case USHELL_ASCII_CHAR_LF :
+    //         {
+
+    //             /* Find command */
+    //             uint8_t ind = 0;
+    //             // UShellErr_e ushellErr = uShellFindCmd(ushell, ushell->io.buffer, &ind);
+    //             // if (ushellErr != USHELL_NO_ERR)
+    //             // {
+    //             //     break;
+    //             // }
+
+    //             break;
+    //         }
+
+    //         /* Backspace  */
+    //         case USHELL_ASCII_CHAR_BS :
+    //         case USHELL_ASCII_CHAR_DEL :
+    //         {
+    //             /* Process the command */
+    //             status = uShellPrint(ushell, "\b \b");
+    //             if (status != USHELL_NO_ERR)
+    //             {
+    //                 break;
+    //             }
+
+    //             /* Remove the last char */
+    //             if (ushell->io.ind > 0)
+    //             {
+    //                 ushell->io.ind--;
+    //             }
+
+    //             break;
+    //         }
+
+    //         /* Horizontal tab */
+    //         case USHELL_ASCII_CHAR_TAB :
+    //         {
+    //             /* Process the command */
+    //             break;
+    //         }
+
+    //         /* Acknowledge */
+    //         default :
+    //         {
+    //             /* Store the data */
+    //             if (ushell->io.ind < USHELL_BUFFER_SIZE)
+    //             {
+    //                 ushell->io.buffer [ushell->io.ind++] = item;
+    //             }
+
+    //             /* Process the command */
+    //             status = uShellPrint(ushell, (char*) &item);
+    //             if (status != USHELL_NO_ERR)
+    //             {
+    //                 break;
+    //             }
+
+    //             break;
+    //         }
+    //     }
+     }
+}
+
+/**
+ * @brief Process the idle state of uShell
+ * @param uShell - the ushell object
+ * @return - UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellIdleStateProcess(UShell_s* const uShell)
+{
+    /* Check input parameter */
+    USHELL_ASSERT(uShell != NULL);
+
+    /* Local variables */
+    UShellErr_e status = USHELL_NO_ERR;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+
+    /* Process the idle state */
+    do
+    {
+        /* Check input parameters */
+        if (uShell == NULL)
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Clear terminal */
+        status = uShellPrint(uShell, USHELL_CLEAR_SCREEN);
         if (status != USHELL_NO_ERR)
         {
-            continue;
+            break;
         }
 
-        /* Print data */
-        status = uShellPrint(ushell, &item);
+        /* Print hello message */
+        status = uShellPrint(uShell, USHELL_HELLO_MSG);
         if (status != USHELL_NO_ERR)
         {
-            continue;
+            break;
         }
 
-        // /* Process the data */
-        // switch (item)
-        // {
-        //     /* Carriage return (\r) */
-        //     case USHELL_ASCII_CHAR_CR :
-        //     case USHELL_ASCII_CHAR_LF :
-        //     {
 
-        //    /* Find command */
-        //    uint8_t ind = 0;
-        //    UShellErr_e ushellErr = uShellFindCmd(ushell, ushell->io.buffer, &ind);
-        //    if (ushellErr != USHELL_NO_ERR)
-        //    {
-        //        break;
-        //    }
 
-        //    break;
-        // }
+        /* Read and forget */
+        UShellItem_t item = 0;
+        status = uShellScanCharWait(uShell, &item);
+        if (status != USHELL_NO_ERR)
+        {
+            break;
+        }
 
-        //    /* Backspace  */
-        //    case USHELL_ASCII_CHAR_BS :
-        //    case USHELL_ASCII_CHAR_DEL :
-        //    {
-        //        /* Process the command */
-        //        break;
-        //    }
+        /* Change state */
+        uShell->fsmState = USHELL_STATE_AUTH;
 
-        //    /* Horizontal tab */
-        //    case USHELL_ASCII_CHAR_TAB :
-        //    {
-        //        /* Process the command */
-        //        break;
-        //    }
+    } while (0);
 
-        //    /* Acknowledge */
-        //    default :
-        //    {
-        //        /* Store the data */
-        //        if (ushell->io.ind < USHELL_BUFFER_SIZE)
-        //        {
-        //            ushell->io.buffer [ushell->io.ind++] = item;
-        //        }
+    return status;
+}
 
-        //    break;
-        // }
-        // }
-    }
+/**
+ * @brief Process the authentication state of uShell
+ * @param uShell - the ushell object
+ * @return - UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellAuthStateProcess(UShell_s* const uShell)
+{
+    return USHELL_NO_ERR;
+}
+
+/**
+ * @brief Process the run state of uShell
+ * @param uShell - the ushell object
+ * @return - UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellRunStateProcess(UShell_s* const uShell)
+{
+    return USHELL_NO_ERR;
+}
+
+/**
+ * @brief Process the error state of uShell
+ * @param uShell - the ushell object
+ * @return - UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellErrStateProcess(UShell_s* const uShell)
+{
+    return USHELL_NO_ERR;
 }
 
 /**
@@ -648,7 +807,7 @@ static void uShellRxReceivedCb(const void* const hal)
         }
 
         /* Send msg */
-        status = uShellQueueMsgSend(ushell, USHELL_MSG_RX_RECEIVED);
+        status = uShellSemaphoreRxEventSet(ushell);
         USHELL_ASSERT(status == USHELL_NO_ERR);
         (void) status;
 
@@ -784,7 +943,7 @@ static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const s
         }
 
         /* Send the data */
-        halStatus = UShellHalWrite(uShell->hal, (uint8_t*) str, len);
+        halStatus = UShellHalWrite(uShell->hal, (uint8_t*) str, len + 1);
         if (halStatus != USHELL_HAL_NO_ERR)
         {
             status = USHELL_PORT_ERR;
@@ -816,7 +975,7 @@ static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const s
  * @param ch - pointer to the char
  * @return USHELL_NO_ERR if success, otherwise error code
  */
-static UShellErr_e uShellScanChar(const UShell_s* const uShell,
+static UShellErr_e uShellScanCharWait(const UShell_s* const uShell,
                                   UShellItem_t* const ch)
 {
     /* Check input parameters */
@@ -827,7 +986,7 @@ static UShellErr_e uShellScanChar(const UShell_s* const uShell,
     UShellErr_e status = USHELL_NO_ERR;
     UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
     UShellMsg_e msg = USHELL_MSG_NONE;
-    char item = 0;
+    uint8_t item = 0;
 
     /* Get the char */
     do
@@ -840,12 +999,6 @@ static UShellErr_e uShellScanChar(const UShell_s* const uShell,
             break;
         }
 
-        /* Flush the queue */
-        status = uShellQueueMsgFlush(uShell);
-        if (status != USHELL_NO_ERR)
-        {
-            break;
-        }
 
         /* Flush the buffers */
         halStatus = UShellHalFlush(uShell->hal);
@@ -864,12 +1017,9 @@ static UShellErr_e uShellScanChar(const UShell_s* const uShell,
         }
 
         /* Wait the message */
-        status = uShellQueueMsgWait(uShell,
-                                    &msg);
-        if ((status != USHELL_NO_ERR) ||
-            (msg != USHELL_MSG_RX_RECEIVED))
+        status = uShellSemaphoreRxEventWait(uShell);
+        if (status != USHELL_NO_ERR)
         {
-            status = USHELL_XFER_ERR;
             break;
         }
 
@@ -1089,6 +1239,14 @@ static UShellErr_e uShellRtEnvHalInit(UShell_s* const uShell,
             status = USHELL_PORT_ERR;
             break;
         }
+
+        /* Open the hal */
+        halStatus = UShellHalOpen(hal);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            return;
+        }
+
     } while (0);
 
     return status;
@@ -1153,6 +1311,13 @@ static UShellErr_e uShellRtEnvHalDeInit(UShell_s* const uShell)
             break;
         }
 
+        /* Close */
+        halStatus = UShellHalClose(uShell->hal);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            return;
+        }
+
         /* Remove the hal object */
         uShell->hal = NULL;
 
@@ -1208,6 +1373,19 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
                                            &queue);
         USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
         USHELL_ASSERT(queue != NULL);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            break;
+        }
+
+        /* : Create semaphore for rx event */
+        UShellOsalSemaphoreHandle_t semaphoreHandle = NULL;
+        osalStatus = UShellOsalSemaphoreCreate(thisOsal,
+                                               USHELL_BUFFER_SIZE,
+                                               0U,
+                                               &semaphoreHandle);
+        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_ASSERT(semaphoreHandle != NULL);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             break;
@@ -1308,6 +1486,24 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
         /* : : Delete the lock object */
         osalStatus = UShellOsalLockObjDelete(thisOsal, lockObj);
         USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+    } while (0);
+
+    /* : Delete the semaphore */
+    do
+    {
+        /* : : Find the semaphore handle */
+        UShellOsalSemaphoreHandle_t semaphoreHandle = NULL;
+        osalStatus = UShellOsalSemaphoreHandleGet(thisOsal, 0U, &semaphoreHandle);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (semaphoreHandle == NULL))
+        {
+            break;
+        }
+
+        /* : : Delete the semaphore */
+        osalStatus = UShellOsalSemaphoreDelete(thisOsal, semaphoreHandle);
+        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+
     } while (0);
 
     /* Set parent */
@@ -1567,8 +1763,7 @@ static UShellErr_e uShellQueueMsgSend(UShell_s* const dio,
             break;
         }
 
-        if (!(msg == USHELL_MSG_RX_RECEIVED) &&
-            !(msg == USHELL_MSG_TX_COMPLETE) &&
+        if (!(msg == USHELL_MSG_TX_COMPLETE) &&
             !(msg == USHELL_MSG_NONE) &&
             !(msg == USHELL_MSG_RX_TX_ERROR))
 
@@ -1702,8 +1897,7 @@ static UShellErr_e uShellQueueMsgPend(UShell_s* const dio,
         }
 
         /* Check msg */
-        if (!(localMsg == USHELL_MSG_RX_RECEIVED) &&
-            !(localMsg == USHELL_MSG_TX_COMPLETE) &&
+        if (!(localMsg == USHELL_MSG_TX_COMPLETE) &&
             !(localMsg == USHELL_MSG_NONE) &&
             !(localMsg == USHELL_MSG_RX_TX_ERROR))
         {
@@ -1768,8 +1962,7 @@ static UShellErr_e uShellQueueMsgWait(UShell_s* const dio,
         }
 
         /* Check msg */
-        if (!(localMsg == USHELL_MSG_RX_RECEIVED) &&
-            !(localMsg == USHELL_MSG_TX_COMPLETE) &&
+        if (!(localMsg == USHELL_MSG_TX_COMPLETE) &&
             !(localMsg == USHELL_MSG_NONE) &&
             !(localMsg == USHELL_MSG_RX_TX_ERROR))
         {
@@ -1779,6 +1972,106 @@ static UShellErr_e uShellQueueMsgWait(UShell_s* const dio,
 
         /* Set the message */
         *msg = localMsg;
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Set the semaphore for the RX event
+ * @param[in] dio - pointer to a UShell instance;
+ * @return UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellSemaphoreRxEventSet(UShell_s* const dio)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(dio != NULL);
+
+    /* Local variable */
+    UShellErr_e status = USHELL_NO_ERR;
+
+    /* Set the semaphore for the RX event */
+    do
+    {
+        /* Check input parameters */
+        if ((dio == NULL) ||
+            (dio->osal == NULL))
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Cast */
+        UShellOsal_s* osal = (UShellOsal_s*) dio->osal;
+
+        /* Get the semaphore handle */
+        UShellOsalSemaphoreHandle_t semaphoreHandle = NULL;
+        UShellOsalErr_e osalStatus = UShellOsalSemaphoreHandleGet(osal, 0U, &semaphoreHandle);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (semaphoreHandle == NULL))
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Set the semaphore for the RX event */
+        osalStatus = UShellOsalSemaphoreRelease(osal, semaphoreHandle);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Wait for the semaphore for the RX event
+ * @param[in] dio - pointer to a UShell instance;
+ * @return UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellSemaphoreRxEventWait(UShell_s* const dio)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(dio != NULL);
+
+    /* Local variable */
+    UShellErr_e status = USHELL_NO_ERR;
+
+    /* Wait for the semaphore for the RX event */
+    do
+    {
+        /* Check input parameters */
+        if ((dio == NULL) ||
+            (dio->osal == NULL))
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Cast */
+        UShellOsal_s* osal = (UShellOsal_s*) dio->osal;
+
+        /* Get the semaphore handle */
+        UShellOsalSemaphoreHandle_t semaphoreHandle = NULL;
+        UShellOsalErr_e osalStatus = UShellOsalSemaphoreHandleGet(osal, 0U, &semaphoreHandle);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (semaphoreHandle == NULL))
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Wait for the semaphore for the RX event */
+        osalStatus = UShellOsalSemaphoreAcquire(osal, semaphoreHandle);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_PORT_ERR;
+            break;
+        }
 
     } while (0);
 
