@@ -45,7 +45,7 @@
  * \brief Safely converts timeout in ms to FreeRTOS ticks
  * handling potential integer overflow in pdMS_TO_TICKS(timeoutMs) FreeRTOS macro
  */
-static TickType_t uShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs);
+static TickType_t UShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs);
 
 /**
  * @brief Create the queue
@@ -250,9 +250,8 @@ static UShellOsalErr_e ushellOsalFreertosSemaphoreAcquirePend(void* const osalFr
 /**
  * \brief Release a semaphore
  */
-static UShellOsalErr_e
-ushellOsalFreertosSemaphoreRelease(void* const osalFreertos,
-                                   const UShellOsalSemaphoreHandle_t semaphoreHandle);
+static UShellOsalErr_e ushellOsalFreertosSemaphoreRelease(void* const osalFreertos,
+                                                          const UShellOsalSemaphoreHandle_t semaphoreHandle);
 
 /**
  * \brief Get the count of a semaphore
@@ -260,6 +259,100 @@ ushellOsalFreertosSemaphoreRelease(void* const osalFreertos,
 static UShellOsalErr_e ushellOsalFreertosSemaphoreCountGet(void* const osalFreertos,
                                                            const UShellOsalSemaphoreHandle_t semaphoreHandle,
                                                            UShellOsalSemaphoreCount_t* const semaphoreCount);
+
+/**
+ * \brief Create the stream buffer
+ */
+static UShellOsalErr_e ushellOsalFreertosStreamBuffCreate(void* const osalFreertos,
+                                                          const size_t buffSizeBytes,
+                                                          const size_t triggerLevelBytes,
+                                                          UShellOsalStreamBuffHandle_t* const streamBuffHandle);
+
+/**
+ * \brief Delete the stream buffer
+ */
+static UShellOsalErr_e ushellOsalFreertosStreamBuffDelete(void* const osalFreertos,
+                                                          const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+/**
+ * \brief Send data to the stream buffer
+ */
+static size_t ushellOsalFreertosStreamBuffSend(void* const osalFreertos,
+                                               const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                               const void* txData,
+                                               const size_t dataLengthBytes,
+                                               const uint32_t msToWait);
+
+/**
+ * \brief Receive data from the stream buffer
+ */
+static size_t ushellOsalFreertosStreamBuffReceive(void* const osalFreertos,
+                                                  const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                                  void* const rxData,
+                                                  const size_t dataLengthBytes,
+                                                  const uint32_t msToWait);
+
+/**
+ * \brief Reset a stream buffer to its initial empty state
+ */
+static UShellOsalErr_e ushellOsalFreertosStreamBuffReset(void* const osalFreertos,
+                                                         const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+/**
+ * @brief Create an event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupCreate(void* const osal,
+                                                   UShellOsalEventGroupHandle_t* const eventGroupHandle);
+
+/**
+ * @brief Create an event group with a specific name.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @param[in] name Name of the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupDelete(void* const osal,
+                                                   const UShellOsalEventGroupHandle_t eventGroupHandle);
+
+/**
+ * @brief Set a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToSet Bits to set in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupSetBits(void* const osal,
+                                                    const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                                    const UShellOsalEventGroupBits_e bitsToSet);
+
+/**
+ * @brief Clear a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToClear Bits to clear in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupClearBits(void* const osal,
+                                                      const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                                      const UShellOsalEventGroupBits_e bitsToClear);
+
+/**
+ * @brief Wait for bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToWait Bits to wait for in the event group.
+ * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupBitsWait(void* const osal,
+                                                     const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                                     const UShellOsalEventGroupBits_e bitsToWait,
+                                                     const bool clearOnExit,
+                                                     const bool waitAllBits);
 
 /**
  * @brief Find the queue handle in the queue handles table
@@ -289,18 +382,30 @@ static inline uint16_t ushellOsalFreertosFindThreadHandle(UShellOsalFreertos_s* 
                                                           const UShellOsalThreadHandle_t threadHandle);
 
 /**
+ * \brief Find the semaphore handle in the semaphores table
+ */
+static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                             const UShellOsalSemaphoreHandle_t semaphoreHandle);
+
+/**
+ * @brief Find the stream buffer handle in the stream buffers table
+ */
+static inline uint16_t ushellOsalFreertosFindStreamBuffHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                              const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+/**
+ * @brief Find the event group handle in the event groups table
+ */
+static inline uint16_t ushellOsalFreertosFindEventGroupHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                              const UShellOsalEventGroupHandle_t eventGroupHandle);
+
+/**
  * @brief Perform thread parameters validation procedure
  *        in terms of the requirements of the FreeRTOS
  * @param[in] threadCfg - pointer to the thread configuration structure
  * @return bool - true if the parameters are valid, false otherwise
  */
 static bool ushellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const threadCfg);
-
-/**
- * \brief Find the semaphore handle in the semaphores table
- */
-static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_s* const osalFreeRtos,
-                                                             const UShellOsalSemaphoreHandle_t semaphoreHandle);
 
 /**
  * @brief FreeRTOS priority levels hash-table.
@@ -348,6 +453,16 @@ static const UShellOsalPortable_s FreeRtosPortable =
         .semaphoreRelease = ushellOsalFreertosSemaphoreRelease,
         .semaphoreCountGet = ushellOsalFreertosSemaphoreCountGet,
         .semaphoreAcquirePend = ushellOsalFreertosSemaphoreAcquirePend,
+        .streamBuffCreate = ushellOsalFreertosStreamBuffCreate,
+        .streamBuffDelete = ushellOsalFreertosStreamBuffDelete,
+        .streamBuffReset = ushellOsalFreertosStreamBuffReset,
+        .streamBuffSend = ushellOsalFreertosStreamBuffSend,
+        .streamBuffReceive = ushellOsalFreertosStreamBuffReceive,
+        .eventGroupSetBits = ushellOsalFreertosEventGroupSetBits,
+        .eventGroupClearBits = ushellOsalFreertosEventGroupClearBits,
+        .eventGroupBitsWait = ushellOsalFreertosEventGroupBitsWait,
+        .eventGroupDelete = ushellOsalFreertosEventGroupDelete,
+        .eventGroupCreate = ushellOsalFreertosEventGroupCreate,
 };
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
@@ -491,7 +606,7 @@ UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreerto
  * \param timeoutMs     - timeout in ms to be checked for integer overflow and safely converted to FreeRTOS ticks
  * \return TickType_t   - timeout in FreeRTOS ticks
  */
-static TickType_t uShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs)
+static TickType_t UShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs)
 {
     // Make sure there is no integer overflow while using incoming value of timeoutMs
     // in the default implementation of FreeRTOS pdMS_TO_TICKS() macro
@@ -759,7 +874,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void* const osalFreertos,
         }
 
         /* Convert the timeout in milliseconds to the ticks */
-        safeTimeoutInTicks = uShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
+        safeTimeoutInTicks = UShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
 
         /* Put the item to the queue */
         sendStatus = xQueueSend((QueueHandle_t) queueHandle,
@@ -984,7 +1099,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void* const osalFreertos,
         }
 
         /* Safely convert timeout in ms to FreeRTOS ticks */
-        safeTimeoutInTicks = uShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
+        safeTimeoutInTicks = UShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
 
         /* Get the item from the FreeRTOS queue */
         receiveStatus = xQueueReceive((QueueHandle_t) queueHandle,
@@ -1749,6 +1864,445 @@ static UShellOsalErr_e ushellOsalFreertosSemaphoreCountGet(void* const osalFreer
 }
 
 /**
+ * \brief Create the stream buffer
+ * \param osalFreertos      - pointer to OSAL instance
+ * \param buffSizeBytes     - the size of the stream buffer in bytes
+ * \param triggerLevelBytes - trigger level in bytes (watermark)
+ * \param streamBuffHandle  - the stream buffer handle was created
+ * \return UShellOsalErr_e error code.
+ */
+static UShellOsalErr_e ushellOsalFreertosStreamBuffCreate(void* const osalFreertos,
+                                                          const size_t buffSizeBytes,
+                                                          const size_t triggerLevelBytes,
+                                                          UShellOsalStreamBuffHandle_t* const streamBuffHandle)
+{
+    // Check income params with assertions because
+    // they must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
+    *streamBuffHandle = NULL;    // Clear stored value
+
+    // Create the FreeRTOS stream buffer:
+    // 1. check if there is a free slot
+    for (int i = 0; i < USHELL_OSAL_STREAM_BUFF_SLOTS_NUM; i++)
+    {
+        if (NULL == osal->streamBuffHandle [i])
+        {
+            // Congratulations!
+            // The free slot was found, create the stream buffer
+            osal->streamBuffHandle [i] = xStreamBufferCreate(buffSizeBytes, triggerLevelBytes);
+            if (NULL == osal->streamBuffHandle [i])
+            {
+                // Stream buffer was not created and must not be used
+                // Exit: error - memory required to create the stream butter could not be allocated
+                return USHELL_OSAL_STREAM_BUFF_MEM_ALLOCATION_ERR;
+            }
+
+            // We can only get there if a stream buffer was created
+            // No additional checks needed
+            *streamBuffHandle = osal->streamBuffHandle [i];
+            // So break the loop
+            break;
+        }
+    }
+
+    // 2. Check if the stream buffer was created
+    if (NULL == *streamBuffHandle)
+    {
+        return USHELL_OSAL_STREAM_BUFF_CREATE_ERR;    // Exit: error - no free slots in the table
+    }
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * \brief Delete the stream buffer
+ * \param osalFreertos      - pointer to OSAL instance
+ * \param streamBuffHandle  - stream buffer handle being deleted
+ * \return UShellOsalErr_e error code.
+ */
+static UShellOsalErr_e ushellOsalFreertosStreamBuffDelete(void* const osalFreertos,
+                                                          const UShellOsalStreamBuffHandle_t streamBuffHandle)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreertos;
+
+    uint16_t streamBuffIndexNum = ushellOsalFreertosFindStreamBuffHandle(osalFreertos, streamBuffHandle);
+    if (0 == streamBuffIndexNum)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM < streamBuffIndexNum)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    // Finally delete the stream buffer
+    vStreamBufferDelete((UShellOsalStreamBuffHandle_t) streamBuffHandle);
+    // And clear the stream buffer slot in the table
+    osal->streamBuffHandle [streamBuffIndexNum - 1] = NULL;    // Subtract 1 because find function increases actual index by 1
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * \brief Send data to the stream buffer
+ * \param osalFreertos      - pointer to FreeRTOS OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer to which a stream is being sent
+ * \param txData            - pointer to the buffer that holds the bytes to be copied into the stream buffer
+ * \param dataLengthBytes   - the size of the data in bytes
+ * \param msToWait          - the maximum amount of time the task should remain in the blocked state to wait
+ * \return size_t the number of bytes written to the stream buffer, will write as many bytes as possible.
+ */
+static size_t ushellOsalFreertosStreamBuffSend(void* const osalFreertos,
+                                               const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                               const void* txData,
+                                               const size_t dataLengthBytes,
+                                               const uint32_t msToWait)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != txData);
+    USHELL_OSAL_FREERTOS_ASSERT(0 != dataLengthBytes);
+
+    size_t bytesWritten = 0;
+
+    uint16_t streamBuffIndexNum = ushellOsalFreertosFindStreamBuffHandle(osalFreertos, streamBuffHandle);
+    if (0 == streamBuffIndexNum)
+    {
+        return bytesWritten;
+    }
+
+    if (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM < streamBuffIndexNum)
+    {
+        return bytesWritten;
+    }
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        bytesWritten = xStreamBufferSendFromISR((UShellOsalStreamBuffHandle_t) streamBuffHandle, txData, dataLengthBytes, &xHigherPriorityTaskWoken);
+
+        // ATTENTION: not sure if this is a correct usage of the return after portYield
+        // a possible solution is to leave as is and to add a parameter to which the number of bytes written will be copied
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+        return bytesWritten;
+    }
+    else
+    {
+        // Safely convert timeout in ms to FreeRTOS ticks
+        TickType_t safeTimeoutInTicks = ushellOsalFreertosSafeTimeoutToTicks(msToWait);
+
+        // Put the item to the stream buffer
+        bytesWritten = xStreamBufferSend((UShellOsalStreamBuffHandle_t) streamBuffHandle, txData, dataLengthBytes, safeTimeoutInTicks);    // with waiting time
+    }
+
+    return bytesWritten;    // Exit: no errors
+}
+
+/**
+ * \brief Receive data from the stream buffer
+ * \param osalFreertos      - pointer to OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer from which bytes are to be received
+ * \param rxData            - pointer to the buffer into which the received bytes will be copied
+ * \param dataLengthBytes   - the size of the data in bytes
+ * \param msToWait          - the maximum amount of time the task should remain in the blocked state to wait
+ *                            for data to become available if the stream buffer is empty
+ * \return size_t the number of bytes read from the stream buffer, 0 = means no bytes were read or an err occurred.
+ */
+static size_t ushellOsalFreertosStreamBuffReceive(void* const osalFreertos,
+                                                  const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                                  void* const rxData,
+                                                  const size_t dataLengthBytes,
+                                                  const uint32_t msToWait)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != rxData);
+    USHELL_OSAL_FREERTOS_ASSERT(0 != dataLengthBytes);
+
+    size_t bytesRead = 0;
+
+    uint16_t streamBuffIndexNum = ushellOsalFreertosFindStreamBuffHandle(osalFreertos, streamBuffHandle);
+    if (0 == streamBuffIndexNum)
+    {
+        return bytesRead;
+    }
+
+    if (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM < streamBuffIndexNum)
+    {
+        return bytesRead;
+    }
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        bytesRead = xStreamBufferReceiveFromISR((UShellOsalStreamBuffHandle_t) streamBuffHandle, rxData, dataLengthBytes, &xHigherPriorityTaskWoken);
+        // ATTENTION: not sure if this is a correct usage of the return after portYield
+        // a possible solution is to leave as is and to add a parameter to which the number of bytes written will be copied
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+        return bytesRead;
+    }
+    else
+    {
+        // Safely convert timeout in ms to FreeRTOS ticks
+        TickType_t safeTimeoutInTicks = ushellOsalFreertosSafeTimeoutToTicks(msToWait);
+
+        // Put the item to the stream buffer
+        bytesRead = xStreamBufferReceive((UShellOsalStreamBuffHandle_t) streamBuffHandle, rxData, dataLengthBytes, safeTimeoutInTicks);
+    }
+
+    return bytesRead;    // Exit: no errors
+}
+
+/**
+ * \brief Reset a stream buffer to its initial empty state
+ * \param osalFreertos      - pointer to OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer being reset
+ * \return UShellOsalErr_e error code.
+ */
+static UShellOsalErr_e ushellOsalFreertosStreamBuffReset(void* const osalFreertos,
+                                                         const UShellOsalStreamBuffHandle_t streamBuffHandle)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    uint16_t streamBuffIndexNum = ushellOsalFreertosFindStreamBuffHandle(osalFreertos, streamBuffHandle);
+    if (0 == streamBuffIndexNum)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM < streamBuffIndexNum)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    // Reset the stream buffer
+    BaseType_t resetStatus = xStreamBufferReset((UShellOsalStreamBuffHandle_t) streamBuffHandle);
+    if (pdPASS != resetStatus)
+    {
+        // If there was a task blocked waiting to send to
+        // or read from the stream buffer then the stream buffer will not be reset and pdFAIL is returned.
+        return USHELL_OSAL_STREAM_BUFF_RESET_ERR;
+    }
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * @brief Create an event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupCreate(void* const osal,
+                                                   UShellOsalEventGroupHandle_t* const eventGroupHandle)
+{
+    // Check income params with assertions because
+    // they must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
+    *eventGroupHandle = NULL;    // Clear stored value
+
+    // Create the FreeRTOS event group:
+    // 1. check if there is a free slot
+    for (int i = 0; i < USHELL_OSAL_EVENT_GROUPS_NUM; i++)
+    {
+        if (NULL == thisOsal->eventGroupHandle [i])
+        {
+            // Congratulations!
+            // The free slot was found, create the event group
+            thisOsal->eventGroupHandle [i] = xEventGroupCreate();
+            if (NULL == thisOsal->eventGroupHandle [i])
+            {
+                // Event group was not created and must not be used
+                // Exit: error - the RAM required to hold the event group cannot be allocated
+                return USHELL_OSAL_EVENT_GROUP_MEM_ALLOCATION_ERR;
+            }
+
+            // We can only get there if the event group was created
+            // No additional checks needed
+            *eventGroupHandle = thisOsal->eventGroupHandle [i];
+            // So break the loop
+            break;
+        }
+    }
+
+    // 2. Check if the event group was created
+    if (NULL == *eventGroupHandle)
+    {
+        return USHELL_OSAL_EVENT_GROUP_CREATE_ERR;    // Exit: error - no free slots in the table
+    }
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * @brief Create an event group with a specific name.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @param[in] name Name of the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupDelete(void* const osal,
+                                                   const UShellOsalEventGroupHandle_t eventGroupHandle)
+{
+    /* Check income params with assertions because
+     * they must be validated by the caller */
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
+
+    uint16_t eventGroupIndex = ushellOsalFreertosFindEventGroupHandle(osal, eventGroupHandle);
+    if (0 == eventGroupIndex)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_EVENT_GROUPS_NUM < eventGroupIndex)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    // Delete the event group
+    vEventGroupDelete((EventGroupHandle_t) eventGroupHandle);
+
+    // Clear the event group slot in the table
+    thisOsal->eventGroupHandle [eventGroupIndex - 1] = NULL;    // Subtract 1 because find function increases actual index by 1
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * @brief Set a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToSet Bits to set in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupSetBits(void* const osal,
+                                                    const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                                    const UShellOsalEventGroupBits_e bitsToSet)
+{
+    /* Check input parameters */
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
+
+    /* Local variable */
+    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
+    UShellOsalErr_e retVal = USHELL_OSAL_NO_ERR;
+    uint16_t eventGroupIndex = 0;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    do
+    {
+
+        /* Check input */
+        if (osal == NULL)
+        {
+            retVal = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
+
+        /* Check the level at which the function was called */
+        if (xPortIsInsideInterrupt())
+        {
+            retVal = USHELL_OSAL_CALL_FROM_ISR_ERR;
+            break;
+        }
+        else
+        {
+            
+        }
+
+        /* Find the event group */
+        eventGroupIndex = ushellOsalFreertosFindEventGroupHandle(osal, eventGroupHandle);
+        if (0 == eventGroupIndex)
+        {
+            retVal = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
+
+    } while (0);
+
+    return retVal;
+}
+
+/**
+ * @brief Clear a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToClear Bits to clear in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e
+ushellOsalFreertosEventGroupClearBits(void* const osal,
+                                      const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                      const UShellOsalEventGroupBits_e bitsToClear);
+
+/**
+ * @brief Wait for bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToWait Bits to wait for in the event group.
+ * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e ushellOsalFreertosEventGroupBitsWait(void* const osal,
+                                                     const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                                     const UShellOsalEventGroupBits_e bitsToWait,
+                                                     const bool clearOnExit,
+                                                     const bool waitAllBits);
+
+/**
  * @brief Find the queue handle in the queue handles table
  * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
  * @param[in] queueHandle  - queue handle to be found
@@ -1903,4 +2457,58 @@ static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_
     }
 
     return handleIndex;
+}
+
+/**
+ * @brief Find the stream buffer handle in the stream buffers table
+ */
+static inline uint16_t ushellOsalFreertosFindStreamBuffHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                              const UShellOsalStreamBuffHandle_t streamBuffHandle)
+{
+    // Check income parameters
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);        // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);    // Must be validated by the caller
+
+    UShellOsal_s* osal = (UShellOsal_s*) osalFreeRtos;
+    uint16_t handleIndex = 0;
+
+    // Try to find
+    for (uint16_t i = 0; i < USHELL_OSAL_STREAM_BUFF_SLOTS_NUM; i++)
+    {
+        if (streamBuffHandle == osal->streamBuffHandle [i])
+        {
+            handleIndex = i + 1;
+            break;
+        }
+    }
+
+    return handleIndex;
+}
+
+/**
+ * @brief Find the event group handle in the event groups table
+ */
+static inline uint16_t ushellOsalFreertosFindEventGroupHandle(UShellOsalFreertos_s* const osalFreeRtos,
+                                                              const UShellOsalEventGroupHandle_t eventGroupHandle)
+{
+    {
+        // Check income parameters
+        USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);        // Must be validated by the caller
+        USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);    // Must be validated by the caller
+
+        UShellOsal_s* osal = (UShellOsal_s*) osalFreeRtos;
+        uint16_t handleIndex = 0;
+
+        // Try to find
+        for (uint16_t i = 0; i < USHELL_OSAL_EVENT_GROUPS_NUM; i++)
+        {
+            if (eventGroupHandle == osal->eventGroupHandle [i])
+            {
+                handleIndex = i + 1;
+                break;
+            }
+        }
+
+        return handleIndex;
+    }
 }

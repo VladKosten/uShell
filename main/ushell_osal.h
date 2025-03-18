@@ -46,6 +46,20 @@ extern "C" {
     #define USHELL_OSAL_SEMAPHORE_OBJS_NUM (1)
 #endif
 
+/**
+ * \brief UShell OSAL stream buffer slots number
+ */
+#ifndef USHELL_OSAL_STREAM_BUFF_SLOTS_NUM
+    #define USHELL_OSAL_STREAM_BUFF_SLOTS_NUM (2)
+#endif
+
+/**
+ * @brief UShell OSAL event groups number.
+ */
+#ifndef USHELL_OSAL_EVENT_GROUPS_NUM
+    #define USHELL_OSAL_EVENT_GROUPS_NUM (1)
+#endif
+
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
@@ -169,6 +183,63 @@ typedef enum
      */
     USHELL_OSAL_SEMAPHORE_RELEASE_ERR,
 
+    /**
+     * @brief Create stream buffer error.
+     *
+     * Indicates that an error occurred while creating a stream buffer.
+     */
+    USHELL_OSAL_STREAM_BUFF_CREATE_ERR,
+
+    /**
+     * @brief Memory allocation error for stream buffer.
+     *
+     * Indicates that an error occurred while allocating memory for a stream buffer.
+     */
+    USHELL_OSAL_STREAM_BUFF_MEM_ALLOCATION_ERR,
+
+    /**
+     * @brief Stream buffer overflow error.
+     *
+     * Indicates that an error occurred due to a stream buffer overflow.
+     */
+    USHELL_OSAL_STREAM_BUFF_RESET_ERR,
+
+    /**
+     * @brief Event group creation error.
+     *
+     * Indicates that an error occurred while creating an event group.
+     *
+     */
+    USHELL_OSAL_EVENT_GROUP_CREATE_ERR,
+
+    /**
+     * @brief Event group memory allocation error.
+     *
+     * Indicates that an error occurred while allocating memory for an event group.
+     */
+    USHELL_OSAL_EVENT_GROUP_MEM_ALLOCATION_ERR,
+
+    /**
+     * @brief Event group set error.
+     *
+     * Indicates that an error occurred while setting an event in the event group.
+     */
+    USHELL_OSAL_EVENT_GROUP_SET_ERR,
+
+    /**
+     * @brief Event group clear error.
+     *
+     * Indicates that an error occurred while clearing an event in the event group.
+     */
+    USHELL_OSAL_EVENT_GROUP_CLEAR_ERR,
+
+    /**
+     * @brief Event group wait error.
+     *
+     * Indicates that an error occurred while waiting for an event in the event group.
+     */
+    USHELL_OSAL_EVENT_GROUP_WAIT_ERR,
+
 } UShellOsalErr_e;
 
 /**
@@ -193,6 +264,12 @@ typedef void* UShellOsalLockObjHandle_t;
 typedef uint32_t UShellOsalTimeMs_t;
 
 /**
+ * \briefUShell OSAL Stream buffers handle type definition
+ * \note  This is not usual OS object type so check out the portable OS implementations to make sure whether its supported or not
+ */
+typedef void* UShellOsalStreamBuffHandle_t;
+
+/**
  * @brief UShell OSAL run-time Thread handle type definition.
  *
  * This type defines a handle for a thread in the UShell OSAL.
@@ -212,6 +289,13 @@ typedef void* UShellOsalSemaphoreHandle_t;
  * This type defines the data type used for representing the count of a semaphore
  */
 typedef uint32_t UShellOsalSemaphoreCount_t;
+
+/**
+ * @brief Event group handle type definition.
+ *
+ * This type defines a handle for an event group in the UShell OSAL.s
+ */
+typedef void* UShellOsalEventGroupHandle_t;
 
 /**
  * @brief UShell OSAL thread worker prototype.
@@ -341,6 +425,26 @@ typedef struct
     UShellOsalThreadHandle_t threadHandle;
 
 } UShellOsalThread_s;
+
+/**
+ * @brief UShell OSAL event group bits enumeration.
+ */
+typedef enum
+{
+    USHELL_OSAL_EVENT_GROUP_BIT_0 = 0x01, /**< Event group bit 0 */
+    USHELL_OSAL_EVENT_GROUP_BIT_1 = 0x02, /**< Event group bit 1 */
+    USHELL_OSAL_EVENT_GROUP_BIT_2 = 0x04, /**< Event group bit 2 */
+    USHELL_OSAL_EVENT_GROUP_BIT_3 = 0x08, /**< Event group bit 3 */
+    USHELL_OSAL_EVENT_GROUP_BIT_4 = 0x10, /**< Event group bit 4 */
+    USHELL_OSAL_EVENT_GROUP_BIT_5 = 0x20, /**< Event group bit 5 */
+    USHELL_OSAL_EVENT_GROUP_BIT_6 = 0x40, /**< Event group bit 6 */
+    USHELL_OSAL_EVENT_GROUP_BIT_7 = 0x80, /**< Event group bit 7 */
+
+    /* Add more bits as needed */
+
+    USHELL_OSAL_EVENT_GROUP_BIT_ALL = 0xFFFFFFFF,
+
+} UShellOsalEventGroupBits_e;
 
 /**
  * @brief UShell OSAL interface methods prototypes for a particular RTOS port.
@@ -651,6 +755,133 @@ typedef struct
                                          const UShellOsalSemaphoreHandle_t semaphoreHandle,
                                          UShellOsalSemaphoreCount_t* const semaphoreCount);
 
+    /**
+     * @brief Stream buffer create.
+     *
+     * This function creates a stream buffer with the specified size and trigger level.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] buffSizeBytes Size of the stream buffer in bytes.
+     * @param[in] triggerLevelBytes Trigger level of the stream buffer in bytes.
+     * @param[out] streamBuffHandle Pointer to store the handle of the created stream buffer.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*streamBuffCreate)(void* const osal,
+                                        const size_t buffSizeBytes,
+                                        const size_t triggerLevelBytes,
+                                        UShellOsalStreamBuffHandle_t* const streamBuffHandle);
+
+    /**
+     * @brief Delete a stream buffer.
+     *
+     * This function deletes the specified stream buffer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] streamBuffHandle Handle of the stream buffer to be deleted.
+     * @return Error code indicating the result of the operation.
+     *
+     */
+    UShellOsalErr_e (*streamBuffDelete)(void* const osal, const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+    /**
+     * @brief Send data to a stream buffer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] streamBuffHandle Handle of the stream buffer.
+     * @param[in] txData Pointer to the data to be sent.
+     * @param[in] dataLengthBytes Length of the data to be sent in bytes.
+     * @param[in] msToWait Timeout in milliseconds.
+     *
+     */
+    size_t (*streamBuffSend)(void* const osal,
+                             const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                             const void* txData,
+                             const size_t dataLengthBytes,
+                             const uint32_t msToWait);
+
+    /**
+     * @brief Receive data from a stream buffer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] streamBuffHandle Handle of the stream buffer.
+     * @param[out] rxData Pointer to the buffer to store the received data.
+     * @param[in] dataLengthBytes Length of the data to be received in bytes.
+     * @param[in] msToWait Timeout in milliseconds.
+     * @return Number of bytes received.
+     *
+     */
+    size_t (*streamBuffReceive)(void* const osal,
+                                const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                void* const rxData,
+                                const size_t dataLengthBytes,
+                                const uint32_t msToWait);
+
+    /**
+     * @brief Reset a stream buffer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] streamBuffHandle Handle of the stream buffer to be reset.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*streamBuffReset)(void* const osal,
+                                       const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+    /**
+     * @brief Create an event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupCreate)(void* const osal,
+                                        UShellOsalEventGroupHandle_t* const eventGroupHandle);
+
+    /**
+     * @brief Create an event group with a specific name.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+     * @param[in] name Name of the event group.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupDelete)(void* const osal,
+                                        const UShellOsalEventGroupHandle_t eventGroupHandle);
+
+    /**
+     * @brief Set a bit in the event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] eventGroupHandle Handle of the event group.
+     * @param[in] bitsToSet Bits to set in the event group.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupSetBits)(void* const osal,
+                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                         const UShellOsalEventGroupBits_e bitsToSet);
+
+    /**
+     * @brief Clear a bit in the event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] eventGroupHandle Handle of the event group.
+     * @param[in] bitsToClear Bits to clear in the event group.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupClearBits)(void* const osal,
+                                           const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                           const UShellOsalEventGroupBits_e bitsToClear);
+
+    /**
+     * @brief Wait for bits in the event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] eventGroupHandle Handle of the event group.
+     * @param[in] bitsToWait Bits to wait for in the event group.
+     * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+     * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupBitsWait)(void* const osal,
+                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                          const UShellOsalEventGroupBits_e bitsToWait,
+                                          const bool clearOnExit,
+                                          const bool waitAllBits)
+
 } UShellOsalPortable_s;
 
 /**
@@ -707,6 +938,21 @@ typedef struct
      * This array contains handles for the semaphore objects available in the OSAL.
      */
     UShellOsalSemaphoreHandle_t semaphoreHandle [USHELL_OSAL_SEMAPHORE_OBJS_NUM];
+
+    /**
+     * @brief Stream buffers handles table.
+     *
+     * This array contains handles for the stream buffers available in the OSAL.
+     *
+     */
+    UShellOsalStreamBuffHandle_t streamBuffHandle [USHELL_OSAL_STREAM_BUFF_SLOTS_NUM];
+
+    /**
+     * @brief Event groups handles table.
+     *
+     * This array contains handles for the event groups available in the OSAL.
+     */
+    UShellOsalEventGroupHandle_t eventGroupHandle [USHELL_OSAL_EVENT_GROUPS_NUM];
 
     /**
      * @brief Portable methods table.
@@ -1054,6 +1300,135 @@ UShellOsalErr_e UShellOsalThreadHandleGet(UShellOsal_s* const osal,
                                           UShellOsalThreadHandle_t* const threadHandle);
 
 /**
+ * \brief Create the stream buffer
+ * \param osal              - pointer to OSAL instance
+ * \param buffSizeBytes     - the size of the stream buffer in bytes
+ * \param triggerLevelBytes - trigger level in bytes (watermark)
+ * \param streamBuffHandle  - the stream buffer handle was created
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalStreamBuffCreate(UShellOsal_s* const osal,
+                                           const size_t buffSizeBytes,
+                                           const size_t triggerLevelBytes,
+                                           UShellOsalStreamBuffHandle_t* const streamBuffHandle);
+
+/**
+ * \brief Delete the stream buffer
+ * \param osal              - pointer to OSAL instance
+ * \param streamBuffHandle  - stream buffer handle being deleted
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalStreamBuffDelete(UShellOsal_s* const osal,
+                                           const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+/**
+ * \brief Send data to the stream buffer
+ * \param osal              - pointer to OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer to which a stream is being sent
+ * \param txData            - pointer to the buffer that holds the bytes to be copied into the stream buffer
+ * \param dataLengthBytes   - the size of the data in bytes
+ * \param msToWait          - the maximum amount of time the task should remain in the blocked state to wait
+ * \return the number of bytes written to the stream buffer.
+ */
+size_t UShellOsalStreamBuffSend(UShellOsal_s* const osal,
+                                const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                const void* txData,
+                                const size_t dataLengthBytes,
+                                const uint32_t msToWait);
+
+/**
+ * \brief Receive data from the stream buffer
+ * \param osal              - pointer to OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer from which bytes are to be received
+ * \param rxData            - pointer to the buffer into which the received bytes will be copied
+ * \param dataLengthBytes   - the size of the data buffer pointed to by rxData parameter in bytes
+ * \param msToWait          - the maximum amount of time the task should remain in the blocked state to wait
+ *                            for data to become available if the stream buffer is empty
+ * \return the number of bytes read from the stream buffer.
+ */
+size_t UShellOsalStreamBuffReceive(UShellOsal_s* const osal,
+                                   const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                   void* const rxData,
+                                   const size_t dataLengthBytes,
+                                   const uint32_t msToWait);
+
+/**
+ * \brief Reset a stream buffer to its initial empty state
+ * \param osal              - pointer to OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer being reset
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
+                                          const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+/**
+ * \brief Get a streambuff handle of the given OSAL object
+ * \param[in]   osal          	    - pointer to OSAL instance
+ * \param[in]   streamBuffSlotInd   - index of streambuff slots
+ * \param[out]  streamBuffHandle    - pointer to an object into which the streambuff handle handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalStreamBuffHandleGet(UShellOsal_s* const osal,
+                                              const size_t streamBuffSlotInd,
+                                              UShellOsalStreamBuffHandle_t* const streamBuffHandle);
+
+/**
+ * @brief Create an event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
+                                       UShellOsalEventGroupHandle_t* const eventGroupHandle);
+
+/**
+ * @brief Create an event group with a specific name.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @param[in] name Name of the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupDelete(UShellOsal_s* const osal,
+                                       const UShellOsalEventGroupHandle_t eventGroupHandle);
+
+/**
+ * @brief Set a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToSet Bits to set in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
+                                        const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                        const UShellOsalEventGroupBits_e bitsToSet);
+
+/**
+ * @brief Clear a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToClear Bits to clear in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupClearBits(UShellOsal_s* const osal,
+                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                          const UShellOsalEventGroupBits_e bitsToClear);
+
+/**
+ * @brief Wait for bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToWait Bits to wait for in the event group.
+ * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
+                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                         const UShellOsalEventGroupBits_e bitsToWait,
+                                         const bool clearOnExit,
+                                         const bool waitAllBits);
+
+/**
  * \brief Get a semaphore handle of the given OSAL object
  * \param[in]   osal                - pointer to OSAL instance
  * \param[in]   semaphoreSlotInd    - index of semaphore slots
@@ -1063,6 +1438,28 @@ UShellOsalErr_e UShellOsalThreadHandleGet(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalSemaphoreHandleGet(UShellOsal_s* const osal,
                                              const size_t semaphoreSlotInd,
                                              UShellOsalSemaphoreHandle_t* const semaphoreHandle);
+
+/**
+ * \brief Get a streambuff handle of the given OSAL object
+ * \param[in]   osal          	    - pointer to OSAL instance
+ * \param[in]   streamBuffSlotInd   - index of streambuff slots
+ * \param[out]  streamBuffHandle    - pointer to an object into which the streambuff handle handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalStreamBuffHandleGet(UShellOsal_s* const osal,
+                                              const size_t streamBuffSlotInd,
+                                              UShellOsalStreamBuffHandle_t* const streamBuffHandle);
+
+/**
+ * @brief Get an event group handle of the given OSAL object
+ * @param[in] osal - pointer to OSAL instance
+ * @param[in] eventGroupSlotInd - index of event group slots
+ * @param[in] eventGroupHandle - pointer to an object into which the event group handle will be copied
+ * @return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalEventGroupHandleGet(UShellOsal_s* const osal,
+                                              const size_t eventGroupSlotInd,
+                                              UShellOsalEventGroupHandle_t* const eventGroupHandle);
 
 #ifdef __cplusplus
 }

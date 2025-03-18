@@ -74,7 +74,7 @@ typedef enum
  * \return none
  * \note This function is the main loop of the UShell module. It is responsible for the processing of the commands and the interaction with the user.
  */
-static void uShellWorker(void* const uShell);
+static void uShellVcpWorker(void* const uShell);
 
 /**
  * \brief Callback for the received data
@@ -229,8 +229,7 @@ static UShellErr_e uShellSemaphoreRxEventPend(UShell_s* const dio,
  * @param[in] uShell - uShell object
  * @return UShellErr_e - error code. non-zero = an error has occurred;
  */
-static UShellErr_e
-uShellRtEnvFuncAuthInit(UShell_s* const uShell);
+static UShellErr_e uShellRtEnvFuncAuthInit(UShell_s* const uShell);
 
 /**
  * @brief Deinitialize the runtime environment authentication
@@ -351,9 +350,9 @@ UShellErr_e UShellInit(UShell_s* const uShell,
 {
 
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(osal != NULL);
-    USHELL_ASSERT(hal != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(osal != NULL);
+    USHELL_VCP_ASSERT(hal != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -403,7 +402,7 @@ UShellErr_e UShellDeInit(UShell_s* const uShell)
 {
 
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -439,7 +438,7 @@ UShellErr_e UShellDeInit(UShell_s* const uShell)
 UShellErr_e UShellRun(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -492,7 +491,7 @@ UShellErr_e UShellRun(UShell_s* const uShell)
 UShellErr_e UShellStop(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -609,10 +608,10 @@ UShellErr_e UShellCmdDetach(UShell_s* const uShell, const UShellCmd_s* const cmd
  * \return none
  * \note This function is the main loop of the UShell module. It is responsible for the processing of the commands and the interaction with the user.
  */
-static void uShellWorker(void* const uShell)
+static void uShellVcpWorker(void* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShell_s* const ushell = (UShell_s*) uShell;
@@ -653,7 +652,7 @@ static void uShellWorker(void* const uShell)
                                                                         ushell->io.buffer);
                     if (historyStatus != USHELL_HISTORY_NO_ERR)
                     {
-                        USHELL_ASSERT(0);
+                        USHELL_VCP_ASSERT(0);
                     }
                     break;
                 }
@@ -707,7 +706,7 @@ static void uShellWorker(void* const uShell)
 static void uShellRxReceivedCb(const void* const hal)
 {
     /* Check input parameters */
-    USHELL_ASSERT(hal != NULL);
+    USHELL_VCP_ASSERT(hal != NULL);
 
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
@@ -719,13 +718,13 @@ static void uShellRxReceivedCb(const void* const hal)
         if ((ushellHal == NULL) ||
             (ushell == NULL))
         {
-            USHELL_ASSERT(0);
+            USHELL_VCP_ASSERT(0);
             break;
         }
 
         /* Send msg */
         status = uShellSemaphoreRxEventSet(ushell);
-        USHELL_ASSERT(status == USHELL_NO_ERR);
+        USHELL_VCP_ASSERT(status == USHELL_NO_ERR);
         (void) status;
 
     } while (0);
@@ -741,7 +740,7 @@ static void uShellRxReceivedCb(const void* const hal)
 static void uShellTxCpltCb(const void* const hal)
 {
     /* Check input parameters */
-    USHELL_ASSERT(hal != NULL);
+    USHELL_VCP_ASSERT(hal != NULL);
 
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
@@ -753,13 +752,13 @@ static void uShellTxCpltCb(const void* const hal)
         if ((ushellHal == NULL) ||
             (ushell == NULL))
         {
-            USHELL_ASSERT(0);
+            USHELL_VCP_ASSERT(0);
             break;
         }
 
         /* Send msg */
         status = uShellQueueMsgSend(ushell, USHELL_MSG_TX_COMPLETE);
-        USHELL_ASSERT(status == USHELL_NO_ERR);
+        USHELL_VCP_ASSERT(status == USHELL_NO_ERR);
         (void) status;
 
     } while (0);
@@ -775,7 +774,7 @@ static void uShellTxCpltCb(const void* const hal)
 static void uShellXferErrorCb(const void* const hal)
 {
     /* Check input parameters */
-    USHELL_ASSERT(hal != NULL);
+    USHELL_VCP_ASSERT(hal != NULL);
 
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
@@ -787,13 +786,13 @@ static void uShellXferErrorCb(const void* const hal)
         if ((ushellHal == NULL) ||
             (ushell == NULL))
         {
-            USHELL_ASSERT(0);
+            USHELL_VCP_ASSERT(0);
             break;
         }
 
         /* Send msg */
         status = uShellQueueMsgSend(ushell, USHELL_MSG_RX_TX_ERROR);
-        USHELL_ASSERT(status == USHELL_NO_ERR);
+        USHELL_VCP_ASSERT(status == USHELL_NO_ERR);
         (void) status;
 
     } while (0);
@@ -809,8 +808,8 @@ static void uShellXferErrorCb(const void* const hal)
 static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const str)
 {
     /* Check input */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(str != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(str != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -886,8 +885,8 @@ static UShellErr_e uShellPrint(const UShell_s* const uShell, const char* const s
 static UShellErr_e uShellPrintIo(const UShell_s* const uShell)
 {
     /* Check input */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(str != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(str != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -964,8 +963,8 @@ static UShellErr_e uShellScanCharWait(const UShell_s* const uShell,
                                       UShellItem_t* const ch)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(ch != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(ch != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1029,8 +1028,8 @@ static UShellErr_e uShellScanCharPend(const UShell_s* const uShell,
                                       const uint32_t timeMs)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(ch != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(ch != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1111,10 +1110,10 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellCfg_s* const cfg)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(osal != NULL);
-    USHELL_ASSERT(hal != NULL);
-    USHELL_ASSERT(cfg != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(osal != NULL);
+    USHELL_VCP_ASSERT(hal != NULL);
+    USHELL_VCP_ASSERT(cfg != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1187,7 +1186,7 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
 static UShellErr_e uShellRtEnvDeInit(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1228,8 +1227,8 @@ static UShellErr_e uShellRtEnvHalInit(UShell_s* const uShell,
                                       UShellHal_s* const hal)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(hal != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(hal != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1306,7 +1305,7 @@ static UShellErr_e uShellRtEnvHalInit(UShell_s* const uShell,
 static UShellErr_e uShellRtEnvHalDeInit(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1382,8 +1381,8 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
                                        UShellOsal_s* const osal)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(osal != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(osal != NULL);
 
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
     UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
@@ -1404,8 +1403,8 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
         /* : Create mutex */
         UShellOsalLockObjHandle_t lockObj = NULL;
         osalStatus = UShellOsalLockObjCreate(thisOsal, &lockObj);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
-        USHELL_ASSERT(lockObj != NULL);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(lockObj != NULL);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             break;
@@ -1417,8 +1416,8 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
                                            sizeof(UShellMsg_e),
                                            8U,
                                            &queue);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
-        USHELL_ASSERT(queue != NULL);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(queue != NULL);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             break;
@@ -1430,8 +1429,8 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
                                                USHELL_BUFFER_SIZE,
                                                0U,
                                                &semaphoreHandle);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
-        USHELL_ASSERT(semaphoreHandle != NULL);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(semaphoreHandle != NULL);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             break;
@@ -1445,10 +1444,10 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
                 .stackSize = USHELL_THREAD_STACK_SIZE,
                 .threadParam = uShell,
                 .threadPriority = USHELL_THREAD_PRIORITY,
-                .threadWorker = uShellWorker};
+                .threadWorker = uShellVcpWorker};
         osalStatus = UShellOsalThreadCreate(thisOsal, &thread, threadCfg);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
-        USHELL_ASSERT(thread != NULL);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(thread != NULL);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             break;
@@ -1473,8 +1472,8 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
 static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
-    USHELL_ASSERT(uShell->osal != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell->osal != NULL);
 
     /* Status obj */
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
@@ -1496,7 +1495,7 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 
         /* : : Delete the thread */
         osalStatus = UShellOsalThreadDelete(thisOsal, thread);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
 
     } while (0);
 
@@ -1514,7 +1513,7 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 
         /* : : Delete the queue */
         osalStatus = UShellOsalQueueDelete(thisOsal, queue);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
     } while (0);
 
     /* : Delete the lock object */
@@ -1531,7 +1530,7 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 
         /* : : Delete the lock object */
         osalStatus = UShellOsalLockObjDelete(thisOsal, lockObj);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
     } while (0);
 
     /* : Delete the semaphore */
@@ -1548,13 +1547,13 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 
         /* : : Delete the semaphore */
         osalStatus = UShellOsalSemaphoreDelete(thisOsal, semaphoreHandle);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
 
     } while (0);
 
     /* Set parent */
     osalStatus = UShellOsalParentSet(thisOsal, NULL);
-    USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+    USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
 
     /* Flush */
     uShell->osal = NULL;
@@ -1568,7 +1567,7 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 static UShellErr_e uShellSemaphoreRxEventSet(UShell_s* const dio)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_VCP_ASSERT(dio != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1618,7 +1617,7 @@ static UShellErr_e uShellSemaphoreRxEventSet(UShell_s* const dio)
 static UShellErr_e uShellSemaphoreRxEventWait(UShell_s* const dio)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_VCP_ASSERT(dio != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1671,7 +1670,7 @@ static UShellErr_e uShellSemaphoreRxEventPend(UShell_s* const dio,
 {
     {
         /* Check input parameters */
-        USHELL_ASSERT(dio != NULL);
+        USHELL_VCP_ASSERT(dio != NULL);
 
         /* Local variable */
         UShellErr_e status = USHELL_NO_ERR;
@@ -1722,7 +1721,7 @@ static UShellErr_e uShellSemaphoreRxEventPend(UShell_s* const dio,
 static UShellErr_e uShellRtEnvFuncAuthInit(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1758,7 +1757,7 @@ static UShellErr_e uShellRtEnvFuncAuthInit(UShell_s* const uShell)
 static UShellErr_e uShellRtEnvFuncAuthDeInit(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1792,7 +1791,7 @@ static UShellErr_e uShellRtEnvFuncAuthDeInit(UShell_s* const uShell)
 static UShellErr_e uShellRtEnvFuncHistoryInit(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1827,7 +1826,7 @@ static UShellErr_e uShellRtEnvFuncHistoryInit(UShell_s* const uShell)
 static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1861,7 +1860,7 @@ static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell)
 static void uShellLock(const UShell_s* const dio)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_VCP_ASSERT(dio != NULL);
 
     do
     {
@@ -1880,8 +1879,8 @@ static void uShellLock(const UShell_s* const dio)
         UShellOsalErr_e osalStatus = UShellOsalLockObjHandleGet(osal,
                                                                 0U,
                                                                 &lockObj);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
-        USHELL_ASSERT(lockObj != NULL);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(lockObj != NULL);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
             (lockObj == NULL))
         {
@@ -1890,7 +1889,7 @@ static void uShellLock(const UShell_s* const dio)
 
         /* Lock */
         osalStatus = UShellOsalLock(osal, lockObj);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
 
     } while (0);
 }
@@ -1903,7 +1902,7 @@ static void uShellLock(const UShell_s* const dio)
 static void uShellUnlock(const UShell_s* const dio)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_VCP_ASSERT(dio != NULL);
 
     do
     {
@@ -1922,8 +1921,8 @@ static void uShellUnlock(const UShell_s* const dio)
         UShellOsalErr_e osalStatus = UShellOsalLockObjHandleGet(osal,
                                                                 0U,
                                                                 &lockObj);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
-        USHELL_ASSERT(lockObj != NULL);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(lockObj != NULL);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
             (lockObj == NULL))
         {
@@ -1932,7 +1931,7 @@ static void uShellUnlock(const UShell_s* const dio)
 
         /* Unlock */
         osalStatus = UShellOsalUnlock(osal, lockObj);
-        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
 
     } while (0);
 }
@@ -1947,7 +1946,7 @@ static UShellErr_e uShellQueueMsgSend(UShell_s* const dio,
                                       const UShellMsg_e msg)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_VCP_ASSERT(dio != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -2005,7 +2004,7 @@ static UShellErr_e uShellQueueMsgSend(UShell_s* const dio,
 static UShellErr_e uShellQueueMsgFlush(UShell_s* const dio)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_VCP_ASSERT(dio != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -2058,7 +2057,7 @@ static UShellErr_e uShellQueueMsgPend(UShell_s* const dio,
                                       const uint32_t timeMs)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_VCP_ASSERT(dio != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -2123,7 +2122,7 @@ static UShellErr_e uShellQueueMsgWait(UShell_s* const dio,
                                       UShellMsg_e* const msg)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_VCP_ASSERT(dio != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -2186,7 +2185,7 @@ static UShellErr_e uShellQueueMsgWait(UShell_s* const dio,
 static inline void uShellTerminalClearScreen(const UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -2197,13 +2196,13 @@ static inline void uShellTerminalClearScreen(const UShell_s* const uShell)
         /* Check input parameters */
         if (uShell == NULL)
         {
-            USHELL_ASSERT(0);
+            USHELL_VCP_ASSERT(0);
             break;
         }
 
         /* Print the command */
         status = uShellPrint(uShell, USHELL_CLEAR_SCREEN);
-        USHELL_ASSERT(status == USHELL_NO_ERR);
+        USHELL_VCP_ASSERT(status == USHELL_NO_ERR);
         if (status != USHELL_NO_ERR)
         {
             break;
@@ -2220,7 +2219,7 @@ static inline void uShellTerminalClearScreen(const UShell_s* const uShell)
 static inline void uShellTerminalClearLine(const UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -2231,13 +2230,13 @@ static inline void uShellTerminalClearLine(const UShell_s* const uShell)
         /* Check input parameters */
         if (uShell == NULL)
         {
-            USHELL_ASSERT(0);
+            USHELL_VCP_ASSERT(0);
             break;
         }
 
         /* Print the command */
         status = uShellPrint(uShell, USHELL_CLEAR_LINE);
-        USHELL_ASSERT(status == USHELL_NO_ERR);
+        USHELL_VCP_ASSERT(status == USHELL_NO_ERR);
         if (status != USHELL_NO_ERR)
         {
             break;
@@ -2254,7 +2253,7 @@ static inline void uShellTerminalClearLine(const UShell_s* const uShell)
 static inline void uShellPrintUserPrompt(const UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -2265,13 +2264,13 @@ static inline void uShellPrintUserPrompt(const UShell_s* const uShell)
         /* Check input parameters */
         if (uShell == NULL)
         {
-            USHELL_ASSERT(0);
+            USHELL_VCP_ASSERT(0);
             break;
         }
 
         /* Print the prompt */
         status = uShellPrint(uShell, USHELL_USER_PROMPT);
-        USHELL_ASSERT(status == USHELL_NO_ERR);
+        USHELL_VCP_ASSERT(status == USHELL_NO_ERR);
         if (status != USHELL_NO_ERR)
         {
             break;
@@ -2288,7 +2287,7 @@ static inline void uShellPrintUserPrompt(const UShell_s* const uShell)
 static inline void uShellTerminalDelChar(const UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(uShell != NULL);
+    USHELL_VCP_ASSERT(uShell != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -2299,13 +2298,13 @@ static inline void uShellTerminalDelChar(const UShell_s* const uShell)
         /* Check input parameters */
         if (uShell == NULL)
         {
-            USHELL_ASSERT(0);
+            USHELL_VCP_ASSERT(0);
             break;
         }
 
         /* Print the command */
         status = uShellPrint(uShell, USHELL_DEL_CHAR);
-        USHELL_ASSERT(status == USHELL_NO_ERR);
+        USHELL_VCP_ASSERT(status == USHELL_NO_ERR);
         if (status != USHELL_NO_ERR)
         {
             break;

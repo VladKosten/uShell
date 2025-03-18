@@ -17,7 +17,6 @@ extern "C" {
 #include "ushell_cmd.h"
 #include "ushell_hal.h"
 #include "ushell_osal.h"
-#include "ushell_auth.h"
 #include "ushell_history.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
@@ -169,7 +168,6 @@ typedef struct
     UShellFsmState_e fsmState;            ///< Finite state machine state
     UShellCfg_s cfg;                      ///< Configuration object
     UShellCmd_s* cmd [USHELL_MAX_CMD];    ///< Commands array
-    UShellAuth_s auth;                    ///< Authentication object
     UShellHistory_s history;              ///< History object
     UShellIo_s io;                        ///< IO object
 

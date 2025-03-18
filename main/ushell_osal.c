@@ -1162,6 +1162,127 @@ UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s* const osal,
 }
 
 /**
+ * @brief Create an event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
+                                       UShellOsalEventGroupHandle_t* const eventGroupHandle)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupCreate))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Create the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupCreate(osal, eventGroupHandle);
+
+    return retStatus;
+}
+
+/**
+ * @brief Create an event group with a specific name.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @param[in] name Name of the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupDelete(UShellOsal_s* const osal,
+                                       const UShellOsalEventGroupHandle_t eventGroupHandle)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupDelete))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Delete the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupDelete(osal, eventGroupHandle);
+
+    return retStatus;
+}
+
+/**
+ * @brief Set a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToSet Bits to set in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
+                                        const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                        const UShellOsalEventGroupBits_e bitsToSet)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupSetBits))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Set the bits in the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupSetBits(osal, eventGroupHandle, bitsToSet);
+
+    return retStatus;
+}
+
+/**
+ * @brief Clear a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToClear Bits to clear in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupClearBits(UShellOsal_s* const osal,
+                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                          const UShellOsalEventGroupBits_e bitsToClear)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupClearBits))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Clear the bits in the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupClearBits(osal, eventGroupHandle, bitsToClear);
+
+    return retStatus;
+}
+
+/**
  * \brief Get a queue handle of the given OSAL object
  * \param[in] osal          - pointer to OSAL instance
  * \param[in] queueSlotInd  - index of queue slot
@@ -1250,6 +1371,52 @@ UShellOsalErr_e UShellOsalSemaphoreHandleGet(UShellOsal_s* const osal,
     }
 
     *semaphoreHandle = osal->semaphoreHandle [semaphoreSlotInd];
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+/**
+ * \brief Get a streambuff handle of the given OSAL object
+ * \param[in]   osal          	    - pointer to OSAL instance
+ * \param[in]   streamBuffSlotInd   - index of streambuff slots
+ * \param[out]  streamBuffHandle    - pointer to an object into which the streambuff handle handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalStreamBuffHandleGet(UShellOsal_s* const osal,
+                                              const size_t streamBuffSlotInd,
+                                              UShellOsalStreamBuffHandle_t* const streamBuffHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle) ||
+        (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM <= streamBuffSlotInd))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    *streamBuffHandle = osal->streamBuffHandle [streamBuffSlotInd];
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+/**
+ * @brief Get an event group handle of the given OSAL object
+ * @param[in] osal - pointer to OSAL instance
+ * @param[in] eventGroupSlotInd - index of event group slots
+ * @param[in] eventGroupHandle - pointer to an object into which the event group handle will be copied
+ * @return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalEventGroupHandleGet(UShellOsal_s* const osal,
+                                              const size_t eventGroupSlotInd,
+                                              UShellOsalEventGroupHandle_t* const eventGroupHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle) ||
+        (USHELL_OSAL_EVENT_GROUPS_NUM <= eventGroupSlotInd))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    *eventGroupHandle = osal->eventGroupHandle [eventGroupSlotInd];
 
     return USHELL_OSAL_NO_ERR;
 }
