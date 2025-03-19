@@ -1,6 +1,8 @@
 # Add libraries
 add_library(UShell STATIC ushell.c
-                          ushell_history.c)
+                          ushell_vcp.c
+                          ushell_history.c
+                          )
 add_library(UShellHal STATIC ushell_hal.c)
 add_library(UShellOsal STATIC ushell_osal.c)
 add_library(UShellCmd STATIC ushell_cmd.c)

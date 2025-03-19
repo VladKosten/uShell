@@ -872,6 +872,7 @@ typedef struct
      * @param[in] osal Pointer to the OSAL instance.
      * @param[in] eventGroupHandle Handle of the event group.
      * @param[in] bitsToWait Bits to wait for in the event group.
+     * @param[out] bitsReceived Pointer to store the received bits.
      * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
      * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
      * @return Error code indicating the result of the operation.
@@ -879,8 +880,20 @@ typedef struct
     UShellOsalErr_e (*eventGroupBitsWait)(void* const osal,
                                           const UShellOsalEventGroupHandle_t eventGroupHandle,
                                           const UShellOsalEventGroupBits_e bitsToWait,
+                                          UShellOsalEventGroupBits_e* const bitsReceived,
                                           const bool clearOnExit,
-                                          const bool waitAllBits)
+                                          const bool waitAllBits);
+
+    /**
+     * @brief Get the active bits in the event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] eventGroupHandle Handle of the event group.
+     * @param[out] bitsActive Pointer to store the active bits.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupBitsActiveGet)(void* const osal,
+                                               const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                               UShellOsalEventGroupBits_e* const bitsActive);
 
 } UShellOsalPortable_s;
 
@@ -1418,6 +1431,7 @@ UShellOsalErr_e UShellEventGroupClearBits(UShellOsal_s* const osal,
  * @param[in] osal Pointer to the OSAL instance.
  * @param[in] eventGroupHandle Handle of the event group.
  * @param[in] bitsToWait Bits to wait for in the event group.
+ * @param[out] bitsReceived Pointer to store the received bits.
  * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
  * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
  * @return Error code indicating the result of the operation.
@@ -1425,8 +1439,20 @@ UShellOsalErr_e UShellEventGroupClearBits(UShellOsal_s* const osal,
 UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
                                          const UShellOsalEventGroupBits_e bitsToWait,
+                                         UShellOsalEventGroupBits_e* const bitsReceived,
                                          const bool clearOnExit,
                                          const bool waitAllBits);
+
+/**
+ * @brief Get the active bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[out] bitsActive Pointer to store the active bits.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
+                                              const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                              UShellOsalEventGroupBits_e* const bitsActive);
 
 /**
  * \brief Get a semaphore handle of the given OSAL object

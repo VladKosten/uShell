@@ -21,19 +21,36 @@ extern "C" {
 
 /**
  * @brief Description of the maximum size of the buffer in the UShell
+ *
+ * This macro defines the maximum size of the buffer used in the UShell.
  */
 #ifndef USHELL_BUFFER_SIZE
     #define USHELL_BUFFER_SIZE 64
 #endif
 
+/**
+ * @brief Name of the uShell thread.
+ *
+ * This macro defines the name used when creating the uShell thread.
+ */
 #ifndef USHELL_THREAD_NAME
     #define USHELL_THREAD_NAME "USHELL_VCP"
 #endif
 
+/**
+ * @brief Stack size for the uShell thread.
+ *
+ * This macro defines the stack size allocated for the uShell thread.
+ */
 #ifndef USHELL_THREAD_STACK_SIZE
-    #define USHELL_THREAD_STACK_SIZE 1024U
+    #define USHELL_THREAD_STACK_SIZE 256U
 #endif
 
+/**
+ * @brief Priority of the uShell thread.
+ *
+ * This macro defines the scheduling priority used by the uShell thread.
+ */
 #ifndef USHELL_THREAD_PRIORITY
     #define USHELL_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
 #endif
@@ -43,7 +60,6 @@ extern "C" {
 /**
  * @brief Describe size of one item in the UShell
  */
-
 typedef char UShellVcpItem_t;
 
 /**
@@ -73,6 +89,7 @@ typedef struct
 
 /**
  * @brief Description of the uShell object
+ * @note This object is used to store the uShell VCP object
  */
 typedef struct
 {
@@ -84,7 +101,7 @@ typedef struct
     const UShellOsal_s* osal;    ///< OSAL object
     const UShellHal_s* hal;      ///< HAL object
 
-    /* Optional fields */
+    /* Internal use  */
     UShellVcpIo_s io;    ///< IO object
 
 } UShellVcp_s;
@@ -148,7 +165,7 @@ UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
  */
 UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
                                 char* const str,
-                                size_t* const size);
+                                const size_t maxSize);
 
 #ifdef __cplusplus
 }

@@ -1252,19 +1252,26 @@ UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Clear a bit in the event group.
+ * @brief Wait for bits in the event group.
  * @param[in] osal Pointer to the OSAL instance.
  * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToClear Bits to clear in the event group.
+ * @param[in] bitsToWait Bits to wait for in the event group.
+ * @param[out] bitsReceived Pointer to store the received bits.
+ * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
  * @return Error code indicating the result of the operation.
  */
-UShellOsalErr_e UShellEventGroupClearBits(UShellOsal_s* const osal,
-                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                          const UShellOsalEventGroupBits_e bitsToClear)
+UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
+                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                         const UShellOsalEventGroupBits_e bitsToWait,
+                                         UShellOsalEventGroupBits_e* const bitsReceived,
+                                         const bool clearOnExit,
+                                         const bool waitAllBits)
 {
     /* Check input parameter */
     if ((NULL == osal) ||
-        (NULL == eventGroupHandle))
+        (NULL == eventGroupHandle) ||
+        (NULL == bitsReceived))
     {
         return USHELL_OSAL_INVALID_ARGS;
     }
@@ -1277,7 +1284,44 @@ UShellOsalErr_e UShellEventGroupClearBits(UShellOsal_s* const osal,
     }
 
     /* Clear the bits in the event group */
-    UShellOsalErr_e retStatus = osal->portable->eventGroupClearBits(osal, eventGroupHandle, bitsToClear);
+    UShellOsalErr_e retStatus = osal->portable->eventGroupBitsWait(osal,
+                                                                   eventGroupHandle,
+                                                                   bitsToWait,
+                                                                   bitsReceived,
+                                                                   clearOnExit,
+                                                                   waitAllBits);
+
+    return retStatus;
+}
+
+/**
+ * @brief Get the active bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[out] bitsActive Pointer to store the active bits.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
+                                              const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                              UShellOsalEventGroupBits_e* const bitsActive)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle) ||
+        (NULL == bitsActive))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupClearBits))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Clear the bits in the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupBitsGet(osal, eventGroupHandle, bitsActive);
 
     return retStatus;
 }

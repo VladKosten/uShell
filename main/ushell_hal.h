@@ -121,12 +121,14 @@ typedef struct
      *
      * @param[in] hal Pointer to the HAL instance.
      * @param[out] data Pointer to the buffer to store the read data.
-     * @param[in] size Size of the buffer.
+     * @param[in] buffSize Size of the buffer.
+     * @param[out] usedSize used size.
      * @return Error code indicating the result of the operation.
      */
     UShellHalErr_e (*read)(void* const hal,
                            UShellHalItem_t* const data,
-                           const size_t size);
+                           const size_t buffSize,
+                           size_t* const usedSize);
 
     /**
      * @brief Set Tx mode
@@ -367,12 +369,14 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
  * @brief Read data from the UShellHal object
  * @param[in] hal - UShellHal object to read
  * @param[in] data - pointer to the data to read
- * @param[in] size - size of the data to read
+ * @param[in] buffSize - size of buffer
+ * @param[out] usedSize - size used in buffer
  * @return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
                              UShellHalItem_t* const data,
-                             const size_t sizeBuffer);
+                             const size_t buffSize,
+                             size_t* const usedSize);
 
 /**
  * @brief Set the tx mode of the UShellHal object

@@ -601,12 +601,14 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
  */
 static UShellHalErr_e uShellHalPortRead(void* const hal,
                                         UShellHalItem_t* const data,
-                                        const size_t size)
+                                        const size_t buffSize,
+                                        size_t* const usedSize)
 {
     /* Check input parameter */
     USHELL_HAL_PORT_ASSERT(hal != NULL);
     USHELL_HAL_PORT_ASSERT(data != NULL);
-    USHELL_HAL_PORT_ASSERT(size > 0);
+    USHELL_HAL_PORT_ASSERT(buffSize > 0);
+    USHELL_HAL_PORT_ASSERT(usedSize == NULL);
 
     /* Local variable */
     UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
@@ -617,7 +619,7 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
         /* Check input parameters */
         if ((halPort == NULL) ||
             (data == NULL) ||
-            (size == 0) ||
+            (buffSize == 0) ||
             (halPort->uart == NULL))
         {
             status = USHELL_HAL_INVALID_ARGS_ERR;
@@ -627,12 +629,10 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
         /* Read data */
         int32_t asfStatus = io_read((struct io_descriptor*) halPort->uart,
                                     (uint8_t*) data,
-                                    size);
-        if (asfStatus != size)
-        {
-            status = USHELL_HAL_PORT_ERR;
-            break;
-        }
+                                    buffSize);
+
+        /* Return used size */
+        *usedSize = asfStatus;
 
     } while (0);
 
