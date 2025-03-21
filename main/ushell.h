@@ -187,7 +187,6 @@ typedef struct
  */
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
-                       const UShellHal_s* const hal,
                        const UShellCfg_s cfg,
                        void* const parent,
                        const char* const name);

@@ -800,6 +800,23 @@ typedef struct
                              const uint32_t msToWait);
 
     /**
+     * @brief Send data to a stream buffer (blocking, no timeout).
+     *
+     * This function writes data to the specified stream buffer, blocking until
+     * all data has been written or an error occurs.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] streamBuffHandle Handle of the stream buffer.
+     * @param[in] txData Pointer to the data to be sent.
+     * @param[in] dataLengthBytes Length of the data to be sent in bytes.
+     * @return Number of bytes actually written to the stream buffer.
+     */
+    size_t (*streamBuffSendBlocking)(void* const osal,
+                                     const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                     const void* txData,
+                                     const size_t dataLengthBytes);
+
+    /**
      * @brief Receive data from a stream buffer.
      *
      * @param[in] osal Pointer to the OSAL instance.
@@ -815,6 +832,22 @@ typedef struct
                                 void* const rxData,
                                 const size_t dataLengthBytes,
                                 const uint32_t msToWait);
+
+    /**
+     * @brief Receive data from a stream buffer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] streamBuffHandle Handle of the stream buffer.
+     * @param[out] rxData Pointer to the buffer to store the received data.
+     * @param[in] dataLengthBytes Length of the data to be received in bytes.
+     * @param[in] msToWait Timeout in milliseconds.
+     * @return Number of bytes received.
+     *
+     */
+    size_t (*streamBuffReceiveBlocking)(void* const osal,
+                                        const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                        void* const rxData,
+                                        const size_t dataLengthBytes);
 
     /**
      * @brief Reset a stream buffer.
@@ -1280,39 +1313,6 @@ UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s* const osal,
                                             UShellOsalSemaphoreCount_t* const semaphoreCount);
 
 /**
- * \brief Get a queue handle of the given OSAL object
- * \param[in] osal          - pointer to OSAL instance
- * \param[in] queueSlotInd  - index of queue slot
- * \param[out] queuehandle  - pointer to an object into which the current queue handle will be copied
- * \return UShellOsalErr_e error code
- */
-UShellOsalErr_e UShellOsalQueueHandleGet(UShellOsal_s* const osal,
-                                         const size_t queueSlotInd,
-                                         UShellOsalQueueHandle_t* const queueHandle);
-
-/**
- * \brief Get a lockobj handle of the given OSAL object
- * \param[in]   osal            - pointer to OSAL instance
- * \param[in]   lockObjSlotInd  - index of lockobj slots
- * \param[out]  lockObjhandle   - pointer to an object into which the lockobj handle will be copied
- * \return UShellOsalErr_e error code
- */
-UShellOsalErr_e UShellOsalLockObjHandleGet(UShellOsal_s* const osal,
-                                           const size_t lockObjSlotInd,
-                                           UShellOsalLockObjHandle_t* const lockObjHandle);
-
-/**
- * \brief Get a thread handle of the given OSAL object
- * \param[in]   osal            - pointer to OSAL instance
- * \param[in]   threadSlotInd   - index of thread slots
- * \param[out]  threadHandle	- pointer to an object into which the thread handle handle will be copied
- * \return UShellOsalErr_e error code
- */
-UShellOsalErr_e UShellOsalThreadHandleGet(UShellOsal_s* const osal,
-                                          const size_t threadSlotInd,
-                                          UShellOsalThreadHandle_t* const threadHandle);
-
-/**
  * \brief Create the stream buffer
  * \param osal              - pointer to OSAL instance
  * \param buffSizeBytes     - the size of the stream buffer in bytes
@@ -1350,6 +1350,23 @@ size_t UShellOsalStreamBuffSend(UShellOsal_s* const osal,
                                 const uint32_t msToWait);
 
 /**
+ * @brief Send data to a stream buffer (blocking, no timeout).
+ *
+ * This function writes data to the specified stream buffer, blocking until
+ * all data has been written or an error occurs.
+ *
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] streamBuffHandle Handle of the stream buffer.
+ * @param[in] txData Pointer to the data to be sent.
+ * @param[in] dataLengthBytes Length of the data to be sent in bytes.
+ * @return Number of bytes actually written to the stream buffer.
+ */
+size_t UShellOsalStreamBuffSendBlocking(UShellOsal_s* const osal,
+                                        const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                        const void* txData,
+                                        const size_t dataLengthBytes);
+
+/**
  * \brief Receive data from the stream buffer
  * \param osal              - pointer to OSAL instance
  * \param streamBuffHandle  - handle of the stream buffer from which bytes are to be received
@@ -1366,6 +1383,22 @@ size_t UShellOsalStreamBuffReceive(UShellOsal_s* const osal,
                                    const uint32_t msToWait);
 
 /**
+ * @brief Receive data from a stream buffer.
+ *
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] streamBuffHandle Handle of the stream buffer.
+ * @param[out] rxData Pointer to the buffer to store the received data.
+ * @param[in] dataLengthBytes Length of the data to be received in bytes.
+ * @param[in] msToWait Timeout in milliseconds.
+ * @return Number of bytes received.
+ *
+ */
+size_t UShellOsalStreamBuffReceiveBlocking(UShellOsal_s* const osal,
+                                           const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                           void* const rxData,
+                                           const size_t dataLengthBytes);
+
+/**
  * \brief Reset a stream buffer to its initial empty state
  * \param osal              - pointer to OSAL instance
  * \param streamBuffHandle  - handle of the stream buffer being reset
@@ -1373,6 +1406,39 @@ size_t UShellOsalStreamBuffReceive(UShellOsal_s* const osal,
  */
 UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
                                           const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+/**
+ * \brief Get a queue handle of the given OSAL object
+ * \param[in] osal          - pointer to OSAL instance
+ * \param[in] queueSlotInd  - index of queue slot
+ * \param[out] queuehandle  - pointer to an object into which the current queue handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalQueueHandleGet(UShellOsal_s* const osal,
+                                         const size_t queueSlotInd,
+                                         UShellOsalQueueHandle_t* const queueHandle);
+
+/**
+ * \brief Get a lockobj handle of the given OSAL object
+ * \param[in]   osal            - pointer to OSAL instance
+ * \param[in]   lockObjSlotInd  - index of lockobj slots
+ * \param[out]  lockObjhandle   - pointer to an object into which the lockobj handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalLockObjHandleGet(UShellOsal_s* const osal,
+                                           const size_t lockObjSlotInd,
+                                           UShellOsalLockObjHandle_t* const lockObjHandle);
+
+/**
+ * \brief Get a thread handle of the given OSAL object
+ * \param[in]   osal            - pointer to OSAL instance
+ * \param[in]   threadSlotInd   - index of thread slots
+ * \param[out]  threadHandle	- pointer to an object into which the thread handle handle will be copied
+ * \return UShellOsalErr_e error code
+ */
+UShellOsalErr_e UShellOsalThreadHandleGet(UShellOsal_s* const osal,
+                                          const size_t threadSlotInd,
+                                          UShellOsalThreadHandle_t* const threadHandle);
 
 /**
  * \brief Get a streambuff handle of the given OSAL object

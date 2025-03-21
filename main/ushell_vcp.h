@@ -24,8 +24,8 @@ extern "C" {
  *
  * This macro defines the maximum size of the buffer used in the UShell.
  */
-#ifndef USHELL_BUFFER_SIZE
-    #define USHELL_BUFFER_SIZE 64
+#ifndef USHELL_VCP_BUFFER_SIZE
+    #define USHELL_VCP_BUFFER_SIZE 64
 #endif
 
 /**
@@ -33,8 +33,8 @@ extern "C" {
  *
  * This macro defines the name used when creating the uShell thread.
  */
-#ifndef USHELL_THREAD_NAME
-    #define USHELL_THREAD_NAME "USHELL_VCP"
+#ifndef USHELL_VCP_THREAD_NAME
+    #define USHELL_VCP_THREAD_NAME "USHELL_VCP"
 #endif
 
 /**
@@ -42,8 +42,8 @@ extern "C" {
  *
  * This macro defines the stack size allocated for the uShell thread.
  */
-#ifndef USHELL_THREAD_STACK_SIZE
-    #define USHELL_THREAD_STACK_SIZE 256U
+#ifndef USHELL_VCP_THREAD_STACK_SIZE
+    #define USHELL_VCP_THREAD_STACK_SIZE 256U
 #endif
 
 /**
@@ -51,8 +51,17 @@ extern "C" {
  *
  * This macro defines the scheduling priority used by the uShell thread.
  */
-#ifndef USHELL_THREAD_PRIORITY
-    #define USHELL_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
+#ifndef USHELL_VCP_THREAD_PRIORITY
+    #define USHELL_VCP_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
+#endif
+
+/**
+ * @brief Timeout for tx operation in the uShell VCP.
+ *
+ * This macro defines the timeout duration for the tx operation in the uShell VCP.
+ */
+#ifndef USHELL_VCP_TX_TIMEOUT_MS
+    #define USHELL_VCP_TX_TIMEOUT_MS 3000U
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -82,8 +91,8 @@ typedef enum
  */
 typedef struct
 {
-    UShellVcpItem_t buffer [USHELL_BUFFER_SIZE];    ///< Buffer for commands
-    size_t ind;                                     ///< Size of the buffer
+    UShellVcpItem_t buffer [USHELL_VCP_BUFFER_SIZE];    ///< Buffer for commands
+    size_t ind;                                         ///< Size of the buffer
 
 } UShellVcpIo_s;
 
@@ -135,17 +144,19 @@ UShellVcpErr_e UShellVcpDeInit(UShellVcp_s* const vcp);
 /**
  * @brief Print string to the uShell vcp object
  * @param[in] vcp - uShell object to be printed
+ * @param[in] str - string to be printed
  * @param[out] none
  * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp);
+UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp, const char* const str);
 
 /**
  * @brief Print char to the uShell vcp object
  * @param vcp - uShell object to be printed
+ * @param ch - char to be printed
  * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp);
+UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch);
 
 /**
  * @brief Scan char from the uShell vcp object

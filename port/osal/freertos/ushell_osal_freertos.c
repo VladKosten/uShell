@@ -284,6 +284,20 @@ static size_t ushellOsalFreertosStreamBuffSend(void* const osalFreertos,
                                                const uint32_t msToWait);
 
 /**
+ * \brief Send data to the stream buffer
+ * \param osalFreertos      - pointer to FreeRTOS OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer to which a stream is being sent
+ * \param txData            - pointer to the buffer that holds the bytes to be copied into the stream buffer
+ * \param dataLengthBytes   - the size of the data in bytes
+ * \param msToWait          - the maximum amount of time the task should remain in the blocked state to wait
+ * \return size_t the number of bytes written to the stream buffer, will write as many bytes as possible.
+ */
+static size_t ushellOsalFreertosStreamBuffSendBlocking(void* const osalFreertos,
+                                                       const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                                       const void* txData,
+                                                       const size_t dataLengthBytes);
+
+/**
  * \brief Receive data from the stream buffer
  */
 static size_t ushellOsalFreertosStreamBuffReceive(void* const osalFreertos,
@@ -291,6 +305,14 @@ static size_t ushellOsalFreertosStreamBuffReceive(void* const osalFreertos,
                                                   void* const rxData,
                                                   const size_t dataLengthBytes,
                                                   const uint32_t msToWait);
+
+/**
+ * @brief Receive data from the stream buffer (blocking, no timeout)
+ */
+static size_t ushellOsalFreertosStreamBuffReceiveBlocking(void* const osalFreertos,
+                                                          const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                                          void* const rxData,
+                                                          const size_t dataLengthBytes);
 
 /**
  * \brief Reset a stream buffer to its initial empty state
@@ -471,6 +493,8 @@ static const UShellOsalPortable_s FreeRtosPortable =
         .streamBuffReset = ushellOsalFreertosStreamBuffReset,
         .streamBuffSend = ushellOsalFreertosStreamBuffSend,
         .streamBuffReceive = ushellOsalFreertosStreamBuffReceive,
+        .streamBuffReceiveBlocking = ushellOsalFreertosStreamBuffReceiveBlocking,
+        .streamBuffSendBlocking = ushellOsalFreertosStreamBuffSendBlocking,
         .eventGroupSetBits = ushellOsalFreertosEventGroupSetBits,
         .eventGroupClearBits = ushellOsalFreertosEventGroupClearBits,
         .eventGroupBitsWait = ushellOsalFreertosEventGroupBitsWait,
@@ -2035,6 +2059,54 @@ static size_t ushellOsalFreertosStreamBuffSend(void* const osalFreertos,
 }
 
 /**
+ * \brief Send data to the stream buffer
+ * \param osalFreertos      - pointer to FreeRTOS OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer to which a stream is being sent
+ * \param txData            - pointer to the buffer that holds the bytes to be copied into the stream buffer
+ * \param dataLengthBytes   - the size of the data in bytes
+ * \param msToWait          - the maximum amount of time the task should remain in the blocked state to wait
+ * \return size_t the number of bytes written to the stream buffer, will write as many bytes as possible.
+ */
+static size_t ushellOsalFreertosStreamBuffSendBlocking(void* const osalFreertos,
+                                                       const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                                       const void* txData,
+                                                       const size_t dataLengthBytes)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != txData);
+    USHELL_OSAL_FREERTOS_ASSERT(0 != dataLengthBytes);
+
+    size_t bytesWritten = 0;
+
+    uint16_t streamBuffIndexNum = ushellOsalFreertosFindStreamBuffHandle(osalFreertos, streamBuffHandle);
+    if (0 == streamBuffIndexNum)
+    {
+        return bytesWritten;
+    }
+
+    if (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM < streamBuffIndexNum)
+    {
+        return bytesWritten;
+    }
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return bytesWritten;
+    }
+    else
+    {
+
+        // Put the item to the stream buffer
+        bytesWritten = xStreamBufferSend((UShellOsalStreamBuffHandle_t) streamBuffHandle, txData, dataLengthBytes, portMAX_DELAY);    // with waiting time
+    }
+
+    return bytesWritten;    // Exit: no errors
+}
+
+/**
  * \brief Receive data from the stream buffer
  * \param osalFreertos      - pointer to OSAL instance
  * \param streamBuffHandle  - handle of the stream buffer from which bytes are to be received
@@ -2044,11 +2116,12 @@ static size_t ushellOsalFreertosStreamBuffSend(void* const osalFreertos,
  *                            for data to become available if the stream buffer is empty
  * \return size_t the number of bytes read from the stream buffer, 0 = means no bytes were read or an err occurred.
  */
-static size_t ushellOsalFreertosStreamBuffReceive(void* const osalFreertos,
-                                                  const UShellOsalStreamBuffHandle_t streamBuffHandle,
-                                                  void* const rxData,
-                                                  const size_t dataLengthBytes,
-                                                  const uint32_t msToWait)
+static size_t
+ushellOsalFreertosStreamBuffReceive(void* const osalFreertos,
+                                    const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                    void* const rxData,
+                                    const size_t dataLengthBytes,
+                                    const uint32_t msToWait)
 {
     // Must be validated by the caller
     USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
@@ -2087,6 +2160,48 @@ static size_t ushellOsalFreertosStreamBuffReceive(void* const osalFreertos,
 
         // Put the item to the stream buffer
         bytesRead = xStreamBufferReceive((UShellOsalStreamBuffHandle_t) streamBuffHandle, rxData, dataLengthBytes, safeTimeoutInTicks);
+    }
+
+    return bytesRead;    // Exit: no errors
+}
+
+/**
+ * @brief Receive data from the stream buffer (blocking, no timeout)
+ */
+static size_t ushellOsalFreertosStreamBuffReceiveBlocking(void* const osalFreertos,
+                                                          const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                                          void* const rxData,
+                                                          const size_t dataLengthBytes)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != rxData);
+    USHELL_OSAL_FREERTOS_ASSERT(0 != dataLengthBytes);
+
+    size_t bytesRead = 0;
+
+    uint16_t streamBuffIndexNum = ushellOsalFreertosFindStreamBuffHandle(osalFreertos, streamBuffHandle);
+    if (0 == streamBuffIndexNum)
+    {
+        return bytesRead;
+    }
+
+    if (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM < streamBuffIndexNum)
+    {
+        return bytesRead;
+    }
+
+    // Check the level at which the function was called
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+    else
+    {
+
+        // Put the item to the stream buffer
+        bytesRead = xStreamBufferReceive((UShellOsalStreamBuffHandle_t) streamBuffHandle, rxData, dataLengthBytes, portMAX_DELAY);
     }
 
     return bytesRead;    // Exit: no errors

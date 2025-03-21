@@ -35,9 +35,9 @@ typedef enum
 {
     USHELL_VCP_FLAG_NONE = 0x00,                 ///< No flags set
     USHELL_VCP_FLAG_RX_EVENT = 0x01,             ///< Rx event
-    USHELL_VCP_FLAG_TX_TRANSFER_EVENT = 0x02,    ///< TX transfer event flag(From TX stream buffer to HAL)
+    USHELL_VCP_FLAG_TX_EVENT = 0x02,             ///< TX transfer event flag(From TX stream buffer to HAL)
     USHELL_VCP_FLAG_TX_COMPLETE_EVENT = 0x04,    ///< TX complete event flag
-    USHELL_VCP_FLAG_TX_ERROR_EVENT = 0x08,       ///< RX/TX error event flag
+    USHELL_VCP_FLAG_TX_RX_ERROR_EVENT = 0x08,    ///< RX/TX error event flag
     USHELL_VCP_FLAG_ERROR_EVENT = 0x10,          ///< Error event flag
 
     /* Add other here */
@@ -46,6 +46,33 @@ typedef enum
     USHELL_VCP_FLAG_ALL = 0x1F,    ///< All flags
 
 } UShellVcpFlags_e;
+
+/**
+ * @brief VCP messages used by the module.
+ *
+ * This enum represents the basic events that can occur in the VCP module,
+ * excluding completion and error events.
+ */
+typedef enum
+{
+    USHELL_VCP_MSG_EVENT_NONE = 0,        ///< No message
+    USHELL_VCP_MSG_EVENT_ERROR = 1,       ///< Error message
+    USHELL_VCP_MSG_EVENT_RX_EVENT = 2,    ///< Rx event
+    USHELL_VCP_MSG_EVENT_TX_EVENT = 3,    ///< Tx event
+} UShellVcpMsgEvent_e;
+
+/**
+ * @brief VCP transfer-related messages.
+ *
+ * This enum represents transaction completion and error events.
+ */
+typedef enum
+{
+    USHELL_VCP_MSG_TX_NONE = 0,        ///< Tx/Rx error event
+    USHELL_VCP_MSG_TX_COMPLETE = 1,    ///< Tx complete event
+    USHELL_VCP_MSG_TX_RX_ERR = 2,      ///< Tx or Rx error event
+
+} UShellVcpMsgTransfer_e;
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
 
@@ -58,7 +85,7 @@ typedef enum
  * \return none
  * \note This function is the main loop of the UShell module. It is responsible for the processing of the commands and the interaction with the user.
  */
-static void uShellVcpWorker(void* const vcp);
+static void uShellVcpWorker(void* const arg);
 
 /**
  * \brief Callback for the received data
@@ -152,39 +179,88 @@ static void uShellVcpLock(const UShellVcp_s* const vcp);
 static void uShellVcpUnlock(const UShellVcp_s* const vcp);
 
 /**
- * @brief Set flags
- * @param vcp - pointer to a Vcp instance;
- * @param flags - flags to be set;
- * @return none;
+ * @brief Send message event to the vcp object
+ * @param vcp - vcp object to be sent
+ * @param msgEvent - message event to be sent
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-static void uShellVcpFlagSet(const UShellVcp_s* const vcp,
-                             UShellVcpFlags_e flags);
+static UShellVcpErr_e uShellVcpMsgEventSend(UShellVcp_s* const vcp,
+                                            UShellVcpMsgEvent_e msgEvent);
 
 /**
- * @brief Wait flag (blocked and not clear)
- * @param vcp - pointer to a vcp instance;
- * @param flags - flags to be set;
- * @param allWait - wait for all flags
+ * @brief Flush message event from the vcp object
+ * @param vcp - vcp object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-static void uShellVcpFlagsWait(const UShellVcp_s* const vcp,
-                               UShellVcpFlags_e flags,
-                               const bool allWait);
+static UShellVcpErr_e uShellVcpMsgEventFlush(UShellVcp_s* const vcp);
 
 /**
- * @brief Clear flag
- * @param vcp - pointer to a vcp instance;
- * @param flags - flags to be set;
+ * @brief Wait for message event from the vcp object (blocked )
+ * @param vcp - vcp object
+ * @param msgEvent - message event to be waited
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-static void uShellVcpFlagClear(const UShellVcp_s* const vcp,
-                               UShellVcpFlags_e flags);
+static UShellVcpErr_e uShellVcpMsgEventWait(UShellVcp_s* const vcp,
+                                            UShellVcpMsgEvent_e* const msgEvent);
 
 /**
- * @brief Flag is set
- * @param vcp - pointer to a vcp instance
- * @param flags - flags to be set
+ * @brief Send message transfer to the vcp object
+ * @param vcp - vcp object to be sent
+ * @param msgTransfer - message transfer to be sent
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-static bool uShellVcpFlagIsSet(const UShellVcp_s* const vcp,
-                               UShellVcpFlags_e flags);
+static UShellVcpErr_e uShellVcpMsgTransferSend(UShellVcp_s* const vcp,
+                                               UShellVcpMsgTransfer_e msgTransfer);
+
+/**
+ * @brief Flush message transfer from the vcp object
+ * @param vcp - vcp object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpMsgTransferFlush(UShellVcp_s* const vcp);
+
+/**
+ * @brief Wait for message transfer from the vcp object (blocked )
+ * @param vcp - vcp object
+ * @param msgTransfer - message transfer to be waited
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpMsgTransferPend(UShellVcp_s* const vcp,
+                                               UShellVcpMsgTransfer_e* const msgTransfer,
+                                               const uint32_t timeout);
+
+/**
+ * @brief Read from the port
+ * @param vcp - vcp object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpReadFromPort(UShellVcp_s* const vcp);
+
+/**
+ * @brief Write to the port
+ * @param vcp - vcp object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpWriteToPort(UShellVcp_s* const vcp);
+
+/**
+ * @brief Flush the buffer of the vcp object
+ * @param vcp - vcp object to be flushed
+ * @return none
+ */
+static inline void uShellVcpIoBuffFlush(UShellVcp_s* const vcp);
+
+/**
+ * @brief Flush the rx buffer of the vcp object
+ * @param vcp - vcp object to be flushed
+ */
+static inline void uShellVcpStreamRxFlush(UShellVcp_s* const vcp);
+
+/**
+ * @brief Flush the tx buffer of the vcp object
+ * @param vcp - vcp object to be flushed
+ */
+static inline void uShellVcpStreamTxFlush(UShellVcp_s* const vcp);
 
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
@@ -204,7 +280,6 @@ UShellVcpErr_e UShellInit(UShellVcp_s* const vcp,
                           void* const parent,
                           const char* const name)
 {
-
     /* Check input parameters */
     USHELL_VCP_ASSERT(vcp != NULL);
     USHELL_VCP_ASSERT(osal != NULL);
@@ -252,7 +327,6 @@ UShellVcpErr_e UShellInit(UShellVcp_s* const vcp,
  */
 UShellVcpErr_e UShellDeInit(UShellVcp_s* const vcp)
 {
-
     /* Check input parameters */
     USHELL_VCP_ASSERT(vcp != NULL);
 
@@ -281,19 +355,127 @@ UShellVcpErr_e UShellDeInit(UShellVcp_s* const vcp)
 }
 
 /**
- * @brief Print string to the vcp vcp object
- * @param[in] vcp - vcp object to be printed
+ * @brief Print string to the uShell vcp object
+ * @param[in] vcp - uShell object to be printed
+ * @param[in] str - string to be printed
  * @param[out] none
  * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp);
+UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp, const char* const str)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellOsal_s* const osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalStreamBuffHandle_t* const streamBuff = NULL;
+    size_t strSize = strlen(str);
+
+    /* Print string to the vcp object */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL) ||
+            (str == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Lock */
+        uShellVcpLock(vcp);
+
+        do
+        {
+            /* Get the stream buffer */
+            osalStatus = UShellOsalStreamBuffHandleGet(osal, 0U, &streamBuff);
+            if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+                (streamBuff == NULL))
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+            /* Write to the stream buffer */
+            osalStatus = UShellOsalStreamBuffSendBlocking(osal, streamBuff, str, strSize);
+            if (osalStatus != USHELL_OSAL_NO_ERR)
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+        } while (0);
+
+        /* Unlock */
+        uShellVcpUnlock(vcp);
+
+    } while (0);
+
+    return status;
+}
 
 /**
- * @brief Print char to the vcp vcp object
- * @param vcp - vcp object to be printed
+ * @brief Print char to the uShell vcp object
+ * @param vcp - uShell object to be printed
+ * @param ch - char to be printed
  * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp);
+UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellOsal_s* const osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalStreamBuffHandle_t* const streamBuff = NULL;
+
+    /* Print string to the vcp object */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Lock */
+        uShellVcpLock(vcp);
+
+        do
+        {
+            /* Get the stream buffer */
+            osalStatus = UShellOsalStreamBuffHandleGet(osal, 0U, &streamBuff);
+            if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+                (streamBuff == NULL))
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+            /* Write to the stream buffer */
+            osalStatus = UShellOsalStreamBuffSendBlocking(osal, streamBuff, ch, 1U);
+            if (osalStatus != USHELL_OSAL_NO_ERR)
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+        } while (0);
+
+        /* Unlock */
+        uShellVcpUnlock(vcp);
+
+    } while (0);
+
+    return status;
+}
 
 /**
  * @brief Scan char from the vcp vcp object
@@ -302,7 +484,61 @@ UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp);
  * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
-                                 char* const ch);
+                                 char* const ch)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellOsal_s* const osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalStreamBuffHandle_t* const streamBuff = NULL;
+
+    /* Print string to the vcp object */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL) ||
+            (ch == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Lock */
+        uShellVcpLock(vcp);
+
+        do
+        {
+            /* Get the stream buffer */
+            osalStatus = UShellOsalStreamBuffHandleGet(osal, 1U, &streamBuff);
+            if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+                (streamBuff == NULL))
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+            /* Write to the stream buffer */
+            osalStatus = UShellOsalStreamBuffReceiveBlocking(osal, streamBuff, ch, 1U);
+            if (osalStatus != USHELL_OSAL_NO_ERR)
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+        } while (0);
+
+        /* Unlock */
+        uShellVcpUnlock(vcp);
+    }
+
+    while (0);
+
+    return status;
+}
 
 /**
  * @brief Scan string from the vcp vcp object
@@ -313,7 +549,84 @@ UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
  */
 UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
                                 char* const str,
-                                const size_t maxSize);
+                                const size_t maxSize)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellOsal_s* const osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalStreamBuffHandle_t* const streamBuff = NULL;
+    char ch = 0U;
+    size_t strSize = 0U;
+
+    /* Print string to the vcp object */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL) ||
+            (str == NULL) ||
+            (maxSize == 0U))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Lock */
+        uShellVcpLock(vcp);
+
+        do
+        {
+            /* Get the stream buffer */
+            osalStatus = UShellOsalStreamBuffHandleGet(osal, maxSize, &streamBuff);
+            if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+                (streamBuff == NULL))
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+            do
+            {
+                /* Write to the stream buffer */
+                osalStatus = UShellOsalStreamBuffReceiveBlocking(osal, streamBuff, ch, 1U);
+                if (osalStatus != USHELL_OSAL_NO_ERR)
+                {
+                    status = USHELL_VCP_INVALID_ARGS_ERR;
+                    break;
+                }
+
+                /* Copy the char to the string */
+                str [strSize] = ch;
+
+                /* Increment the size */
+                strSize++;
+
+                /* Check the size of the string */
+                if (strSize >= maxSize)
+                {
+                    status = USHELL_VCP_INVALID_ARGS_ERR;
+                    break;
+                }
+
+                /* Check is the end of the string */
+                if (ch == '\0')
+                {
+                    break;
+                }
+
+            } while (1);
+
+        } while (0);
+
+        /* Unlock */
+        uShellVcpUnlock(vcp);
+
+    } while (0);
+}
 
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
 
@@ -324,23 +637,89 @@ UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
  * \return none
  * \note This function is the main loop of the UShell module. It is responsible for the processing of the commands and the interaction with the user.
  */
-static void uShellVcpWorker(void* const vcp)
+static void uShellVcpWorker(void* const arg)
 {
     /* Check input parameters */
     USHELL_VCP_ASSERT(vcp != NULL);
 
     /* Local variables */
-    UShellVcp_s* const ushell = (UShellVcp_s*) vcp;
+    UShellVcp_s* const vcp = (UShellVcp_s*) arg;
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
-    UShellVcpItem_t item = 0;
+    UShellVcpMsgEvent_e msgEvent = USHELL_VCP_MSG_EVENT_NONE;
 
     /* Main loop */
     while (1)
     {
-
-        do
+        /* Wait for the event */
+        status = uShellVcpMsgEventWait(vcp, &msgEvent);
+        if (status != USHELL_VCP_NO_ERR)
         {
-        } while (0);
+            continue;
+        }
+
+        /* Process the msg */
+        switch (msgEvent)
+        {
+
+            /* Process the received data */
+            case (USHELL_VCP_MSG_EVENT_RX_EVENT) :
+                /* Process the received data */
+                status = uShellVcpReadFromPort(vcp);
+                if (status != USHELL_VCP_NO_ERR)
+                {
+                    /* Send error msg */
+                    uShellVcpMsgEventSend(vcp, USHELL_VCP_MSG_EVENT_ERROR);
+                    USHELL_VCP_ASSERT(0);
+                }
+                break;
+
+            /* Process the transmitted data */
+            case (USHELL_VCP_MSG_EVENT_TX_EVENT) :
+                /* Process the transmitted data */
+                status = uShellVcpWriteToPort(vcp);
+                if (status != USHELL_VCP_NO_ERR)
+                {
+                    /* Send error msg */
+                    uShellVcpMsgEventSend(vcp, USHELL_VCP_MSG_EVENT_ERROR);
+                    USHELL_VCP_ASSERT(0);
+                }
+
+                break;
+
+            /* Process the error */
+            case (USHELL_VCP_MSG_EVENT_ERROR) :
+
+                /* Process the error */
+                status = uShellVcpMsgEventFlush(vcp);
+                USHELL_VCP_ASSERT(status == USHELL_VCP_NO_ERR);
+
+                /* Process the error */
+                status = uShellVcpMsgTransferFlush(vcp);
+                USHELL_VCP_ASSERT(status == USHELL_VCP_NO_ERR);
+
+                /* Flush the rx stream buffers */
+                uShellVcpStreamRxFlush(vcp);
+
+                /* Flush the tx stream buffers */
+                uShellVcpStreamTxFlush(vcp);
+
+                /* Flush the buffer */
+                uShellVcpIoBuffFlush(vcp);
+
+                /* Set the rx mode in hal */
+                UShellHalErr_e halStatus = UShellHalSetRxMode(vcp->hal);
+                USHELL_VCP_ASSERT(halStatus == USHELL_HAL_NO_ERR);
+                (void) halStatus;
+
+                break;
+
+            /* None is none */
+            case (USHELL_VCP_MSG_EVENT_NONE) :
+            default :
+            {
+                break;
+            }
+        }
     }
 }
 
@@ -359,7 +738,7 @@ static void uShellVcpRxReceivedCb(const void* const hal)
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
     UShellVcp_s* const ushell = (UShellVcp_s*) ushellHal->parent;
-    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+
     do
     {
         /* Check input parameters */
@@ -371,9 +750,7 @@ static void uShellVcpRxReceivedCb(const void* const hal)
         }
 
         /* Send msg */
-        status = uShellSemaphoreRxEventSet(ushell);
-        USHELL_VCP_ASSERT(status == USHELL_VCP_NO_ERR);
-        (void) status;
+        uShellVcpFlagSet(ushell, USHELL_VCP_FLAG_RX_EVENT);
 
     } while (0);
 }
@@ -393,7 +770,7 @@ static void uShellVcpTxCpltCb(const void* const hal)
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
     UShellVcp_s* const ushell = (UShellVcp_s*) ushellHal->parent;
-    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+
     do
     {
         /* Check input parameters */
@@ -405,9 +782,7 @@ static void uShellVcpTxCpltCb(const void* const hal)
         }
 
         /* Send msg */
-        status = uShellQueueMsgSend(ushell, USHELL_MSG_TX_COMPLETE);
-        USHELL_VCP_ASSERT(status == USHELL_VCP_NO_ERR);
-        (void) status;
+        uShellVcpFlagSet(ushell, USHELL_VCP_FLAG_TX_COMPLETE_EVENT);
 
     } while (0);
 }
@@ -427,7 +802,7 @@ static void uShellVcpXferErrorCb(const void* const hal)
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
     UShellVcp_s* const ushell = (UShellVcp_s*) ushellHal->parent;
-    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+
     do
     {
         /* Check input parameters */
@@ -439,9 +814,7 @@ static void uShellVcpXferErrorCb(const void* const hal)
         }
 
         /* Send msg */
-        status = uShellQueueMsgSend(ushell, USHELL_MSG_RX_TX_ERROR);
-        USHELL_VCP_ASSERT(status == USHELL_VCP_NO_ERR);
-        (void) status;
+        uShellVcpFlagSet(ushell, USHELL_VCP_FLAG_TX_RX_ERROR_EVENT);
 
     } while (0);
 }
@@ -728,11 +1101,27 @@ static UShellVcpErr_e uShellVcpRtEnvOsalInit(UShellVcp_s* const vcp,
             break;
         }
 
-        /* Create the event system */
-        UShellOsalEventGroupHandle_t eventGroup = NULL;
-        osalStatus = UShellOsalEventGroupCreate(thisOsal, &eventGroup);
+        /* Create the queue for event msg */
+        UShellOsalQueueHandle_t queueEvent = NULL;
+        osalStatus = UShellOsalQueueCreate(thisOsal,
+                                           5U,
+                                           sizeof(UShellVcpMsgEvent_e),
+                                           &queueEvent);
         USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
-        USHELL_VCP_ASSERT(eventGroup != NULL);
+        USHELL_VCP_ASSERT(queueEvent != NULL);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            break;
+        }
+
+        /* Create the queue for transfer to read from VCP */
+        UShellOsalQueueHandle_t queueRx = NULL;
+        osalStatus = UShellOsalQueueCreate(thisOsal,
+                                           2U,
+                                           sizeof(UShellVcpMsgTransfer_e),
+                                           &queueRx);
+        USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_VCP_ASSERT(queueRx != NULL);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             break;
@@ -741,7 +1130,7 @@ static UShellVcpErr_e uShellVcpRtEnvOsalInit(UShellVcp_s* const vcp,
         /* Create stream buffer for transfer to write in VCP */
         UShellOsalStreamBuffHandle_t streamBufferTx = NULL;
         osalStatus = UShellOsalStreamBuffCreate(thisOsal,
-                                                USHELL_BUFFER_SIZE,
+                                                USHELL_VCP_BUFFER_SIZE,
                                                 1U,
                                                 &streamBufferTx);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
@@ -753,7 +1142,7 @@ static UShellVcpErr_e uShellVcpRtEnvOsalInit(UShellVcp_s* const vcp,
         /* Create stream buffer for transfer to read from VCP */
         UShellOsalStreamBuffHandle_t streamBufferRx = NULL;
         osalStatus = UShellOsalStreamBuffCreate(thisOsal,
-                                                USHELL_BUFFER_SIZE,
+                                                USHELL_VCP_BUFFER_SIZE,
                                                 1U,
                                                 &streamBufferRx);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
@@ -766,10 +1155,10 @@ static UShellVcpErr_e uShellVcpRtEnvOsalInit(UShellVcp_s* const vcp,
         UShellOsalThreadHandle_t thread = NULL;
         UShellOsalThreadCfg_s threadCfg =
             {
-                .name = USHELL_THREAD_NAME,
-                .stackSize = USHELL_THREAD_STACK_SIZE,
+                .name = USHELL_VCP_THREAD_NAME,
+                .stackSize = USHELL_VCP_THREAD_STACK_SIZE,
                 .threadParam = vcp,
-                .threadPriority = USHELL_THREAD_PRIORITY,
+                .threadPriority = USHELL_VCP_THREAD_PRIORITY,
                 .threadWorker = uShellVcpWorker};
         osalStatus = UShellOsalThreadCreate(thisOsal, &thread, threadCfg);
         USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
@@ -845,20 +1234,38 @@ static UShellVcpErr_e uShellVcpRtEnvOsalDeInit(UShellVcp_s* const vcp)
             USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
         } while (0);
 
-        /* : Delete the event group */
+        /* : Delete the queue for event msg */
         do
         {
             /* : : Find the event group handle */
-            UShellOsalEventGroupHandle_t eventGroup = NULL;
-            osalStatus = UShellOsalEventGroupHandleGet(thisOsal, 0U, &eventGroup);
+            UShellOsalQueueHandle_t queueEvent = NULL;
+            osalStatus = UShellOsalQueueHandleGet(thisOsal, 0U, &queueEvent);
             if ((osalStatus != USHELL_OSAL_NO_ERR) ||
-                (eventGroup == NULL))
+                (queueEvent == NULL))
             {
                 break;
             }
 
             /* : : Delete the event group */
-            osalStatus = UShellOsalEventGroupDelete(thisOsal, eventGroup);
+            osalStatus = UShellOsalQueueDelete(thisOsal, queueEvent);
+            USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+
+        } while (0);
+
+        /* : Delete the queue for transfer */
+        do
+        {
+            /* : : Find the event group handle */
+            UShellOsalQueueHandle_t queueEvent = NULL;
+            osalStatus = UShellOsalQueueHandleGet(thisOsal, 1U, &queueEvent);
+            if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+                (queueEvent == NULL))
+            {
+                break;
+            }
+
+            /* : : Delete the event group */
+            osalStatus = UShellOsalQueueDelete(thisOsal, queueEvent);
             USHELL_VCP_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
 
         } while (0);
@@ -960,50 +1367,616 @@ static void uShellVcpUnlock(const UShellVcp_s* const vcp)
 }
 
 /**
- * @brief Set flags
- * @param vcp - pointer to a Vcp instance;
- * @param flags - flags to be set;
- * @return none;
+ * @brief Send message event to the vcp object
+ * @param vcp - vcp object to be sent
+ * @param msgEvent - message event to be sent
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-static void uShellVcpFlagSet(const UShellVcp_s* const vcp,
-                             UShellVcpFlags_e flags)
+static UShellVcpErr_e uShellVcpMsgEventSend(UShellVcp_s* const vcp,
+                                            UShellVcpMsgEvent_e msgEvent)
 {
-    /* Check input parameter */
+    /* Check input parameters */
     USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalQueueHandle_t queue = NULL;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+
+    /* Send the message to the queue */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check msg event */
+        if (!(msgEvent == USHELL_VCP_MSG_EVENT_NONE) &&
+            !(msgEvent == USHELL_VCP_MSG_EVENT_RX_EVENT) &&
+            !(msgEvent == USHELL_VCP_MSG_EVENT_TX_EVENT) &&
+            !(msgEvent == USHELL_VCP_MSG_EVENT_ERROR))
+
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Get the queue handle */
+
+        osalStatus = UShellOsalQueueHandleGet(osal, 0U, &queue);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (queue == NULL))
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Send the message to the queue */
+        osalStatus = UShellOsalQueueItemPut(osal, queue, &msgEvent);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Flush message event from the vcp object
+ * @param vcp - vcp object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpMsgEventFlush(UShellVcp_s* const vcp)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalQueueHandle_t queue = NULL;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+
+    /* Send the message to the queue */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Get the queue handle */
+        osalStatus = UShellOsalQueueHandleGet(osal, 0U, &queue);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (queue == NULL))
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Flush the queue */
+        osalStatus = UShellOsalQueueFlush(osal, queue);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Wait for message event from the vcp object (blocked )
+ * @param vcp - vcp object
+ * @param msgEvent - message event to be waited
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpMsgEventWait(UShellVcp_s* const vcp,
+                                            UShellVcpMsgEvent_e* const msgEvent)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalQueueHandle_t queue = NULL;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellVcpMsgEvent_e msgEventLocal = USHELL_VCP_MSG_EVENT_NONE;
+
+    /* Send the message to the queue */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL) ||
+            (msgEvent == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Get the queue handle */
+        osalStatus = UShellOsalQueueHandleGet(osal, 0U, &queue);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (queue == NULL))
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Get the message from the queue */
+        osalStatus = UShellOsalQueueItemWait(osal, queue, &msgEventLocal);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            *msgEvent = USHELL_VCP_MSG_EVENT_NONE;
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Check msg event */
+        if (!(msgEventLocal == USHELL_VCP_MSG_EVENT_NONE) &&
+            !(msgEventLocal == USHELL_VCP_MSG_EVENT_RX_EVENT) &&
+            !(msgEventLocal == USHELL_VCP_MSG_EVENT_TX_EVENT) &&
+            !(msgEventLocal == USHELL_VCP_MSG_EVENT_ERROR))
+
+        {
+            *msgEvent = USHELL_VCP_MSG_EVENT_NONE;
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Set the message event */
+        *msgEvent = msgEventLocal;
+    }
+
+    while (0);
+
+    return status;
+}
+
+/**
+ * @brief Send message transfer to the vcp object
+ * @param vcp - vcp object to be sent
+ * @param msgTransfer - message transfer to be sent
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpMsgTransferSend(UShellVcp_s* const vcp,
+                                               UShellVcpMsgTransfer_e msgTransfer)
+{
+    {
+        /* Check input parameters */
+        USHELL_VCP_ASSERT(vcp != NULL);
+
+        /* Local variable */
+        UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+        UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+        UShellOsalQueueHandle_t queue = NULL;
+        UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+
+        /* Send the message to the queue */
+        do
+        {
+            /* Check input parameters */
+            if ((vcp == NULL) ||
+                (osal == NULL))
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+            /* Check msg event */
+            if (!(msgTransfer == USHELL_VCP_MSG_TX_NONE) &&
+                !(msgTransfer == USHELL_VCP_MSG_TX_COMPLETE) &&
+                !(msgTransfer == USHELL_VCP_MSG_TX_RX_ERR))
+
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+            /* Get the queue handle */
+            osalStatus = UShellOsalQueueHandleGet(osal, 1U, &queue);
+            if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+                (queue == NULL))
+            {
+                status = USHELL_VCP_PORT_ERR;
+                break;
+            }
+
+            /* Send the message to the queue */
+            osalStatus = UShellOsalQueueItemPut(osal, queue, &msgTransfer);
+            if (osalStatus != USHELL_OSAL_NO_ERR)
+            {
+                status = USHELL_VCP_PORT_ERR;
+                break;
+            }
+
+        } while (0);
+
+        return status;
+    }
+}
+
+/**
+ * @brief Flush message transfer from the vcp object
+ * @param vcp - vcp object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpMsgTransferFlush(UShellVcp_s* const vcp)
+{
+    {
+        /* Check input parameters */
+        USHELL_VCP_ASSERT(vcp != NULL);
+
+        /* Local variable */
+        UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+        UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+        UShellOsalQueueHandle_t queue = NULL;
+        UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+
+        /* Send the message to the queue */
+        do
+        {
+            /* Check input parameters */
+            if ((vcp == NULL) ||
+                (osal == NULL))
+            {
+                status = USHELL_VCP_INVALID_ARGS_ERR;
+                break;
+            }
+
+            /* Get the queue handle */
+            osalStatus = UShellOsalQueueHandleGet(osal, 1U, &queue);
+            if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+                (queue == NULL))
+            {
+                status = USHELL_VCP_PORT_ERR;
+                break;
+            }
+
+            /* Flush the queue */
+            osalStatus = UShellOsalQueueFlush(osal, queue);
+            if (osalStatus != USHELL_OSAL_NO_ERR)
+            {
+                status = USHELL_VCP_PORT_ERR;
+                break;
+            }
+
+        } while (0);
+
+        return status;
+    }
+}
+
+/**
+ * @brief Wait for message transfer from the vcp object (blocked )
+ * @param vcp - vcp object
+ * @param msgTransfer - message transfer to be waited
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpMsgTransferPend(UShellVcp_s* const vcp,
+                                               UShellVcpMsgTransfer_e* const msgTransfer,
+                                               const uint32_t timeout)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalQueueHandle_t queue = NULL;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellVcpMsgEvent_e msgTxLocal = USHELL_VCP_MSG_EVENT_NONE;
+
+    /* Send the message to the queue */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL) ||
+            (msgTransfer == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Get the queue handle */
+        osalStatus = UShellOsalQueueHandleGet(osal, 1U, &queue);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (queue == NULL))
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Get the message from the queue */
+        osalStatus = ushellOsalQueueItemPend(osal, queue, &msgTxLocal, timeout);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_VCP_PORT_ERR;
+            *msgTransfer = USHELL_VCP_MSG_TX_RX_ERR;
+            break;
+        }
+
+        /* Check msg event */
+        if (!(msgTxLocal == USHELL_VCP_MSG_TX_NONE) &&
+            !(msgTxLocal == USHELL_VCP_MSG_TX_COMPLETE) &&
+            !(msgTxLocal == USHELL_VCP_MSG_TX_RX_ERR))
+
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            *msgTransfer = USHELL_VCP_MSG_TX_RX_ERR;
+            break;
+        }
+
+        /* Set the message event */
+        *msgTransfer = msgTxLocal;
+    }
+
+    while (0);
+
+    return status;
+}
+
+/**
+ * @brief Read from the port
+ * @param vcp - vcp object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpReadFromPort(UShellVcp_s* const vcp)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
+
+    UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+    UShellHal_s* hal = (UShellHal_s*) vcp->hal;
+    UShellOsalStreamBuffHandle_t streamBuffer = NULL;
+
+    /* Read from the port */
 
     do
     {
-        /* Check input parameter */
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL) ||
+            (hal == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Get the stream buffer handle */
+        osalStatus = UShellOsalStreamBuffHandleGet(osal, 1U, &streamBuffer);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (streamBuffer == NULL))
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Process send */
+        do
+        {
+
+            /* Read from hal */
+            halStatus = UShellHalRead(hal, vcp->io.buffer, USHELL_VCP_BUFFER_SIZE, &vcp->io.ind);
+            if (halStatus != USHELL_HAL_NO_ERR)
+            {
+                status = USHELL_VCP_PORT_ERR;
+                break;
+            }
+
+            /* Check we have to send */
+            if (vcp->io.ind <= 0U)
+            {
+                break;
+            }
+
+            /* Send to stream buffer */
+            osalStatus = UShellOsalStreamBuffSendBlocking(osal,
+                                                          streamBuffer,
+                                                          vcp->io.buffer,
+                                                          vcp->io.ind);
+
+            if (osalStatus != USHELL_OSAL_NO_ERR)
+            {
+                status = USHELL_VCP_PORT_ERR;
+                break;
+            }
+
+        } while (1);
+
+        /* Send the message to the queue */
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Write to the port
+ * @param vcp - vcp object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellVcpErr_e uShellVcpWriteToPort(UShellVcp_s* const vcp)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
+
+    UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+    UShellHal_s* hal = (UShellHal_s*) vcp->hal;
+    UShellOsalStreamBuffHandle_t streamBuffer = NULL;
+    UShellVcpMsgTransfer_e msgTxLocal = USHELL_VCP_MSG_TX_NONE;
+
+    /* Read from the port */
+
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL) ||
+            (hal == NULL))
+        {
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Get the stream buffer handle */
+        osalStatus = UShellOsalStreamBuffHandleGet(osal, 0U, &streamBuffer);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (streamBuffer == NULL))
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Open tx mode */
+        halStatus = UShellHalSetTxMode(hal);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Process send */
+        do
+        {
+
+            /* Flush the buffer */
+            uShellVcpIoBuffFlush(vcp);
+
+            /* Read from stream buffer */
+            vcp->io.ind = UShellOsalStreamBuffReceive(osal,
+                                                      streamBuffer,
+                                                      vcp->io.buffer,
+                                                      USHELL_VCP_BUFFER_SIZE,
+                                                      0U);
+
+            /* Check we have to send */
+            if (vcp->io.ind <= 0U)
+            {
+                break;
+            }
+
+            /* Flush the tx queue */
+            uShellVcpMsgTransferFlush(vcp);
+
+            /* Send to hal */
+            halStatus = UShellHalWrite(hal, vcp->io.buffer, vcp->io.ind);
+            if (halStatus != USHELL_HAL_NO_ERR)
+            {
+                status = USHELL_VCP_PORT_ERR;
+                break;
+            }
+
+            /* Wait for tx complete */
+            uShellVcpMsgTransferPend(vcp, &msgTxLocal, 1000U);
+            if (msgTxLocal != USHELL_VCP_MSG_TX_COMPLETE)
+            {
+                status = USHELL_VCP_PORT_ERR;
+                break;
+            }
+
+        } while (1);
+
+        /* Set rx mode */
+        halStatus = UShellHalSetRxMode(hal);
+        if (halStatus != USHELL_HAL_NO_ERR)
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        /* Send the message to the queue */
+    } while (0);
+
+    return status;
+}
+
+/**
+ * @brief Flush the buffer of the vcp object
+ * @param vcp - vcp object to be flushed
+ * @return none
+ */
+static inline void uShellVcpIoBuffFlush(UShellVcp_s* const vcp)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Flush the buffer */
+    do
+    {
+        /* Check input parameters */
         if (vcp == NULL)
         {
-            USHELL_VCP_ASSERT(0);
             break;
         }
 
-        /* Check flags */
-        if ((flags & USHELL_VCP_FLAG_ALL) == 0)
+        /* Flush the buffer */
+        memset(&vcp->io, 0, sizeof(UShellVcpIo_s));
+
+    } while (0);
+}
+
+/**
+ * @brief Flush the rx buffer of the vcp object
+ * @param vcp - vcp object to be flushed
+ */
+static inline void uShellVcpStreamRxFlush(UShellVcp_s* const vcp)
+{
+    /* Check input parameters */
+    USHELL_VCP_ASSERT(vcp != NULL);
+
+    /* Local variable */
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalStreamBuffHandle_t streamBuffer = NULL;
+
+    /* Flush the buffer */
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL))
         {
-            USHELL_VCP_ASSERT(0);
             break;
         }
 
-        /* Find event handler */
-        UShellOsalEventGroupHandle_t eventsHandler = NULL;
-        UShellOsalErr_e osalStatus = UShellOsalEventGroupHandleGet((UShellOsal_s*) vcp->osal, 0U, &eventsHandler);
+        /* Get the stream buffer handle */
+        osalStatus = UShellOsalStreamBuffHandleGet(osal, 1U, &streamBuffer);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
-            (eventsHandler == NULL))
+            (streamBuffer == NULL))
         {
-            USHELL_VCP_ASSERT(0);
             break;
         }
 
-        /* Set the flags */
-        osalStatus = UShellEventGroupSetBits((UShellOsal_s*) vcp->osal,
-                                             eventsHandler,
-                                             flags);
+        /* Flush the stream buffer */
+        osalStatus = UShellOsalStreamBuffReset(osal, streamBuffer);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
-            USHELL_VCP_ASSERT(0);
             break;
         }
 
@@ -1011,166 +1984,43 @@ static void uShellVcpFlagSet(const UShellVcp_s* const vcp,
 }
 
 /**
- * @brief Wait flag (blocked and not clear)
- * @param vcp - pointer to a vcp instance;
- * @param flags - flags to be set;
- * @param allWait - wait for all flags
+ * @brief Flush the tx buffer of the vcp object
+ * @param vcp - vcp object to be flushed
  */
-static void uShellVcpFlagsWait(const UShellVcp_s* const vcp,
-                               UShellVcpFlags_e flags,
-                               const bool allWait)
+static inline void uShellVcpStreamTxFlush(UShellVcp_s* const vcp)
 {
-    /* Check input parameter */
+    /* Check input parameters */
     USHELL_VCP_ASSERT(vcp != NULL);
 
+    /* Local variable */
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
+    UShellOsalStreamBuffHandle_t streamBuffer = NULL;
+
+    /* Flush the buffer */
     do
     {
-        /* Check input parameter */
-        if (vcp == NULL)
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (osal == NULL))
         {
-            USHELL_VCP_ASSERT(0);
             break;
         }
 
-        /* Check flags */
-        if ((flags & USHELL_VCP_FLAG_ALL) == 0)
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-        /* Find event handler */
-        UShellOsalEventGroupHandle_t eventsHandler = NULL;
-        UShellOsalErr_e osalStatus = UShellOsalEventGroupHandleGet((UShellOsal_s*) vcp->osal, 0U, &eventsHandler);
+        /* Get the stream buffer handle */
+        osalStatus = UShellOsalStreamBuffHandleGet(osal, 0U, &streamBuffer);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
-            (eventsHandler == NULL))
+            (streamBuffer == NULL))
         {
-            USHELL_VCP_ASSERT(0);
             break;
         }
 
-        /* Set the flags */
-        UShellOsalEventGroupBits_e activeFlags = 0;
-        osalStatus = UShellEventGroupBitsWait((UShellOsal_s*) vcp->osal,
-                                              eventsHandler,
-                                              flags,
-                                              &activeFlags,
-                                              false,
-                                              allWait);
-
-        /* Check status */
+        /* Flush the stream buffer */
+        osalStatus = UShellOsalStreamBuffReset(osal, streamBuffer);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
-            USHELL_VCP_ASSERT(0);
             break;
         }
-
-    } while (0);
-}
-
-/**
- * @brief Clear flag
- * @param vcp - pointer to a vcp instance;
- * @param flags - flags to be set;
- */
-static void uShellVcpFlagClear(const UShellVcp_s* const vcp,
-                               UShellVcpFlags_e flags)
-{
-    /* Check input parameter */
-    USHELL_VCP_ASSERT(vcp != NULL);
-
-    do
-    {
-        /* Check input parameter */
-        if (vcp == NULL)
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-        /* Check flags */
-        if ((flags & USHELL_VCP_FLAG_ALL) == 0)
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-        /* Find event handler */
-        UShellOsalEventGroupHandle_t eventsHandler = NULL;
-        UShellOsalErr_e osalStatus = UShellOsalEventGroupHandleGet((UShellOsal_s*) vcp->osal, 0U, &eventsHandler);
-        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
-            (eventsHandler == NULL))
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-        /* Set the flags */
-        osalStatus = UShellEventGroupClearBits((UShellOsal_s*) vcp->osal,
-                                               eventsHandler,
-                                               flags);
-        if (osalStatus != USHELL_OSAL_NO_ERR)
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-    } while (0);
-}
-
-/**
- * @brief Flag is set
- * @param vcp - pointer to a vcp instance
- * @param flags - flags to be set
- */
-static bool uShellVcpFlagIsSet(const UShellVcp_s* const vcp,
-                               UShellVcpFlags_e flags)
-{
-    /* Check input parameter */
-    USHELL_VCP_ASSERT(vcp != NULL);
-
-    /* Local */
-    bool isSet = false;
-    UShellOsalEventGroupBits_e activeFlags = 0;
-
-    do
-    {
-        /* Check input parameter */
-        if (vcp == NULL)
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-        /* Check flags */
-        if ((flags & USHELL_VCP_FLAG_ALL) == 0)
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-        /* Find event handler */
-        UShellOsalEventGroupHandle_t eventsHandler = NULL;
-        UShellOsalErr_e osalStatus = UShellOsalEventGroupHandleGet((UShellOsal_s*) vcp->osal, 0U, &eventsHandler);
-        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
-            (eventsHandler == NULL))
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-        /* Get the flags */
-        osalStatus = UShellEventGroupBitsActiveGet((UShellOsal_s*) vcp->osal,
-                                                   eventsHandler,
-                                                   &activeFlags);
-        if (osalStatus != USHELL_OSAL_NO_ERR)
-        {
-            USHELL_VCP_ASSERT(0);
-            break;
-        }
-
-        /* Return */
-        isSet = (flags & activeFlags) ? true : false;
 
     } while (0);
 }

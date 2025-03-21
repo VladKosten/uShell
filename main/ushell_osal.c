@@ -1162,6 +1162,244 @@ UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s* const osal,
 }
 
 /**
+ * \brief Create the stream buffer
+ * \param osal              - pointer to OSAL instance
+ * \param buffSizeBytes     - the size of the stream buffer in bytes
+ * \param triggerLevelBytes - trigger level in bytes (watermark)
+ * \param streamBuffHandle  - the stream buffer handle was created
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalStreamBuffCreate(UShellOsal_s* const osal,
+                                           const size_t buffSizeBytes,
+                                           const size_t triggerLevelBytes,
+                                           UShellOsalStreamBuffHandle_t* const streamBuffHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle) ||
+        (0 == buffSizeBytes) ||
+        (0 == triggerLevelBytes) ||
+        (triggerLevelBytes > buffSizeBytes))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->streamBuffCreate))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->streamBuffCreate(osal,
+                                                                 buffSizeBytes,
+                                                                 triggerLevelBytes,
+                                                                 streamBuffHandle);
+
+    return retStatus;
+}
+
+/**
+ * \brief Delete the stream buffer
+ * \param osal              - pointer to OSAL instance
+ * \param streamBuffHandle  - stream buffer handle being deleted
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalStreamBuffDelete(UShellOsal_s* const osal,
+                                           const UShellOsalStreamBuffHandle_t streamBuffHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->streamBuffDelete))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->streamBuffDelete(osal, streamBuffHandle);
+
+    return retStatus;
+}
+
+/**
+ * \brief Send data to the stream buffer
+ * \param osal              - pointer to OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer to which a stream is being sent
+ * \param txData            - pointer to the buffer that holds the bytes to be copied into the stream buffer
+ * \param dataLengthBytes   - the size of the data in bytes
+ * \param msToWait          - the maximum amount of time the task should remain in the blocked state to wait
+ * \return the number of bytes written to the stream buffer.
+ */
+size_t UShellOsalStreamBuffSend(UShellOsal_s* const osal,
+                                const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                const void* txData,
+                                const size_t dataLengthBytes,
+                                const uint32_t msToWait)
+{
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle) ||
+        (NULL == txData) ||
+        (0 == dataLengthBytes))
+    {
+        return 0;
+    }
+
+    if ((NULL == osal->portable->streamBuffSend))
+    {
+        return 0;
+    }
+
+    size_t bytesWritten = osal->portable->streamBuffSend(osal,
+                                                         streamBuffHandle,
+                                                         txData,
+                                                         dataLengthBytes,
+                                                         msToWait);
+
+    return bytesWritten;
+}
+
+/**
+ * @brief Send data to a stream buffer (blocking, no timeout).
+ *
+ * This function writes data to the specified stream buffer, blocking until
+ * all data has been written or an error occurs.
+ *
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] streamBuffHandle Handle of the stream buffer.
+ * @param[in] txData Pointer to the data to be sent.
+ * @param[in] dataLengthBytes Length of the data to be sent in bytes.
+ * @return Number of bytes actually written to the stream buffer.
+ */
+size_t UShellOsalStreamBuffSendBlocking(UShellOsal_s* const osal,
+                                        const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                        const void* txData,
+                                        const size_t dataLengthBytes)
+{
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle) ||
+        (NULL == txData) ||
+        (0 == dataLengthBytes))
+    {
+        return 0;
+    }
+
+    if ((NULL == osal->portable->streamBuffSendBlocking))
+    {
+        return 0;
+    }
+
+    size_t bytesWritten = osal->portable->streamBuffSendBlocking(osal,
+                                                                 streamBuffHandle,
+                                                                 txData,
+                                                                 dataLengthBytes);
+
+    return bytesWritten;
+}
+
+/**
+ * \brief Receive data from the stream buffer
+ * \param osal              - pointer to OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer from which bytes are to be received
+ * \param rxData            - pointer to the buffer into which the received bytes will be copied
+ * \param dataLengthBytes   - the size of the data buffer pointed to by rxData parameter in bytes
+ * \param msToWait          - the maximum amount of time the task should remain in the blocked state to wait
+ *                            for data to become available if the stream buffer is empty
+ * \return the number of bytes read from the stream buffer.
+ */
+size_t UShellOsalStreamBuffReceive(UShellOsal_s* const osal,
+                                   const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                   void* const rxData,
+                                   const size_t dataLengthBytes,
+                                   const uint32_t msToWait)
+{
+
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle) ||
+        (NULL == rxData) ||
+        (0 == dataLengthBytes))
+    {
+        return 0;
+    }
+
+    if ((NULL == osal->portable->streamBuffReceive))
+    {
+        return 0;
+    }
+
+    size_t bytesRead = osal->portable->streamBuffReceive(osal,
+                                                         streamBuffHandle,
+                                                         rxData,
+                                                         dataLengthBytes,
+                                                         msToWait);
+
+    return bytesRead;
+}
+
+/**
+ * @brief Receive data from a stream buffer.
+ *
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] streamBuffHandle Handle of the stream buffer.
+ * @param[out] rxData Pointer to the buffer to store the received data.
+ * @param[in] dataLengthBytes Length of the data to be received in bytes.
+ * @param[in] msToWait Timeout in milliseconds.
+ * @return Number of bytes received.
+ *
+ */
+size_t UShellOsalStreamBuffReceiveBlocking(UShellOsal_s* const osal,
+                                           const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                           void* const rxData,
+                                           const size_t dataLengthBytes)
+{
+
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle) ||
+        (NULL == rxData) ||
+        (0 == dataLengthBytes))
+    {
+        return 0;
+    }
+
+    if ((NULL == osal->portable->streamBuffReceiveBlocking))
+    {
+        return 0;
+    }
+
+    size_t bytesRead = osal->portable->streamBuffReceiveBlocking(osal,
+                                                                 streamBuffHandle,
+                                                                 rxData,
+                                                                 dataLengthBytes);
+
+    return bytesRead;
+}
+
+/**
+ * \brief Reset a stream buffer to its initial empty state
+ * \param osal              - pointer to OSAL instance
+ * \param streamBuffHandle  - handle of the stream buffer being reset
+ * \return UShellOsalErr_e error code.
+ */
+UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
+                                          const UShellOsalStreamBuffHandle_t streamBuffHandle)
+{
+
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->streamBuffReset))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->streamBuffReset(osal, streamBuffHandle);
+
+    return retStatus;
+}
+
+/**
  * @brief Create an event group.
  * @param[in] osal Pointer to the OSAL instance.
  * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
