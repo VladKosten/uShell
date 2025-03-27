@@ -45,7 +45,7 @@
  * \brief Safely converts timeout in ms to FreeRTOS ticks
  * handling potential integer overflow in pdMS_TO_TICKS(timeoutMs) FreeRTOS macro
  */
-static TickType_t UShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs);
+static TickType_t uShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs);
 
 /**
  * @brief Create the queue
@@ -321,75 +321,6 @@ static UShellOsalErr_e ushellOsalFreertosStreamBuffReset(void* const osalFreerto
                                                          const UShellOsalStreamBuffHandle_t streamBuffHandle);
 
 /**
- * @brief Create an event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupCreate(void* const osal,
-                                                   UShellOsalEventGroupHandle_t* const eventGroupHandle);
-
-/**
- * @brief Create an event group with a specific name.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @param[in] name Name of the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupDelete(void* const osal,
-                                                   const UShellOsalEventGroupHandle_t eventGroupHandle);
-
-/**
- * @brief Set a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToSet Bits to set in the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupSetBits(void* const osal,
-                                                    const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                                    const UShellOsalEventGroupBits_e bitsToSet);
-
-/**
- * @brief Clear a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToClear Bits to clear in the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupClearBits(void* const osal,
-                                                      const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                                      const UShellOsalEventGroupBits_e bitsToClear);
-
-/**
- * @brief Wait for bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToWait Bits to wait for in the event group.
- * @param[out] bitsReceived Pointer to store the received bits.
- * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
- * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupBitsWait(void* const osal,
-                                                     const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                                     const UShellOsalEventGroupBits_e bitsToWait,
-                                                     UShellOsalEventGroupBits_e* const bitsReceived,
-                                                     const bool clearOnExit,
-                                                     const bool waitAllBits);
-
-/**
- * @brief Get the active bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[out] bitsActive Pointer to store the active bits.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupBitsActiveGet(void* const osal,
-                                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                                          UShellOsalEventGroupBits_e* const bitsActive);
-
-/**
  * @brief Find the queue handle in the queue handles table
  * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
  * @param[in] queueHandle  - queue handle to be found
@@ -427,12 +358,6 @@ static inline uint16_t ushellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_
  */
 static inline uint16_t ushellOsalFreertosFindStreamBuffHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                               const UShellOsalStreamBuffHandle_t streamBuffHandle);
-
-/**
- * @brief Find the event group handle in the event groups table
- */
-static inline uint16_t ushellOsalFreertosFindEventGroupHandle(UShellOsalFreertos_s* const osalFreeRtos,
-                                                              const UShellOsalEventGroupHandle_t eventGroupHandle);
 
 /**
  * @brief Perform thread parameters validation procedure
@@ -495,11 +420,6 @@ static const UShellOsalPortable_s FreeRtosPortable =
         .streamBuffReceive = ushellOsalFreertosStreamBuffReceive,
         .streamBuffReceiveBlocking = ushellOsalFreertosStreamBuffReceiveBlocking,
         .streamBuffSendBlocking = ushellOsalFreertosStreamBuffSendBlocking,
-        .eventGroupSetBits = ushellOsalFreertosEventGroupSetBits,
-        .eventGroupClearBits = ushellOsalFreertosEventGroupClearBits,
-        .eventGroupBitsWait = ushellOsalFreertosEventGroupBitsWait,
-        .eventGroupDelete = ushellOsalFreertosEventGroupDelete,
-        .eventGroupCreate = ushellOsalFreertosEventGroupCreate,
 };
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
@@ -643,7 +563,7 @@ UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreerto
  * \param timeoutMs     - timeout in ms to be checked for integer overflow and safely converted to FreeRTOS ticks
  * \return TickType_t   - timeout in FreeRTOS ticks
  */
-static TickType_t UShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs)
+static TickType_t uShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs)
 {
     // Make sure there is no integer overflow while using incoming value of timeoutMs
     // in the default implementation of FreeRTOS pdMS_TO_TICKS() macro
@@ -911,7 +831,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPost(void* const osalFreertos,
         }
 
         /* Convert the timeout in milliseconds to the ticks */
-        safeTimeoutInTicks = UShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
+        safeTimeoutInTicks = uShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
 
         /* Put the item to the queue */
         sendStatus = xQueueSend((QueueHandle_t) queueHandle,
@@ -1136,7 +1056,7 @@ static UShellOsalErr_e ushellOsalFreertosQueueItemPend(void* const osalFreertos,
         }
 
         /* Safely convert timeout in ms to FreeRTOS ticks */
-        safeTimeoutInTicks = UShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
+        safeTimeoutInTicks = uShellOsalFreertosSafeTimeoutToTicks(timeoutMs);
 
         /* Get the item from the FreeRTOS queue */
         receiveStatus = xQueueReceive((QueueHandle_t) queueHandle,
@@ -2049,7 +1969,7 @@ static size_t ushellOsalFreertosStreamBuffSend(void* const osalFreertos,
     else
     {
         // Safely convert timeout in ms to FreeRTOS ticks
-        TickType_t safeTimeoutInTicks = ushellOsalFreertosSafeTimeoutToTicks(msToWait);
+        TickType_t safeTimeoutInTicks = uShellOsalFreertosSafeTimeoutToTicks(msToWait);
 
         // Put the item to the stream buffer
         bytesWritten = xStreamBufferSend((UShellOsalStreamBuffHandle_t) streamBuffHandle, txData, dataLengthBytes, safeTimeoutInTicks);    // with waiting time
@@ -2156,7 +2076,7 @@ ushellOsalFreertosStreamBuffReceive(void* const osalFreertos,
     else
     {
         // Safely convert timeout in ms to FreeRTOS ticks
-        TickType_t safeTimeoutInTicks = ushellOsalFreertosSafeTimeoutToTicks(msToWait);
+        TickType_t safeTimeoutInTicks = uShellOsalFreertosSafeTimeoutToTicks(msToWait);
 
         // Put the item to the stream buffer
         bytesRead = xStreamBufferReceive((UShellOsalStreamBuffHandle_t) streamBuffHandle, rxData, dataLengthBytes, safeTimeoutInTicks);
@@ -2247,467 +2167,6 @@ static UShellOsalErr_e ushellOsalFreertosStreamBuffReset(void* const osalFreerto
     }
 
     return USHELL_OSAL_NO_ERR;    // Exit: no errors
-}
-
-/**
- * @brief Create an event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupCreate(void* const osal,
-                                                   UShellOsalEventGroupHandle_t* const eventGroupHandle)
-{
-    // Check income params with assertions because
-    // they must be validated by the caller
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
-
-    /* Local variable */
-    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
-    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-
-    /* Crate the event group */
-    do
-    {
-        /* Check status */
-        if ((NULL == thisOsal) ||
-            (NULL == eventGroupHandle))
-        {
-            status = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Check the level at which the function was called */
-        if (xPortIsInsideInterrupt())
-        {
-            status = USHELL_OSAL_CALL_FROM_ISR_ERR;
-            break;
-        }
-
-        // Create the FreeRTOS event group:
-        // 1. check if there is a free slot
-        for (int i = 0; i < USHELL_OSAL_EVENT_GROUPS_NUM; i++)
-        {
-            if (NULL == thisOsal->eventGroupHandle [i])
-            {
-                // Congratulations!
-                // The free slot was found, create the event group
-                thisOsal->eventGroupHandle [i] = xEventGroupCreate();
-                if (NULL == thisOsal->eventGroupHandle [i])
-                {
-                    // Event group was not created and must not be used
-                    // Exit: error - the RAM required to hold the event group cannot be allocated
-                    return USHELL_OSAL_EVENT_GROUP_MEM_ALLOCATION_ERR;
-                }
-
-                // We can only get there if the event group was created
-                // No additional checks needed
-                *eventGroupHandle = thisOsal->eventGroupHandle [i];
-                // So break the loop
-                break;
-            }
-        }
-
-        // 2. Check if the event group was created
-        if (NULL == *eventGroupHandle)
-        {
-            status = USHELL_OSAL_EVENT_GROUP_CREATE_ERR;    // Exit: error - no free slots in the table
-            break;
-        }
-
-    } while (0);
-
-    return status;    // Exit: no errors
-}
-
-/**
- * @brief Create an event group with a specific name.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @param[in] name Name of the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupDelete(void* const osal,
-                                                   const UShellOsalEventGroupHandle_t eventGroupHandle)
-{
-    /* Check income params with assertions because
-     * they must be validated by the caller */
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
-
-    /* Local variable */
-    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
-    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
-    uint16_t eventGroupIndex = 0;
-    /* Delete the event group */
-    do
-    {
-        /* Check input */
-        if ((NULL == thisOsal) ||
-            (NULL == eventGroupHandle))
-        {
-            status = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        // Check the level at which the function was called
-        if (xPortIsInsideInterrupt())
-        {
-            status = USHELL_OSAL_CALL_FROM_ISR_ERR;
-            break;
-        }
-
-        // Find the event group
-        eventGroupIndex = ushellOsalFreertosFindEventGroupHandle(osal, eventGroupHandle);
-        if (0 == eventGroupIndex)
-        {
-            status = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        // Check if the event group index is valid
-        if (USHELL_OSAL_EVENT_GROUPS_NUM < eventGroupIndex)
-        {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
-        }
-
-        // Delete the event group
-        vEventGroupDelete((EventGroupHandle_t) eventGroupHandle);
-
-        // Clear the event group slot in the table
-        thisOsal->eventGroupHandle [eventGroupIndex - 1] = NULL;    // Subtract 1 because find function increases actual index by 1
-
-    } while (0);
-
-    return status;    // Exit: no errors
-}
-
-/**
- * @brief Set a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToSet Bits to set in the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupSetBits(void* const osal,
-                                                    const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                                    const UShellOsalEventGroupBits_e bitsToSet)
-{
-    /* Check input parameters */
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
-
-    /* Local variable */
-    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
-    UShellOsalErr_e retVal = USHELL_OSAL_NO_ERR;
-    uint16_t eventGroupIndex = 0;
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    BaseType_t statusFreertos = pdFALSE;
-    EventBits_t xResult = 0;
-
-    /* Set bits */
-    do
-    {
-
-        /* Check input */
-        if ((osal == NULL) ||
-            (eventGroupHandle == NULL))
-        {
-            retVal = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Find the event group */
-        eventGroupIndex = ushellOsalFreertosFindEventGroupHandle(osal, eventGroupHandle);
-        if (0 == eventGroupIndex)
-        {
-            retVal = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Check if the event group index is valid */
-        if (USHELL_OSAL_EVENT_GROUPS_NUM < eventGroupIndex)
-        {
-            retVal = USHELL_OSAL_PORT_SPECIFIC_ERR;
-            break;
-        }
-
-        /* Check the level at which the function was called */
-        if (xPortIsInsideInterrupt())
-        {
-            /* Call from ISR */
-            statusFreertos = xEventGroupSetBitsFromISR((EventGroupHandle_t) eventGroupHandle,
-                                                       bitsToSet,
-                                                       &xHigherPriorityTaskWoken);
-            if (pdTRUE != statusFreertos)
-            {
-                retVal = USHELL_OSAL_EVENT_GROUP_SET_ERR;
-                break;
-            }
-
-            /* Switch context */
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        }
-        else
-        {
-            /* Call from task */
-            xResult = xEventGroupSetBits((EventGroupHandle_t) eventGroupHandle, bitsToSet);
-
-            /* Check if all desired bits are set */
-            if ((xResult & bitsToSet) != bitsToSet)
-            {
-                retVal = USHELL_OSAL_EVENT_GROUP_SET_ERR;
-                break;
-            }
-        }
-
-    } while (0);
-
-    return retVal;
-}
-
-/**
- * @brief Clear a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToClear Bits to clear in the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupClearBits(void* const osal,
-                                                      const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                                      const UShellOsalEventGroupBits_e bitsToClear)
-{
-    /* Check input parameters */
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
-
-    /* Local variable */
-    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
-    UShellOsalErr_e retVal = USHELL_OSAL_NO_ERR;
-    uint16_t eventGroupIndex = 0;
-    BaseType_t statusFreertos = pdFALSE;
-    EventBits_t xResult = 0;
-
-    /* Set bits */
-    do
-    {
-
-        /* Check input */
-        if ((osal == NULL) ||
-            (eventGroupHandle == NULL))
-        {
-            retVal = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Find the event group */
-        eventGroupIndex = ushellOsalFreertosFindEventGroupHandle(osal, eventGroupHandle);
-        if (0 == eventGroupIndex)
-        {
-            retVal = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Check if the event group index is valid */
-        if (USHELL_OSAL_EVENT_GROUPS_NUM < eventGroupIndex)
-        {
-            retVal = USHELL_OSAL_PORT_SPECIFIC_ERR;
-            break;
-        }
-
-        /* Check the level at which the function was called */
-        if (xPortIsInsideInterrupt())
-        {
-            /* Call from ISR */
-            statusFreertos = xEventGroupClearBitsFromISR((EventGroupHandle_t) eventGroupHandle,
-                                                         bitsToClear);
-            if (pdTRUE != statusFreertos)
-            {
-                retVal = USHELL_OSAL_EVENT_GROUP_SET_ERR;
-                break;
-            }
-        }
-        else
-        {
-            /* Call from task */
-            xResult = xEventGroupClearBits((EventGroupHandle_t) eventGroupHandle, bitsToClear);
-
-            /* Check if all desired bits are cleared */
-            if ((xResult & bitsToClear) != 0)
-            {
-                retVal = USHELL_OSAL_EVENT_GROUP_SET_ERR;
-                break;
-            }
-        }
-
-    } while (0);
-
-    return retVal;
-}
-
-/**
- * @brief Wait for bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToWait Bits to wait for in the event group.
- * @param[out] bitsReceived Pointer to store the received bits.
- * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
- * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupBitsWait(void* const osal,
-                                                     const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                                     const UShellOsalEventGroupBits_e bitsToWait,
-                                                     UShellOsalEventGroupBits_e* const bitsReceived,
-                                                     const bool clearOnExit,
-                                                     const bool waitAllBits)
-{
-    /* Check input parameters */
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != bitsReceived);
-
-    /* Local variable */
-    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
-    UShellOsalErr_e retVal = USHELL_OSAL_NO_ERR;
-    uint16_t eventGroupIndex = 0;
-    BaseType_t statusFreertos = pdFALSE;
-    EventBits_t xResult = 0;
-
-    /* Set bits */
-    do
-    {
-
-        /* Check input */
-        if ((osal == NULL) ||
-            (eventGroupHandle == NULL) ||
-            (bitsReceived == NULL))
-        {
-            retVal = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Find the event group */
-        eventGroupIndex = ushellOsalFreertosFindEventGroupHandle(osal, eventGroupHandle);
-        if (0 == eventGroupIndex)
-        {
-            retVal = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Check if the event group index is valid */
-        if (USHELL_OSAL_EVENT_GROUPS_NUM < eventGroupIndex)
-        {
-            retVal = USHELL_OSAL_PORT_SPECIFIC_ERR;
-            break;
-        }
-
-        /* Check the level at which the function was called */
-        if (xPortIsInsideInterrupt())
-        {
-            retVal = USHELL_OSAL_CALL_FROM_ISR_ERR;
-            break;
-        }
-
-        /* Get current bits */
-        EventBits_t bitsCurrent = xEventGroupGetBits((EventGroupHandle_t) eventGroupHandle);
-
-        /* Call from task */
-        xResult = xEventGroupWaitBits((EventGroupHandle_t) eventGroupHandle,
-                                      bitsToWait,
-                                      clearOnExit,
-                                      waitAllBits,
-                                      portMAX_DELAY);    // TODO: to change to 0 ?
-
-        /* Check */
-        if ((xResult & bitsToWait) == 0)
-        {
-            retVal = USHELL_OSAL_EVENT_GROUP_WAIT_ERR;
-            break;
-        }
-
-        /* Set the received bits */
-
-        *bitsReceived = xResult;
-
-    }
-
-    while (0);
-
-    return retVal;
-}
-
-/**
- * @brief Get the active bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[out] bitsActive Pointer to store the active bits.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e ushellOsalFreertosEventGroupBitsActiveGet(void* const osal,
-                                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                                          UShellOsalEventGroupBits_e* const bitsActive)
-{
-    /* Check input parameters */
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != osal);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);
-    USHELL_OSAL_FREERTOS_ASSERT(NULL != bitsActive);
-
-    /* Local variable */
-    UShellOsal_s* thisOsal = (UShellOsal_s*) osal;
-    UShellOsalErr_e retVal = USHELL_OSAL_NO_ERR;
-    uint16_t eventGroupIndex = 0;
-    EventBits_t xResult = 0;
-
-    /* Set bits */
-    do
-    {
-
-        /* Check input */
-        if ((osal == NULL) ||
-            (eventGroupHandle == NULL) ||
-            (bitsActive == NULL))
-        {
-            retVal = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Find the event group */
-        eventGroupIndex = ushellOsalFreertosFindEventGroupHandle(osal, eventGroupHandle);
-        if (0 == eventGroupIndex)
-        {
-            retVal = USHELL_OSAL_INVALID_ARGS;
-            break;
-        }
-
-        /* Check if the event group index is valid */
-        if (USHELL_OSAL_EVENT_GROUPS_NUM < eventGroupIndex)
-        {
-            retVal = USHELL_OSAL_PORT_SPECIFIC_ERR;
-            break;
-        }
-
-        /* Check the level at which the function was called */
-        if (xPortIsInsideInterrupt())
-        {
-            xResult = xEventGroupGetBitsFromISR((EventGroupHandle_t) eventGroupHandle);
-        }
-        else
-        {
-
-            /* Get current bits */
-            xResult = xEventGroupGetBits((EventGroupHandle_t) eventGroupHandle);
-        }
-
-        /* Return active bits  */
-        *bitsActive = xResult;
-
-    }
-
-    while (0);
-
-    return retVal;
 }
 
 /**
@@ -2891,32 +2350,4 @@ static inline uint16_t ushellOsalFreertosFindStreamBuffHandle(UShellOsalFreertos
     }
 
     return handleIndex;
-}
-
-/**
- * @brief Find the event group handle in the event groups table
- */
-static inline uint16_t ushellOsalFreertosFindEventGroupHandle(UShellOsalFreertos_s* const osalFreeRtos,
-                                                              const UShellOsalEventGroupHandle_t eventGroupHandle)
-{
-    {
-        // Check income parameters
-        USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreeRtos);        // Must be validated by the caller
-        USHELL_OSAL_FREERTOS_ASSERT(NULL != eventGroupHandle);    // Must be validated by the caller
-
-        UShellOsal_s* osal = (UShellOsal_s*) osalFreeRtos;
-        uint16_t handleIndex = 0;
-
-        // Try to find
-        for (uint16_t i = 0; i < USHELL_OSAL_EVENT_GROUPS_NUM; i++)
-        {
-            if (eventGroupHandle == osal->eventGroupHandle [i])
-            {
-                handleIndex = i + 1;
-                break;
-            }
-        }
-
-        return handleIndex;
-    }
 }

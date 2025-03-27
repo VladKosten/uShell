@@ -53,13 +53,6 @@ extern "C" {
     #define USHELL_OSAL_STREAM_BUFF_SLOTS_NUM (2)
 #endif
 
-/**
- * @brief UShell OSAL event groups number.
- */
-#ifndef USHELL_OSAL_EVENT_GROUPS_NUM
-    #define USHELL_OSAL_EVENT_GROUPS_NUM (1)
-#endif
-
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
@@ -204,42 +197,6 @@ typedef enum
      */
     USHELL_OSAL_STREAM_BUFF_RESET_ERR,
 
-    /**
-     * @brief Event group creation error.
-     *
-     * Indicates that an error occurred while creating an event group.
-     *
-     */
-    USHELL_OSAL_EVENT_GROUP_CREATE_ERR,
-
-    /**
-     * @brief Event group memory allocation error.
-     *
-     * Indicates that an error occurred while allocating memory for an event group.
-     */
-    USHELL_OSAL_EVENT_GROUP_MEM_ALLOCATION_ERR,
-
-    /**
-     * @brief Event group set error.
-     *
-     * Indicates that an error occurred while setting an event in the event group.
-     */
-    USHELL_OSAL_EVENT_GROUP_SET_ERR,
-
-    /**
-     * @brief Event group clear error.
-     *
-     * Indicates that an error occurred while clearing an event in the event group.
-     */
-    USHELL_OSAL_EVENT_GROUP_CLEAR_ERR,
-
-    /**
-     * @brief Event group wait error.
-     *
-     * Indicates that an error occurred while waiting for an event in the event group.
-     */
-    USHELL_OSAL_EVENT_GROUP_WAIT_ERR,
-
 } UShellOsalErr_e;
 
 /**
@@ -289,13 +246,6 @@ typedef void* UShellOsalSemaphoreHandle_t;
  * This type defines the data type used for representing the count of a semaphore
  */
 typedef uint32_t UShellOsalSemaphoreCount_t;
-
-/**
- * @brief Event group handle type definition.
- *
- * This type defines a handle for an event group in the UShell OSAL.s
- */
-typedef void* UShellOsalEventGroupHandle_t;
 
 /**
  * @brief UShell OSAL thread worker prototype.
@@ -425,26 +375,6 @@ typedef struct
     UShellOsalThreadHandle_t threadHandle;
 
 } UShellOsalThread_s;
-
-/**
- * @brief UShell OSAL event group bits enumeration.
- */
-typedef enum
-{
-    USHELL_OSAL_EVENT_GROUP_BIT_0 = 0x01, /**< Event group bit 0 */
-    USHELL_OSAL_EVENT_GROUP_BIT_1 = 0x02, /**< Event group bit 1 */
-    USHELL_OSAL_EVENT_GROUP_BIT_2 = 0x04, /**< Event group bit 2 */
-    USHELL_OSAL_EVENT_GROUP_BIT_3 = 0x08, /**< Event group bit 3 */
-    USHELL_OSAL_EVENT_GROUP_BIT_4 = 0x10, /**< Event group bit 4 */
-    USHELL_OSAL_EVENT_GROUP_BIT_5 = 0x20, /**< Event group bit 5 */
-    USHELL_OSAL_EVENT_GROUP_BIT_6 = 0x40, /**< Event group bit 6 */
-    USHELL_OSAL_EVENT_GROUP_BIT_7 = 0x80, /**< Event group bit 7 */
-
-    /* Add more bits as needed */
-
-    USHELL_OSAL_EVENT_GROUP_BIT_ALL = 0xFFFFFFFF,
-
-} UShellOsalEventGroupBits_e;
 
 /**
  * @brief UShell OSAL interface methods prototypes for a particular RTOS port.
@@ -859,75 +789,6 @@ typedef struct
     UShellOsalErr_e (*streamBuffReset)(void* const osal,
                                        const UShellOsalStreamBuffHandle_t streamBuffHandle);
 
-    /**
-     * @brief Create an event group.
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*eventGroupCreate)(void* const osal,
-                                        UShellOsalEventGroupHandle_t* const eventGroupHandle);
-
-    /**
-     * @brief Create an event group with a specific name.
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
-     * @param[in] name Name of the event group.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*eventGroupDelete)(void* const osal,
-                                        const UShellOsalEventGroupHandle_t eventGroupHandle);
-
-    /**
-     * @brief Set a bit in the event group.
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] eventGroupHandle Handle of the event group.
-     * @param[in] bitsToSet Bits to set in the event group.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*eventGroupSetBits)(void* const osal,
-                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                         const UShellOsalEventGroupBits_e bitsToSet);
-
-    /**
-     * @brief Clear a bit in the event group.
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] eventGroupHandle Handle of the event group.
-     * @param[in] bitsToClear Bits to clear in the event group.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*eventGroupClearBits)(void* const osal,
-                                           const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                           const UShellOsalEventGroupBits_e bitsToClear);
-
-    /**
-     * @brief Wait for bits in the event group.
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] eventGroupHandle Handle of the event group.
-     * @param[in] bitsToWait Bits to wait for in the event group.
-     * @param[out] bitsReceived Pointer to store the received bits.
-     * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
-     * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*eventGroupBitsWait)(void* const osal,
-                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                          const UShellOsalEventGroupBits_e bitsToWait,
-                                          UShellOsalEventGroupBits_e* const bitsReceived,
-                                          const bool clearOnExit,
-                                          const bool waitAllBits);
-
-    /**
-     * @brief Get the active bits in the event group.
-     * @param[in] osal Pointer to the OSAL instance.
-     * @param[in] eventGroupHandle Handle of the event group.
-     * @param[out] bitsActive Pointer to store the active bits.
-     * @return Error code indicating the result of the operation.
-     */
-    UShellOsalErr_e (*eventGroupBitsActiveGet)(void* const osal,
-                                               const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                               UShellOsalEventGroupBits_e* const bitsActive);
-
 } UShellOsalPortable_s;
 
 /**
@@ -992,13 +853,6 @@ typedef struct
      *
      */
     UShellOsalStreamBuffHandle_t streamBuffHandle [USHELL_OSAL_STREAM_BUFF_SLOTS_NUM];
-
-    /**
-     * @brief Event groups handles table.
-     *
-     * This array contains handles for the event groups available in the OSAL.
-     */
-    UShellOsalEventGroupHandle_t eventGroupHandle [USHELL_OSAL_EVENT_GROUPS_NUM];
 
     /**
      * @brief Portable methods table.
@@ -1452,75 +1306,6 @@ UShellOsalErr_e UShellOsalStreamBuffHandleGet(UShellOsal_s* const osal,
                                               UShellOsalStreamBuffHandle_t* const streamBuffHandle);
 
 /**
- * @brief Create an event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
-                                       UShellOsalEventGroupHandle_t* const eventGroupHandle);
-
-/**
- * @brief Create an event group with a specific name.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @param[in] name Name of the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e UShellEventGroupDelete(UShellOsal_s* const osal,
-                                       const UShellOsalEventGroupHandle_t eventGroupHandle);
-
-/**
- * @brief Set a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToSet Bits to set in the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
-                                        const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                        const UShellOsalEventGroupBits_e bitsToSet);
-
-/**
- * @brief Clear a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToClear Bits to clear in the event group.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e UShellEventGroupClearBits(UShellOsal_s* const osal,
-                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                          const UShellOsalEventGroupBits_e bitsToClear);
-
-/**
- * @brief Wait for bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToWait Bits to wait for in the event group.
- * @param[out] bitsReceived Pointer to store the received bits.
- * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
- * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
-                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                         const UShellOsalEventGroupBits_e bitsToWait,
-                                         UShellOsalEventGroupBits_e* const bitsReceived,
-                                         const bool clearOnExit,
-                                         const bool waitAllBits);
-
-/**
- * @brief Get the active bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[out] bitsActive Pointer to store the active bits.
- * @return Error code indicating the result of the operation.
- */
-UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
-                                              const UShellOsalEventGroupHandle_t eventGroupHandle,
-                                              UShellOsalEventGroupBits_e* const bitsActive);
-
-/**
  * \brief Get a semaphore handle of the given OSAL object
  * \param[in]   osal                - pointer to OSAL instance
  * \param[in]   semaphoreSlotInd    - index of semaphore slots
@@ -1541,17 +1326,6 @@ UShellOsalErr_e UShellOsalSemaphoreHandleGet(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalStreamBuffHandleGet(UShellOsal_s* const osal,
                                               const size_t streamBuffSlotInd,
                                               UShellOsalStreamBuffHandle_t* const streamBuffHandle);
-
-/**
- * @brief Get an event group handle of the given OSAL object
- * @param[in] osal - pointer to OSAL instance
- * @param[in] eventGroupSlotInd - index of event group slots
- * @param[in] eventGroupHandle - pointer to an object into which the event group handle will be copied
- * @return UShellOsalErr_e - error code. non-zero = an error has occurred;
- */
-UShellOsalErr_e UShellOsalEventGroupHandleGet(UShellOsal_s* const osal,
-                                              const size_t eventGroupSlotInd,
-                                              UShellOsalEventGroupHandle_t* const eventGroupHandle);
 
 #ifdef __cplusplus
 }

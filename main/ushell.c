@@ -159,7 +159,6 @@ static UShellErr_e uShellFindCmd(const UShell_s* const uShell, const char* const
  */
 static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellOsal_s* const osal,
-                                   UShellHal_s* const hal,
                                    UShellCfg_s* const cfg);
 
 /**
@@ -168,22 +167,6 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
  * @return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvDeInit(UShell_s* const uShell);
-
-/**
- * @brief Initialize the runtime environment HAL
- * @param uShell - uShell object
- * @param hal - hal object
- * @return USHELL_NO_ERR if success, otherwise error code
- */
-static UShellErr_e uShellRtEnvHalInit(UShell_s* const uShell,
-                                      UShellHal_s* const hal);
-
-/**
- * @brief Deinitialize the runtime environment HAL
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
- */
-static UShellErr_e uShellRtEnvHalDeInit(UShell_s* const uShell);
 
 /**
  * @brief Initialize the runtime environment OSAL
@@ -332,18 +315,16 @@ static inline void uShellTerminalDelChar(const UShell_s* const uShell);
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
- * \brief Init uShell object
+ * @brief Init uShell object
  * \param[in] uShell - uShell object to be initialized
  * \param[in] osal - osal object
- * \param[in] hal - hal object
  * \param[in] parent - parent object
  * \param[in] name - name of the object
  * \param[out] none
- * \return USHELL_NO_ERR if success, otherwise error code
+ * @return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
-                       const UShellHal_s* const hal,
                        const UShellCfg_s cfg,
                        void* const parent,
                        const char* const name)
@@ -352,7 +333,6 @@ UShellErr_e UShellInit(UShell_s* const uShell,
     /* Check input parameters */
     USHELL_VCP_ASSERT(uShell != NULL);
     USHELL_VCP_ASSERT(osal != NULL);
-    USHELL_VCP_ASSERT(hal != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -361,8 +341,7 @@ UShellErr_e UShellInit(UShell_s* const uShell,
     {
         /* Initialize the runtime environment */
         if ((uShell == NULL) ||
-            (osal == NULL) ||
-            (hal == NULL))
+            (osal == NULL))
         {
             return USHELL_INVALID_ARGS_ERR;
         }
@@ -377,7 +356,6 @@ UShellErr_e UShellInit(UShell_s* const uShell,
         /* Initialize the runtime environment */
         status = uShellRtEnvInit(uShell,
                                  (UShellOsal_s*) osal,
-                                 (UShellHal_s*) hal,
                                  (UShellCfg_s*) &cfg);
         if (status != USHELL_NO_ERR)
         {
@@ -886,7 +864,6 @@ static UShellErr_e uShellPrintIo(const UShell_s* const uShell)
 {
     /* Check input */
     USHELL_VCP_ASSERT(uShell != NULL);
-    USHELL_VCP_ASSERT(str != NULL);
 
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -954,137 +931,6 @@ static UShellErr_e uShellPrintIo(const UShell_s* const uShell)
 }
 
 /**
- * @brief Get char from the input
- * @param uShell - uShell object
- * @param ch - pointer to the char
- * @return USHELL_NO_ERR if success, otherwise error code
- */
-static UShellErr_e uShellScanCharWait(const UShell_s* const uShell,
-                                      UShellItem_t* const ch)
-{
-    /* Check input parameters */
-    USHELL_VCP_ASSERT(uShell != NULL);
-    USHELL_VCP_ASSERT(ch != NULL);
-
-    /* Local variables */
-    UShellErr_e status = USHELL_NO_ERR;
-    UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
-    UShellMsg_e msg = USHELL_MSG_NONE;
-    uint8_t item = 0;
-
-    /* Get the char */
-    do
-    {
-        /* Check input parameters */
-        if ((uShell == NULL) ||
-            (ch == NULL))
-        {
-            status = USHELL_INVALID_ARGS_ERR;
-            break;
-        }
-
-        /* Set the rx mode */
-        halStatus = UShellHalSetRxMode(uShell->hal);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Wait the message */
-        status = uShellSemaphoreRxEventWait(uShell);
-        if (status != USHELL_NO_ERR)
-        {
-            status = USHELL_XFER_ERR;
-            break;
-        }
-
-        /* Get the char */
-        halStatus = UShellHalRead(uShell->hal, &item, 1U);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Set the char */
-        *ch = item;
-    }
-
-    while (0);
-
-    return status;
-}
-
-/**
- * @brief Get char from the input with timeout
- * @param uShell - uShell object
- * @param ch - pointer to the char
- * @param timeMs - timeout in milliseconds
- * @return
- */
-static UShellErr_e uShellScanCharPend(const UShell_s* const uShell,
-                                      UShellItem_t* const ch,
-                                      const uint32_t timeMs)
-{
-    /* Check input parameters */
-    USHELL_VCP_ASSERT(uShell != NULL);
-    USHELL_VCP_ASSERT(ch != NULL);
-
-    /* Local variables */
-    UShellErr_e status = USHELL_NO_ERR;
-    UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
-    uint8_t item = 0;
-
-    /* Get the char */
-    do
-    {
-        /* Check input parameters */
-        if ((uShell == NULL) ||
-            (ch == NULL))
-        {
-            status = USHELL_INVALID_ARGS_ERR;
-            break;
-        }
-
-        /* Set the rx mode */
-        halStatus = UShellHalSetRxMode(uShell->hal);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Wait the message */
-        status = uShellSemaphoreRxEventPend(uShell,
-                                            timeMs);
-        if ((status != USHELL_NO_ERR))
-        {
-            status = USHELL_XFER_ERR;
-            break;
-        }
-
-        UShellOsalSemaphoreCount_t count = 0;
-        status = UShellOsalSemaphoreCountGet(uShell->osal, uShell->osal->semaphoreHandle [0], &count);
-
-        /* Get the char */
-        halStatus = UShellHalRead(uShell->hal, &item, 1U);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Set the char */
-        *ch = item;
-    }
-
-    while (0);
-
-    return status;
-}
-
-/**
  * \brief Find command
  * \param[in] uShell - uShell object
  * \param[in] str - string to be found
@@ -1106,13 +952,11 @@ static UShellErr_e uShellFindCmd(const UShell_s* const uShell, const char* const
  */
 static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellOsal_s* const osal,
-                                   UShellHal_s* const hal,
                                    UShellCfg_s* const cfg)
 {
     /* Check input parameters */
     USHELL_VCP_ASSERT(uShell != NULL);
     USHELL_VCP_ASSERT(osal != NULL);
-    USHELL_VCP_ASSERT(hal != NULL);
     USHELL_VCP_ASSERT(cfg != NULL);
 
     /* Local variables */
@@ -1123,7 +967,6 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
         /* Check input parameter */
         if ((uShell == NULL) ||
             (osal == NULL) ||
-            (hal == NULL) ||
             (cfg == NULL))
         {
             return USHELL_INVALID_ARGS_ERR;
@@ -1150,13 +993,6 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
             {
                 break;
             }
-        }
-
-        /* Initialize the runtime environment HAL */
-        status = uShellRtEnvHalInit(uShell, hal);
-        if (status != USHELL_NO_ERR)
-        {
-            break;
         }
 
         /* Initialize the runtime environment OSAL */
@@ -1203,168 +1039,11 @@ static UShellErr_e uShellRtEnvDeInit(UShell_s* const uShell)
         /* Deinitialize the runtime environment OSAL */
         uShellRtEnvOsalDeInit(uShell);
 
-        /* Deinitialize the runtime environment HAL */
-        uShellRtEnvHalDeInit(uShell);
-
         /* Deinitialize the runtime environment authentication */
         uShellRtEnvFuncHistoryDeInit(uShell);
 
         /* Deinitialize the runtime environment history */
         uShellRtEnvFuncAuthDeInit(uShell);
-
-    } while (0);
-
-    return status;
-}
-
-/**
- * @brief Initialize the runtime environment HAL
- * @param uShell - uShell object
- * @param hal - hal object
- * @return USHELL_NO_ERR if success, otherwise error code
- */
-static UShellErr_e uShellRtEnvHalInit(UShell_s* const uShell,
-                                      UShellHal_s* const hal)
-{
-    /* Check input parameters */
-    USHELL_VCP_ASSERT(uShell != NULL);
-    USHELL_VCP_ASSERT(hal != NULL);
-
-    /* Local variables */
-    UShellErr_e status = USHELL_NO_ERR;
-    UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
-
-    do
-    {
-        /* Check input parameter */
-        if ((uShell == NULL) ||
-            (hal == NULL))
-        {
-            status = USHELL_INVALID_ARGS_ERR;
-            break;
-        }
-
-        /* Save the hal object */
-        uShell->hal = hal;
-
-        /* Attach the parent object */
-        halStatus = UShellHalParentSet(hal, uShell);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Attach callback for the received data */
-        halStatus = UShellHalCbAttach(hal,
-                                      USHELL_HAL_CB_RX_RECEIVED,
-                                      uShellRxReceivedCb);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Attach callback for the transmitted data */
-        halStatus = UShellHalCbAttach(hal,
-                                      USHELL_HAL_CB_TX_COMPLETE,
-                                      uShellTxCpltCb);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Attach callback for the error */
-        halStatus = UShellHalCbAttach(hal,
-                                      USHELL_HAL_CB_RX_TX_ERROR,
-                                      uShellXferErrorCb);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Open the hal */
-        halStatus = UShellHalOpen(hal);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            return;
-        }
-
-    } while (0);
-
-    return status;
-}
-
-/**
- * @brief Deinitialize the runtime environment HAL
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
- */
-static UShellErr_e uShellRtEnvHalDeInit(UShell_s* const uShell)
-{
-    /* Check input parameters */
-    USHELL_VCP_ASSERT(uShell != NULL);
-
-    /* Local variables */
-    UShellErr_e status = USHELL_NO_ERR;
-    UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
-
-    do
-    {
-        /* Check input parameter */
-        if ((uShell == NULL) ||
-            (uShell->hal == NULL))
-        {
-            status = USHELL_INVALID_ARGS_ERR;
-            break;
-        }
-
-        /* Detach callback for the received data */
-        halStatus = UShellHalCbDetach(uShell->hal,
-                                      USHELL_HAL_CB_RX_RECEIVED);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Detach callback for the transmitted data */
-        halStatus = UShellHalCbDetach(uShell->hal,
-                                      USHELL_HAL_CB_TX_COMPLETE);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Detach callback for the error */
-        halStatus = UShellHalCbDetach(uShell->hal,
-                                      USHELL_HAL_CB_RX_TX_ERROR);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Detach the parent object */
-        halStatus = UShellHalParentSet(uShell->hal, NULL);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            status = USHELL_PORT_ERR;
-            break;
-        }
-
-        /* Close */
-        halStatus = UShellHalClose(uShell->hal);
-        if (halStatus != USHELL_HAL_NO_ERR)
-        {
-            return;
-        }
-
-        /* Remove the hal object */
-        uShell->hal = NULL;
 
     } while (0);
 
@@ -1711,76 +1390,6 @@ static UShellErr_e uShellSemaphoreRxEventPend(UShell_s* const dio,
 
         return status;
     }
-}
-
-/**
- * @brief Initialize the runtime environment authentication
- * @param[in] uShell - uShell object
- * @return UShellErr_e - error code. non-zero = an error has occurred;
- */
-static UShellErr_e uShellRtEnvFuncAuthInit(UShell_s* const uShell)
-{
-    /* Check input parameters */
-    USHELL_VCP_ASSERT(uShell != NULL);
-
-    /* Local variables */
-    UShellErr_e status = USHELL_NO_ERR;
-
-    do
-    {
-        /* Check input parameters */
-        if (uShell == NULL)
-        {
-            status = USHELL_INVALID_ARGS_ERR;
-            break;
-        }
-
-        /* Initialize the authentication */
-        status = UShellAuthInit(&uShell->auth,
-                                uShell,
-                                USHELL_AUTH_PASSWORD);
-        if (status != USHELL_NO_ERR)
-        {
-            break;
-        }
-
-    } while (0);
-
-    return status;
-}
-
-/**
- * @brief Deinitialize the runtime environment authentication
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
- */
-static UShellErr_e uShellRtEnvFuncAuthDeInit(UShell_s* const uShell)
-{
-    /* Check input parameters */
-    USHELL_VCP_ASSERT(uShell != NULL);
-
-    /* Local variables */
-    UShellErr_e status = USHELL_NO_ERR;
-
-    do
-    {
-        /* Check input parameters */
-        if (uShell == NULL)
-        {
-            status = USHELL_INVALID_ARGS_ERR;
-            break;
-        }
-
-        /* Deinitialize the authentication */
-        status = UShellAuthDeInit(&uShell->auth);
-        if (status != USHELL_NO_ERR)
-        {
-            break;
-        }
-
-    } while (0);
-
-    return status;
 }
 
 /**

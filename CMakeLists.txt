@@ -18,6 +18,7 @@ else()
     message("-- UShell INCLUDE IN APPLICATION")
     option(HAL_PORT_ASF "Use ASF HAL port" ON)
     option(OSAL_PORT_FREERTOS "Use FreeRTOS OSAL port" ON)
+    add_subdirectory(startup)
 endif()
 
 # Add subdirectories

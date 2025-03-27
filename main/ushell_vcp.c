@@ -274,11 +274,11 @@ static inline void uShellVcpStreamTxFlush(UShellVcp_s* const vcp);
  * \param[out] none
  * \return USHELL_VCP_NO_ERR if success, otherwise error code
  */
-UShellVcpErr_e UShellInit(UShellVcp_s* const vcp,
-                          const UShellOsal_s* const osal,
-                          const UShellHal_s* const hal,
-                          void* const parent,
-                          const char* const name)
+UShellVcpErr_e UShellVcpInit(UShellVcp_s* const vcp,
+                             const UShellOsal_s* const osal,
+                             const UShellHal_s* const hal,
+                             void* const parent,
+                             const char* const name)
 {
     /* Check input parameters */
     USHELL_VCP_ASSERT(vcp != NULL);
@@ -325,7 +325,7 @@ UShellVcpErr_e UShellInit(UShellVcp_s* const vcp,
  * \param[out] none
  * \return USHELL_VCP_NO_ERR if success, otherwise error code
  */
-UShellVcpErr_e UShellDeInit(UShellVcp_s* const vcp)
+UShellVcpErr_e UShellVcpDeInit(UShellVcp_s* const vcp)
 {
     /* Check input parameters */
     USHELL_VCP_ASSERT(vcp != NULL);

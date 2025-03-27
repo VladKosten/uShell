@@ -98,14 +98,16 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
 
 /**
  * @brief Read function.
- * @param[in] hal Pointer to the HAL instance.
- * @param[out] data Pointer to the buffer to store the read data.
- * @param[in] size Size of the buffer.
+ * @param hal - Pointer to the HAL instance.
+ * @param data - Pointer to the buffer to store the read data.
+ * @param buffSize - Size of the buffer.
+ * @param usedSize - Pointer to the variable to store the size of the data read.
  * @return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortRead(void* const hal,
                                         UShellHalItem_t* const data,
-                                        const size_t size);
+                                        const size_t buffSize,
+                                        size_t* const usedSize);
 
 /**
  * @brief Set Tx mode

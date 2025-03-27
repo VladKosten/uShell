@@ -179,7 +179,6 @@ typedef struct
  * @brief Init uShell object
  * \param[in] uShell - uShell object to be initialized
  * \param[in] osal - osal object
- * \param[in] hal - hal object
  * \param[in] parent - parent object
  * \param[in] name - name of the object
  * \param[out] none
