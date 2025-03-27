@@ -2022,6 +2022,7 @@ static size_t ushellOsalFreertosStreamBuffSendBlocking(void* const osalFreertos,
         // Put the item to the stream buffer
         bytesWritten = xStreamBufferSend((UShellOsalStreamBuffHandle_t) streamBuffHandle, txData, dataLengthBytes, portMAX_DELAY);    // with waiting time
     }
+    
 
     return bytesWritten;    // Exit: no errors
 }

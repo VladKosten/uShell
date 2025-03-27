@@ -29,25 +29,6 @@
 #endif
 
 /**
- * @brief VCP flag
- */
-typedef enum
-{
-    USHELL_VCP_FLAG_NONE = 0x00,                 ///< No flags set
-    USHELL_VCP_FLAG_RX_EVENT = 0x01,             ///< Rx event
-    USHELL_VCP_FLAG_TX_EVENT = 0x02,             ///< TX transfer event flag(From TX stream buffer to HAL)
-    USHELL_VCP_FLAG_TX_COMPLETE_EVENT = 0x04,    ///< TX complete event flag
-    USHELL_VCP_FLAG_TX_RX_ERROR_EVENT = 0x08,    ///< RX/TX error event flag
-    USHELL_VCP_FLAG_ERROR_EVENT = 0x10,          ///< Error event flag
-
-    /* Add other here */
-
-    /* Last */
-    USHELL_VCP_FLAG_ALL = 0x1F,    ///< All flags
-
-} UShellVcpFlags_e;
-
-/**
  * @brief VCP messages used by the module.
  *
  * This enum represents the basic events that can occur in the VCP module,
@@ -90,29 +71,32 @@ static void uShellVcpWorker(void* const arg);
 /**
  * \brief Callback for the received data
  * \param[in] hal - hal object
+ * \param[in] cbType - callback type
  * \param[out] none
  * \return none
  * \note This function is called when the data is received from the serial port.
  */
-static void uShellVcpRxReceivedCb(const void* const hal);
+static void uShellVcpRxReceivedCb(const void* const hal, const UShellHalCallback_e cbType);
 
 /**
  * \brief Callback for the transmitted data
  * \param[in] hal - hal object
+ * \param[in] cbType - callback type
  * \param[out] none
  * \return none
  * \note This function is called when the data is transmitted to the serial port.
  */
-static void uShellVcpTxCpltCb(const void* const hal);
+static void uShellVcpTxCompleteCb(const void* const hal, const UShellHalCallback_e cbType);
 
 /**
  * \brief Callback for the error
  * \param[in] hal - hal object
+ * \param[in] cbType - callback type
  * \param[out] none
  * \return none
  * \note This function is called when the error occurs in the serial port.
  */
-static void uShellVcpXferErrorCb(const void* const hal);
+static void uShellVcpXferErrorCb(const void* const hal, const UShellHalCallback_e cbType);
 
 /**
  * @brief Initialize the runtime environment
@@ -370,7 +354,7 @@ UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp, const char* const str)
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
     UShellOsal_s* const osal = (UShellOsal_s*) vcp->osal;
-    UShellOsalStreamBuffHandle_t* const streamBuff = NULL;
+    UShellOsalStreamBuffHandle_t streamBuff = NULL;
     size_t strSize = strlen(str);
 
     /* Print string to the vcp object */
@@ -432,7 +416,7 @@ UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch)
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
     UShellOsal_s* const osal = (UShellOsal_s*) vcp->osal;
-    UShellOsalStreamBuffHandle_t* const streamBuff = NULL;
+    UShellOsalStreamBuffHandle_t streamBuff = NULL;
 
     /* Print string to the vcp object */
     do
@@ -460,7 +444,10 @@ UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch)
             }
 
             /* Write to the stream buffer */
-            osalStatus = UShellOsalStreamBuffSendBlocking(osal, streamBuff, ch, 1U);
+            osalStatus = UShellOsalStreamBuffSendBlocking(osal,
+                                                          streamBuff,
+                                                          (void*) &ch,
+                                                          1U);
             if (osalStatus != USHELL_OSAL_NO_ERR)
             {
                 status = USHELL_VCP_INVALID_ARGS_ERR;
@@ -493,7 +480,7 @@ UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
     UShellOsal_s* const osal = (UShellOsal_s*) vcp->osal;
-    UShellOsalStreamBuffHandle_t* const streamBuff = NULL;
+    UShellOsalStreamBuffHandle_t streamBuff = NULL;
 
     /* Print string to the vcp object */
     do
@@ -558,7 +545,7 @@ UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
     UShellOsal_s* const osal = (UShellOsal_s*) vcp->osal;
-    UShellOsalStreamBuffHandle_t* const streamBuff = NULL;
+    UShellOsalStreamBuffHandle_t streamBuff = NULL;
     char ch = 0U;
     size_t strSize = 0U;
 
@@ -592,7 +579,10 @@ UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
             do
             {
                 /* Write to the stream buffer */
-                osalStatus = UShellOsalStreamBuffReceiveBlocking(osal, streamBuff, ch, 1U);
+                osalStatus = UShellOsalStreamBuffReceiveBlocking(osal,
+                                                                 streamBuff,
+                                                                 (void*) &ch,
+                                                                 1U);
                 if (osalStatus != USHELL_OSAL_NO_ERR)
                 {
                     status = USHELL_VCP_INVALID_ARGS_ERR;
@@ -626,6 +616,8 @@ UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
         uShellVcpUnlock(vcp);
 
     } while (0);
+
+    return status;
 }
 
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
@@ -644,6 +636,7 @@ static void uShellVcpWorker(void* const arg)
 
     /* Local variables */
     UShellVcp_s* const vcp = (UShellVcp_s*) arg;
+    UShellHal_s* hal = (UShellHal_s*) vcp->hal;
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     UShellVcpMsgEvent_e msgEvent = USHELL_VCP_MSG_EVENT_NONE;
 
@@ -662,7 +655,8 @@ static void uShellVcpWorker(void* const arg)
         {
 
             /* Process the received data */
-            case (USHELL_VCP_MSG_EVENT_RX_EVENT) :
+            case USHELL_VCP_MSG_EVENT_RX_EVENT :
+
                 /* Process the received data */
                 status = uShellVcpReadFromPort(vcp);
                 if (status != USHELL_VCP_NO_ERR)
@@ -675,6 +669,7 @@ static void uShellVcpWorker(void* const arg)
 
             /* Process the transmitted data */
             case (USHELL_VCP_MSG_EVENT_TX_EVENT) :
+
                 /* Process the transmitted data */
                 status = uShellVcpWriteToPort(vcp);
                 if (status != USHELL_VCP_NO_ERR)
@@ -687,7 +682,7 @@ static void uShellVcpWorker(void* const arg)
                 break;
 
             /* Process the error */
-            case (USHELL_VCP_MSG_EVENT_ERROR) :
+            case USHELL_VCP_MSG_EVENT_ERROR :
 
                 /* Process the error */
                 status = uShellVcpMsgEventFlush(vcp);
@@ -707,14 +702,14 @@ static void uShellVcpWorker(void* const arg)
                 uShellVcpIoBuffFlush(vcp);
 
                 /* Set the rx mode in hal */
-                UShellHalErr_e halStatus = UShellHalSetRxMode(vcp->hal);
+                UShellHalErr_e halStatus = UShellHalSetRxMode(hal);
                 USHELL_VCP_ASSERT(halStatus == USHELL_HAL_NO_ERR);
                 (void) halStatus;
 
                 break;
 
             /* None is none */
-            case (USHELL_VCP_MSG_EVENT_NONE) :
+            case USHELL_VCP_MSG_EVENT_NONE :
             default :
             {
                 break;
@@ -724,13 +719,13 @@ static void uShellVcpWorker(void* const arg)
 }
 
 /**
- * \brief Callback for the received data
- * \param[in] hal - hal object
- * \param[out] none
- * \return none
- * \note This function is called when the data is received from the serial port.
+ * @brief Callback for the received data
+ * @param[in] hal - hal object
+ * @param[in] cbType - callback type
+ * @param[out] none
  */
-static void uShellVcpRxReceivedCb(const void* const hal)
+static void uShellVcpRxReceivedCb(const void* const hal,
+                                  const UShellHalCallback_e cbType)
 {
     /* Check input parameters */
     USHELL_VCP_ASSERT(hal != NULL);
@@ -738,19 +733,23 @@ static void uShellVcpRxReceivedCb(const void* const hal)
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
     UShellVcp_s* const ushell = (UShellVcp_s*) ushellHal->parent;
-
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     do
     {
         /* Check input parameters */
         if ((ushellHal == NULL) ||
-            (ushell == NULL))
+            (ushell == NULL) ||
+            (cbType != USHELL_HAL_CB_RX_RECEIVED))
         {
             USHELL_VCP_ASSERT(0);
             break;
         }
 
-        /* Send msg */
-        uShellVcpFlagSet(ushell, USHELL_VCP_FLAG_RX_EVENT);
+        status = uShellVcpMsgEventSend(ushell, USHELL_VCP_MSG_EVENT_RX_EVENT);
+        if (status != USHELL_VCP_NO_ERR)
+        {
+            USHELL_VCP_ASSERT(0);
+        }
 
     } while (0);
 }
@@ -758,11 +757,13 @@ static void uShellVcpRxReceivedCb(const void* const hal)
 /**
  * \brief Callback for the transmitted data
  * \param[in] hal - hal object
+ * \param[in] cbType - callback type
  * \param[out] none
  * \return none
  * \note This function is called when the data is transmitted to the serial port.
  */
-static void uShellVcpTxCpltCb(const void* const hal)
+static void uShellVcpTxCompleteCb(const void* const hal,
+                                  const UShellHalCallback_e cbType)
 {
     /* Check input parameters */
     USHELL_VCP_ASSERT(hal != NULL);
@@ -770,19 +771,23 @@ static void uShellVcpTxCpltCb(const void* const hal)
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
     UShellVcp_s* const ushell = (UShellVcp_s*) ushellHal->parent;
-
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     do
     {
         /* Check input parameters */
         if ((ushellHal == NULL) ||
-            (ushell == NULL))
+            (ushell == NULL) ||
+            (cbType != USHELL_HAL_CB_TX_COMPLETE))
         {
             USHELL_VCP_ASSERT(0);
             break;
         }
 
-        /* Send msg */
-        uShellVcpFlagSet(ushell, USHELL_VCP_FLAG_TX_COMPLETE_EVENT);
+        status = uShellVcpMsgTransferSend(ushell, USHELL_VCP_MSG_TX_COMPLETE);
+        if (status != USHELL_VCP_NO_ERR)
+        {
+            USHELL_VCP_ASSERT(0);
+        }
 
     } while (0);
 }
@@ -790,11 +795,13 @@ static void uShellVcpTxCpltCb(const void* const hal)
 /**
  * \brief Callback for the error
  * \param[in] hal - hal object
+ * \param[in] cbType - callback type
  * \param[out] none
  * \return none
  * \note This function is called when the error occurs in the serial port.
  */
-static void uShellVcpXferErrorCb(const void* const hal)
+static void uShellVcpXferErrorCb(const void* const hal,
+                                 const UShellHalCallback_e cbType)
 {
     /* Check input parameters */
     USHELL_VCP_ASSERT(hal != NULL);
@@ -802,19 +809,23 @@ static void uShellVcpXferErrorCb(const void* const hal)
     /* Local variables */
     UShellHal_s* const ushellHal = (UShellHal_s*) hal;
     UShellVcp_s* const ushell = (UShellVcp_s*) ushellHal->parent;
-
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     do
     {
         /* Check input parameters */
         if ((ushellHal == NULL) ||
-            (ushell == NULL))
+            (ushell == NULL) ||
+            (cbType != USHELL_HAL_CB_RX_TX_ERROR))
         {
             USHELL_VCP_ASSERT(0);
             break;
         }
 
-        /* Send msg */
-        uShellVcpFlagSet(ushell, USHELL_VCP_FLAG_TX_RX_ERROR_EVENT);
+        status = uShellVcpMsgTransferSend(ushell, USHELL_VCP_MSG_TX_RX_ERR);
+        if (status != USHELL_VCP_NO_ERR)
+        {
+            USHELL_VCP_ASSERT(0);
+        }
 
     } while (0);
 }
@@ -959,7 +970,7 @@ static UShellVcpErr_e uShellVcpRtEnvHalInit(UShellVcp_s* const vcp,
         /* Attach callback for the transmitted data */
         halStatus = UShellHalCbAttach(hal,
                                       USHELL_HAL_CB_TX_COMPLETE,
-                                      uShellVcpTxCpltCb);
+                                      uShellVcpTxCompleteCb);
         if (halStatus != USHELL_HAL_NO_ERR)
         {
             status = USHELL_VCP_PORT_ERR;
@@ -980,7 +991,8 @@ static UShellVcpErr_e uShellVcpRtEnvHalInit(UShellVcp_s* const vcp,
         halStatus = UShellHalOpen(hal);
         if (halStatus != USHELL_HAL_NO_ERR)
         {
-            return;
+            status = USHELL_VCP_PORT_ERR;
+            break;
         }
 
     } while (0);
@@ -1001,6 +1013,7 @@ static UShellVcpErr_e uShellVcpRtEnvHalDeInit(UShellVcp_s* const vcp)
     /* Local variables */
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
+    UShellHal_s* hal = (UShellHal_s*) vcp->hal;
 
     do
     {
@@ -1013,7 +1026,7 @@ static UShellVcpErr_e uShellVcpRtEnvHalDeInit(UShellVcp_s* const vcp)
         }
 
         /* Detach callback for the received data */
-        halStatus = UShellHalCbDetach(vcp->hal,
+        halStatus = UShellHalCbDetach(hal,
                                       USHELL_HAL_CB_RX_RECEIVED);
         if (halStatus != USHELL_HAL_NO_ERR)
         {
@@ -1022,7 +1035,7 @@ static UShellVcpErr_e uShellVcpRtEnvHalDeInit(UShellVcp_s* const vcp)
         }
 
         /* Detach callback for the transmitted data */
-        halStatus = UShellHalCbDetach(vcp->hal,
+        halStatus = UShellHalCbDetach(hal,
                                       USHELL_HAL_CB_TX_COMPLETE);
         if (halStatus != USHELL_HAL_NO_ERR)
         {
@@ -1031,7 +1044,7 @@ static UShellVcpErr_e uShellVcpRtEnvHalDeInit(UShellVcp_s* const vcp)
         }
 
         /* Detach callback for the error */
-        halStatus = UShellHalCbDetach(vcp->hal,
+        halStatus = UShellHalCbDetach(hal,
                                       USHELL_HAL_CB_RX_TX_ERROR);
         if (halStatus != USHELL_HAL_NO_ERR)
         {
@@ -1040,7 +1053,7 @@ static UShellVcpErr_e uShellVcpRtEnvHalDeInit(UShellVcp_s* const vcp)
         }
 
         /* Detach the parent object */
-        halStatus = UShellHalParentSet(vcp->hal, NULL);
+        halStatus = UShellHalParentSet(hal, NULL);
         if (halStatus != USHELL_HAL_NO_ERR)
         {
             status = USHELL_VCP_PORT_ERR;
@@ -1048,10 +1061,11 @@ static UShellVcpErr_e uShellVcpRtEnvHalDeInit(UShellVcp_s* const vcp)
         }
 
         /* Close */
-        halStatus = UShellHalClose(vcp->hal);
+        halStatus = UShellHalClose(hal);
         if (halStatus != USHELL_HAL_NO_ERR)
         {
-            return;
+            status = USHELL_VCP_PORT_ERR;
+            break;
         }
 
         /* Remove the hal object */
@@ -1466,7 +1480,7 @@ static UShellVcpErr_e uShellVcpMsgEventFlush(UShellVcp_s* const vcp)
         }
 
         /* Flush the queue */
-        osalStatus = UShellOsalQueueFlush(osal, queue);
+        osalStatus = UShellOsalQueueReset(osal, queue);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             status = USHELL_VCP_PORT_ERR;
@@ -1649,7 +1663,7 @@ static UShellVcpErr_e uShellVcpMsgTransferFlush(UShellVcp_s* const vcp)
             }
 
             /* Flush the queue */
-            osalStatus = UShellOsalQueueFlush(osal, queue);
+            osalStatus = UShellOsalQueueReset(osal, queue);
             if (osalStatus != USHELL_OSAL_NO_ERR)
             {
                 status = USHELL_VCP_PORT_ERR;
@@ -1680,7 +1694,7 @@ static UShellVcpErr_e uShellVcpMsgTransferPend(UShellVcp_s* const vcp,
     UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
     UShellOsalQueueHandle_t queue = NULL;
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
-    UShellVcpMsgEvent_e msgTxLocal = USHELL_VCP_MSG_EVENT_NONE;
+    UShellVcpMsgTransfer_e msgTxLocal = USHELL_VCP_MSG_EVENT_NONE;
 
     /* Send the message to the queue */
     do
@@ -1746,6 +1760,7 @@ static UShellVcpErr_e uShellVcpReadFromPort(UShellVcp_s* const vcp)
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
     UShellHalErr_e halStatus = USHELL_HAL_NO_ERR;
+    size_t sendByte = 0U;
 
     UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
     UShellHal_s* hal = (UShellHal_s*) vcp->hal;
@@ -1792,12 +1807,12 @@ static UShellVcpErr_e uShellVcpReadFromPort(UShellVcp_s* const vcp)
             }
 
             /* Send to stream buffer */
-            osalStatus = UShellOsalStreamBuffSendBlocking(osal,
-                                                          streamBuffer,
-                                                          vcp->io.buffer,
-                                                          vcp->io.ind);
+            sendByte = UShellOsalStreamBuffSendBlocking(osal,
+                                                        streamBuffer,
+                                                        vcp->io.buffer,
+                                                        vcp->io.ind);
 
-            if (osalStatus != USHELL_OSAL_NO_ERR)
+            if (sendByte != vcp->io.ind)
             {
                 status = USHELL_VCP_PORT_ERR;
                 break;
@@ -1882,7 +1897,11 @@ static UShellVcpErr_e uShellVcpWriteToPort(UShellVcp_s* const vcp)
             }
 
             /* Flush the tx queue */
-            uShellVcpMsgTransferFlush(vcp);
+            status = uShellVcpMsgTransferFlush(vcp);
+            if (status != USHELL_VCP_NO_ERR)
+            {
+                break;
+            }
 
             /* Send to hal */
             halStatus = UShellHalWrite(hal, vcp->io.buffer, vcp->io.ind);
@@ -1893,8 +1912,9 @@ static UShellVcpErr_e uShellVcpWriteToPort(UShellVcp_s* const vcp)
             }
 
             /* Wait for tx complete */
-            uShellVcpMsgTransferPend(vcp, &msgTxLocal, 1000U);
-            if (msgTxLocal != USHELL_VCP_MSG_TX_COMPLETE)
+            status = uShellVcpMsgTransferPend(vcp, &msgTxLocal, USHELL_VCP_TX_TIMEOUT_MS);
+            if ((msgTxLocal != USHELL_VCP_MSG_TX_COMPLETE) ||
+                (status != USHELL_VCP_NO_ERR))
             {
                 status = USHELL_VCP_PORT_ERR;
                 break;
@@ -1910,7 +1930,6 @@ static UShellVcpErr_e uShellVcpWriteToPort(UShellVcp_s* const vcp)
             break;
         }
 
-        /* Send the message to the queue */
     } while (0);
 
     return status;

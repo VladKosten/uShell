@@ -43,7 +43,7 @@ extern "C" {
  * This macro defines the stack size allocated for the uShell thread.
  */
 #ifndef USHELL_VCP_THREAD_STACK_SIZE
-    #define USHELL_VCP_THREAD_STACK_SIZE 256U
+    #define USHELL_VCP_THREAD_STACK_SIZE 512U
 #endif
 
 /**
