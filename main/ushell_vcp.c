@@ -758,10 +758,6 @@ static void uShellWorker(void* const arg)
             case USHELL_VCP_EVENT_ERROR :
 
                 /* Process the error */
-                status = uShellVcpEventFlush(vcp);
-                USHELL_VCP_ASSERT(status == USHELL_VCP_NO_ERR);
-
-                /* Process the error */
                 status = uShellVcpMsgTransferFlush(vcp);
                 USHELL_VCP_ASSERT(status == USHELL_VCP_NO_ERR);
 
@@ -1593,7 +1589,7 @@ static UShellVcpErr_e uShellVcpEventSend(UShellVcp_s* const vcp,
     UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
     UShellOsalEventGroupHandle_t event = NULL;
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
-    UShellOsalEventGroupBits_e bits = 0U;
+    bool eventExist = false;
 
     /* Send the message to the queue */
     do
@@ -1607,29 +1603,24 @@ static UShellVcpErr_e uShellVcpEventSend(UShellVcp_s* const vcp,
         }
 
         /* Check we have these event */
-        bool eventExist = false;
         if (msgEvent & USHELL_VCP_EVENT_NONE)
         {
             eventExist = true;
         }
         if (msgEvent & USHELL_VCP_EVENT_RX_EVENT)
         {
-            bits |= USHELL_OSAL_EVENT_GROUP_BIT_0;
             eventExist = true;
         }
         if (msgEvent & USHELL_VCP_EVENT_TX_EVENT)
         {
-            bits |= USHELL_OSAL_EVENT_GROUP_BIT_1;
             eventExist = true;
         }
         if (msgEvent & USHELL_VCP_EVENT_ERROR)
         {
-            bits |= USHELL_OSAL_EVENT_GROUP_BIT_2;
             eventExist = true;
         }
         if (msgEvent & USHELL_VCP_EVENT_INSPECT)
         {
-            bits |= USHELL_OSAL_EVENT_GROUP_BIT_3;
             eventExist = true;
         }
 
@@ -1649,7 +1640,7 @@ static UShellVcpErr_e uShellVcpEventSend(UShellVcp_s* const vcp,
         }
 
         /* Send the message to the queue */
-        osalStatus = UShellEventGroupSetBits(osal, event, bits);
+        osalStatus = UShellEventGroupSetBits(osal, event, msgEvent);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             status = USHELL_VCP_PORT_ERR;
@@ -1676,10 +1667,14 @@ static UShellVcpErr_e uShellVcpEventWait(UShellVcp_s* const vcp,
     /* Local variable */
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
     UShellOsal_s* osal = (UShellOsal_s*) vcp->osal;
-    UShellOsalEventGroupHandle_t event = NULL;
+    UShellOsalEventGroupHandle_t eventHandle = NULL;
     UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
-    UShellVcpEvent_e msgEventLocal = USHELL_VCP_EVENT_NONE;
-    UShellOsalEventGroupBits_e bits = 0U;
+    UShellOsalEventGroupBits_e receivedBit = 0U;
+    UShellOsalEventGroupBits_e bitsToWait = USHELL_VCP_EVENT_ERROR |
+                                            USHELL_VCP_EVENT_RX_EVENT |
+                                            USHELL_VCP_EVENT_TX_EVENT |
+                                            USHELL_VCP_EVENT_INSPECT;
+    bool eventExist = false;
 
     /* Send the message to the queue */
     do
@@ -1694,27 +1689,50 @@ static UShellVcpErr_e uShellVcpEventWait(UShellVcp_s* const vcp,
         }
 
         /* Get the queue handle */
-        osalStatus = UShellOsalEventGroupHandleGet(osal, 0U, &event);
+        osalStatus = UShellOsalEventGroupHandleGet(osal, 0U, &eventHandle);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
-            (event == NULL))
+            (eventHandle == NULL))
         {
             status = USHELL_VCP_PORT_ERR;
             break;
         }
 
-        /* Get the message from the queue */
+        /* Get the event */
         osalStatus = UShellEventGroupBitsWait(osal,
-                                              event,
-                                              USHELL_OSAL_EVENT_GROUP_BIT_0 |
-                                                  USHELL_OSAL_EVENT_GROUP_BIT_1 |
-                                                  USHELL_OSAL_EVENT_GROUP_BIT_2 |
-                                                  USHELL_OSAL_EVENT_GROUP_BIT_3 |
-                                                  USHELL_OSAL_EVENT_GROUP_BIT_4,
-                                              &bits,
-                                              USHELL_OSAL_WAIT_FOREVER);
+                                              eventHandle,
+                                              bitsToWait,
+                                              &receivedBit,
+                                              true,
+                                              false);
 
-        /* Set the message event */
-        *msgEvent = msgEventLocal;
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
+        if (receivedBit & USHELL_VCP_EVENT_RX_EVENT)
+        {
+            *msgEvent = USHELL_VCP_EVENT_RX_EVENT;
+        }
+        else if (receivedBit & USHELL_VCP_EVENT_TX_EVENT)
+        {
+            *msgEvent = USHELL_VCP_EVENT_TX_EVENT;
+        }
+        else if (receivedBit & USHELL_VCP_EVENT_ERROR)
+        {
+            *msgEvent = USHELL_VCP_EVENT_ERROR;
+        }
+        else if (receivedBit & USHELL_VCP_EVENT_INSPECT)
+        {
+            *msgEvent = USHELL_VCP_EVENT_INSPECT;
+        }
+        else
+        {
+            status = USHELL_VCP_PORT_ERR;
+            break;
+        }
+
     }
 
     while (0);

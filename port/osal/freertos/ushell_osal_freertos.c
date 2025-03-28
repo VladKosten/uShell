@@ -2935,14 +2935,7 @@ UShellOsalErr_e uShellOsalFreertosEventGroupSetBits(void* const osal,
         else
         {
             /* Call from task */
-            xResult = xEventGroupSetBits((EventGroupHandle_t) eventGroupHandle, bitsToSet);
-
-            /* Check if all desired bits are set */
-            if ((xResult & bitsToSet) != bitsToSet)
-            {
-                retVal = USHELL_OSAL_EVENT_GROUP_SET_ERR;
-                break;
-            }
+            xEventGroupSetBits((EventGroupHandle_t) eventGroupHandle, bitsToSet);
         }
 
     } while (0);
