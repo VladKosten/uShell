@@ -36,17 +36,17 @@ typedef enum
 typedef char* UShellCmdHelp_t;
 
 /**
- * @brief Describe size of one item in the UShell.
+ * \brief Describe size of one item in the UShell.
  */
 typedef char UShellCmdItem_t;
 
 /**
- * @brief Describe a cmd port table.
+ * \brief Describe a cmd port table.
  */
 typedef struct
 {
     /**
-     * @brief Execute cmd
+     * \brief Execute cmd
      * \param[in] cmd - pointer to the cmd object
      * \param[in] arg - pointer to the arguments (Can be NULL and it means no arguments)
      * \param[in] out - pointer to the output buffer (Can be NULL and it means no output)

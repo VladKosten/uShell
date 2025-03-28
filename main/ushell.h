@@ -23,21 +23,21 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * @brief Description of the maximum number of commands in the UShell
+ * \brief Description of the maximum number of commands in the UShell
  */
 #ifndef USHELL_MAX_CMD
     #define USHELL_MAX_CMD 10
 #endif
 
 /**
- * @brief Description of the maximum size of the buffer in the UShell
+ * \brief Description of the maximum size of the buffer in the UShell
  */
 #ifndef USHELL_BUFFER_SIZE
     #define USHELL_BUFFER_SIZE 256
 #endif
 
 /**
- * @brief Description of the default password in the UShell
+ * \brief Description of the default password in the UShell
  */
 #ifndef USHELL_AUTH_PASSWORD
     #define USHELL_AUTH_PASSWORD "admin"
@@ -70,17 +70,17 @@ extern "C" {
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
- * @brief Describe size of one item in the UShell
+ * \brief Describe size of one item in the UShell
  */
 
 typedef char UShellItem_t;
 /**
- * @brief Describe feature of the UShell
+ * \brief Describe feature of the UShell
  */
 typedef bool UShellFeature_b;
 
 /**
- * @brief Enumeration of possible error codes returned by the UShell Hal module.
+ * \brief Enumeration of possible error codes returned by the UShell Hal module.
  */
 typedef enum
 {
@@ -95,7 +95,7 @@ typedef enum
 } UShellErr_e;
 
 /**
- * @brief Description of the uShell IO object
+ * \brief Description of the uShell IO object
  * @note This object is used to store the buffer for input/output operations in the uShell
  */
 typedef struct
@@ -106,7 +106,7 @@ typedef struct
 } UShellIo_s;
 
 /**
- * @brief Enumeration of the uShell finite state machine states.
+ * \brief Enumeration of the uShell finite state machine states.
  *
  * This enumeration defines the different states in which the uShell can operate.
  * These states include:
@@ -124,7 +124,7 @@ typedef enum
 } UShellFsmState_e;
 
 /**
- * @brief Description of the uShell object
+ * \brief Description of the uShell object
  */
 typedef enum
 
@@ -153,7 +153,7 @@ typedef struct
 } UShellCfg_s;
 
 /**
- * @brief Description of the uShell object
+ * \brief Description of the uShell object
  */
 typedef struct
 {
@@ -178,14 +178,14 @@ typedef struct
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
- * @brief Init uShell object
+ * \brief Init uShell object
  * \param[in] uShell - uShell object to be initialized
  * \param[in] osal - osal object
  * \param[in] vcs - vcp object
  * \param[in] parent - parent object
  * \param[in] name - name of the object
  * \param[out] none
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
@@ -195,41 +195,41 @@ UShellErr_e UShellInit(UShell_s* const uShell,
                        const char* const name);
 
 /**
- * @brief DeInit uShell object
+ * \brief DeInit uShell object
  * \param[in] uShell - uShell object to be deinitialized
  * \param[out] none
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellDeInit(UShell_s* const uShell);
 
 /**
- * @brief Run uShell object
+ * \brief Run uShell object
  * \param[in] uShell - uShell object to be run
  * \param[out] none
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellRun(UShell_s* const uShell);
 
 /**
- * @brief Stop uShell object
+ * \brief Stop uShell object
  * \param[in] uShell - uShell object to be stopped
  * \param[out] none
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellStop(UShell_s* const uShell);
 
 /**
- * @brief Attach command to uShell object
+ * \brief Attach command to uShell object
  * \param[in] uShell - uShell object
  * \param[in] cmd - command to be attached
  * \param[out] none
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellCmdAttach(UShell_s* const uShell,
                             const UShellCmd_s* const cmd);
 
 /**
- * @brief Detach command from uShell object
+ * \brief Detach command from uShell object
  * \param[in] uShell - uShell object
  * \param[in] cmd - command to be detached
  * \param[out] none

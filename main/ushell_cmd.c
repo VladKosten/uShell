@@ -1,6 +1,6 @@
 /**
  * \file         ushell_cmd.c
- * @brief        The file contains the implementation of the UShell command module.
+ * \brief        The file contains the implementation of the UShell command module.
  *               Object UShellCmd is a parent object for the command objects.
  * \authors      Vladislav Kosten (vladkosten@gmail.com)
  * \copyright    MIT License (c) 2025
@@ -13,7 +13,7 @@
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
 /**
- * @brief Assert macro for the UShellHal module.
+ * \brief Assert macro for the UShellHal module.
  */
 #ifndef USHELL_CMD_ASSERT
     #ifdef USHELL_ASSERT
@@ -73,10 +73,10 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
 }
 
 /**
- * @brief Deinitialize the UShell  module.
+ * \brief Deinitialize the UShell  module.
  * \param [in] cmd - UShellOsal obj to be deinitialized
  * \param [out] none
- * @return UShellOsalErr_e - error code
+ * \return UShellOsalErr_e - error code
  */
 UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd)
 {
@@ -93,10 +93,10 @@ UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd)
 }
 
 /**
- * @brief Get the name of the UShell  module.
+ * \brief Get the name of the UShell  module.
  * \param [in] cmd - UShellOsal obj
  * \param [out] name - name of the object
- * @return UShellOsalErr_e - error code
+ * \return UShellOsalErr_e - error code
  */
 UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd,
                                 char** const name)
@@ -115,10 +115,10 @@ UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd,
 }
 
 /**
- * @brief Get the help string of the cmd.
+ * \brief Get the help string of the cmd.
  * \param [in] cmd - UShellOsal obj
  * \param [out] help - help string
- * @return UShellOsalErr_e - error code
+ * \return UShellOsalErr_e - error code
  */
 UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const help)
 {

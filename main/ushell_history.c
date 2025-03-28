@@ -1,6 +1,6 @@
 /**
  * \file         ushell_history.c
- * @brief        The file contains the implementation of the UShell history module.
+ * \brief        The file contains the implementation of the UShell history module.
  * \warning      A warning may be placed here...
  * \bug          Bug report may be placed here...
  * \authors      Vladislav Kosten (vladkosten@gmail.com)
@@ -12,7 +12,7 @@
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
 /**
- * @brief Assert macro for the UShellHal module.
+ * \brief Assert macro for the UShellHal module.
  */
 #ifndef USHELL_HISTORY_ASSERT
     #ifdef USHELL_ASSERT
@@ -29,10 +29,10 @@
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
- * @brief Initialize UShell history object
+ * \brief Initialize UShell history object
  * @param[in] history - uShell history object to be initialized
  * @param[in] parent - parent object
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryInit(UShellHistory_s* const history,
                                      const void* const parent)
@@ -66,9 +66,9 @@ UShellHistoryErr_e UShellHistoryInit(UShellHistory_s* const history,
 }
 
 /**
- * @brief Deinit UShell history object
+ * \brief Deinit UShell history object
  * @param[in] history - uShell history object to be deinitialized
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryDeInit(UShellHistory_s* const history)
 {
@@ -97,10 +97,10 @@ UShellHistoryErr_e UShellHistoryDeInit(UShellHistory_s* const history)
 }
 
 /**
- * @brief Add command string to the history buffer
+ * \brief Add command string to the history buffer
  * @param history - uShell history object
  * @param str - command string to be added
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryAdd(UShellHistory_s* const history,
                                     const char* const str)
@@ -134,11 +134,11 @@ UShellHistoryErr_e UShellHistoryAdd(UShellHistory_s* const history,
 }
 
 /**
- * @brief Get command string from the history buffer
+ * \brief Get command string from the history buffer
  * @param[in] history - uShell history object
  * @param[out] str - buffer for the retrieved command string
  * @param[in] index - offset from the last command in the history
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryGetByIndex(UShellHistory_s* const history,
                                            char* const str,
@@ -173,11 +173,11 @@ UShellHistoryErr_e UShellHistoryGetByIndex(UShellHistory_s* const history,
 }
 
 /**
- * @brief Find cmd in the history buffer
+ * \brief Find cmd in the history buffer
  * @param[in] history - uShell history object
  * @param[in] str - command string to be found
  * @param[in] index - index of the command string in the history buffer
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryFindCmd(UShellHistory_s* const history,
                                         const char* const str,

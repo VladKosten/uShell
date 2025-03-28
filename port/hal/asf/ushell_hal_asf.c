@@ -72,37 +72,37 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
                                                      void** const parent);
 
 /**
- * @brief Open function.
+ * \brief Open function.
  * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortOpen(void* const hal);
 
 /**
- * @brief Close function.
+ * \brief Close function.
  * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortClose(void* const hal);
 
 /**
- * @brief Write function.
+ * \brief Write function.
  * @param[in] hal Pointer to the HAL instance.
  * @param[in] data Pointer to the data to be written.
  * @param[in] size Size of the data to be written.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortWrite(void* const hal,
                                          const UShellHalItem_t* const data,
                                          const size_t size);
 
 /**
- * @brief Read function.
+ * \brief Read function.
  * @param hal - Pointer to the HAL instance.
  * @param data - Pointer to the buffer to store the read data.
  * @param buffSize - Size of the buffer.
  * @param usedSize - Pointer to the variable to store the size of the data read.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortRead(void* const hal,
                                         UShellHalItem_t* const data,
@@ -110,17 +110,17 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
                                         size_t* const usedSize);
 
 /**
- * @brief Set Tx mode
+ * \brief Set Tx mode
  * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  *
  */
 static UShellHalErr_e uShellHalPortSetTxMode(void* const hal);
 
 /**
- * @brief Set Rx mode
+ * \brief Set Rx mode
  * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortSetRxMode(void* const hal);
 
@@ -146,7 +146,7 @@ static void uShellHalPortRxReceiveCb(const struct usart_async_descriptor* const 
 static void uShellHalPortTxCompleteCb(const struct usart_async_descriptor* const usart);
 
 /**
- * @brief Table of uShell HAL port operation functions.
+ * \brief Table of uShell HAL port operation functions.
  *
  * This structure holds pointers to the functions implementing the uShell HAL
  * port operations. These include opening, closing, reading from, writing to the
@@ -162,7 +162,7 @@ static UShellHalPortTable_s ushellHalPortTable = {
 };
 
 /**
- * @brief For store context from interrupt
+ * \brief For store context from interrupt
  */
 static USHellPortLink_s uShellPortLink = {
     .parent = NULL,
@@ -425,9 +425,9 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
 }
 
 /**
- * @brief Open function.
+ * \brief Open function.
  * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortOpen(void* const hal)
 {
@@ -488,9 +488,9 @@ static UShellHalErr_e uShellHalPortOpen(void* const hal)
 }
 
 /**
- * @brief Close function.
+ * \brief Close function.
  * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortClose(void* const hal)
 {
@@ -548,11 +548,11 @@ static UShellHalErr_e uShellHalPortClose(void* const hal)
 }
 
 /**
- * @brief Write function.
+ * \brief Write function.
  * @param[in] hal Pointer to the HAL instance.
  * @param[in] data Pointer to the data to be written.
  * @param[in] size Size of the data to be written.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortWrite(void* const hal,
                                          const UShellHalItem_t* const data,
@@ -595,11 +595,11 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
 }
 
 /**
- * @brief Read function.
+ * \brief Read function.
  * @param[in] hal Pointer to the HAL instance.
  * @param[out] data Pointer to the buffer to store the read data.
  * @param[in] size Size of the buffer.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortRead(void* const hal,
                                         UShellHalItem_t* const data,
@@ -642,9 +642,9 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
 }
 
 /**
- * @brief Set Tx mode
+ * \brief Set Tx mode
  * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  *
  */
 static UShellHalErr_e uShellHalPortSetTxMode(void* const hal)
@@ -683,9 +683,9 @@ static UShellHalErr_e uShellHalPortSetTxMode(void* const hal)
 }
 
 /**
- * @brief Set Rx mode
+ * \brief Set Rx mode
  * @param[in] hal Pointer to the HAL instance.
- * @return Error code indicating the result of the operation.
+ * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortSetRxMode(void* const hal)
 {

@@ -28,14 +28,14 @@
 #endif
 
 /**
- * @brief DioMonitor startup OS-port type
+ * \brief DioMonitor startup OS-port type
  *
  * This type defines the OSAL port implementation for the DioMonitor startup.
  */
 typedef USHELL_STARTUP_OSAL_PORT_TYPE UShellStartupOsal_s;
 
 /**
- * @brief DioMonitor startup HW-port type
+ * \brief DioMonitor startup HW-port type
  *
  * This type defines the HAL port implementation for the DioMonitor startup.
  */
@@ -49,7 +49,7 @@ typedef USHELL_STARTUP_HAL_PORT_TYPE UShellStartupHal_s;
 UShell_s uShellObj = {0};
 
 /**
- * @brief Instance of the uShell VCP
+ * \brief Instance of the uShell VCP
  */
 UShellVcp_s uShellVcpObj = {0};
 
@@ -71,9 +71,9 @@ static UShellStartupHal_s uShellStartupVcpHalObj = {0};
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]=====================================================================
 
 /**
- * @brief uShell VCP initialization
- * @param void
- * @return int16_t - error code. non-zero = an error has occurred;
+ * \brief uShell VCP initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
  */
 static int16_t uShellVcpInit(void);
 
@@ -136,9 +136,9 @@ int16_t UShellStartup(void)
 }
 
 /**
- * @brief uShell VCP initialization
- * @param void
- * @return int16_t - error code. non-zero = an error has occurred;
+ * \brief uShell VCP initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
  */
 static int16_t uShellVcpInit(void)
 {

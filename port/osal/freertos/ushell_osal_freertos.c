@@ -1,6 +1,6 @@
 /**
  * \file       ushell_osal_freertos.c
- * @brief      UShell OSAL FreeRTOS portable layer
+ * \brief      UShell OSAL FreeRTOS portable layer
  * \author     Vladislav Kosten (vladkosten@gmail.com)
  * \copyright    MIT License (c) 2025
  * \warning    A warning may be placed here...
@@ -21,13 +21,13 @@
 //=====================================================================[ INTERNAL MACRO DEFENITIONS ]==============================================================================
 
 /**
- * @brief UShell OSAL ASSERT macro definition for FreeRTOS.
+ * \brief UShell OSAL ASSERT macro definition for FreeRTOS.
  *
  * This macro is used to perform assertions in the UShell Operating System Abstraction Layer (OSAL)
  * specific to FreeRTOS. If `USHELL_OSAL_ASSERT` is defined, `USHELL_OSAL_FREERTOS_ASSERT` will use it
  * to perform the assertion. Otherwise, `USHELL_OSAL_FREERTOS_ASSERT` will be defined as an empty macro.
  *
- * @param[in] cond The condition to be asserted.
+ * \param[in] cond The condition to be asserted.
  */
 #ifndef USHELL_OSAL_FREERTOS_ASSERT
     #ifdef USHELL_OSAL_ASSERT
@@ -48,12 +48,12 @@
 static TickType_t uShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs);
 
 /**
- * @brief Create the queue
- * @param[in]   osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in]   queueItemSize - the size of the queue item
- * @param[in]   queueDepth    - queue depth
- * @param[out]  queueHandle   - queue handle that was created
- * @return UShellOsalErr_e error code
+ * \brief Create the queue
+ * \param[in]   osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in]   queueItemSize - the size of the queue item
+ * \param[in]   queueDepth    - queue depth
+ * \param[out]  queueHandle   - queue handle that was created
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueCreate(void* const osalFreertos,
                                                      const size_t queueItemSize,
@@ -61,32 +61,32 @@ static UShellOsalErr_e uShellOsalFreertosQueueCreate(void* const osalFreertos,
                                                      UShellOsalQueueHandle_t* const queueHandle);
 
 /**
- * @brief Delete the queue
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - queue handle to be deleted
- * @return UShellOsalErr_e error code
+ * \brief Delete the queue
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - queue handle to be deleted
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueDelete(void* const osalFreertos,
                                                      const UShellOsalQueueHandle_t queueHandle);
 
 /**
- * @brief Put the item to the queue
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - the handle to the queue on which the item is to be put
- * @param[in] queueItemPtr  - pointer to the item source buff
- * @return UShellOsalErr_e error code
+ * \brief Put the item to the queue
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - the handle to the queue on which the item is to be put
+ * \param[in] queueItemPtr  - pointer to the item source buff
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemPut(void* const osalFreertos,
                                                       const UShellOsalQueueHandle_t queueHandle,
                                                       const void* const queueItemPtr);
 
 /**
- * @brief Put the item to the queue with specified waiting time
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - the handle to the queue on which the item is to be posted.
- * @param[in] queueItemPtr  - pointer to the item source buff
- * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
- * @return UShellOsalErr_e error code
+ * \brief Put the item to the queue with specified waiting time
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - the handle to the queue on which the item is to be posted.
+ * \param[in] queueItemPtr  - pointer to the item source buff
+ * \param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemPost(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
@@ -94,34 +94,34 @@ static UShellOsalErr_e uShellOsalFreertosQueueItemPost(void* const osalFreertos,
                                                        const uint32_t timeoutMs);
 
 /**
- * @brief Get the item from the queue [NON-BLOCKING CALL]
- * @param[in]   osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in]   queueHandle   - the handle to the queue from which the item is to be received.
- * @param[out]  queueItemPtr  - tointer to the buffer into which the received item will be copied
- * @return UShellOsalErr_e error code
+ * \brief Get the item from the queue [NON-BLOCKING CALL]
+ * \param[in]   osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in]   queueHandle   - the handle to the queue from which the item is to be received.
+ * \param[out]  queueItemPtr  - tointer to the buffer into which the received item will be copied
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemGet(void* const osalFreertos,
                                                       const UShellOsalQueueHandle_t queueHandle,
                                                       void* const queueItemPtr);
 
 /**
- * @brief Get the item from the queue [BLOCKING CALL]
- * @param[in]   osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in]   queueHandle   - the handle to the queue from which the item is to be received.
- * @param[out]  queueItemPtr  - pointer to the buffer into which the received item will be copied
- * @return UShellOsalErr_e error code
+ * \brief Get the item from the queue [BLOCKING CALL]
+ * \param[in]   osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in]   queueHandle   - the handle to the queue from which the item is to be received.
+ * \param[out]  queueItemPtr  - pointer to the buffer into which the received item will be copied
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemWait(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
                                                        void* const queueItemPtr);
 
 /**
- * @brief Get the item from the queue with specified waiting time
- * @param[in]   osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in]   queueHandle   - the handle to the queue from which the item is to be received.
- * @param[out]  queueItemPtr  - pointer to the buffer into which the received item will be copied
- * @param[in]   timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
- * @return UShellOsalErr_e error code
+ * \brief Get the item from the queue with specified waiting time
+ * \param[in]   osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in]   queueHandle   - the handle to the queue from which the item is to be received.
+ * \param[out]  queueItemPtr  - pointer to the buffer into which the received item will be copied
+ * \param[in]   timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemPend(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
@@ -129,93 +129,93 @@ static UShellOsalErr_e uShellOsalFreertosQueueItemPend(void* const osalFreertos,
                                                        const uint32_t timeoutMs);
 
 /**
- * @brief  Reset the queue
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - the handle to the queue to be reset
- * @return UShellOsalErr_e error code
+ * \brief  Reset the queue
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - the handle to the queue to be reset
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueReset(void* const osalFreertos,
                                                     const UShellOsalQueueHandle_t queueHandle);
 
 /**
- * @brief Create the lock object
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[out] lockObjHandle - lock object handle that was created
- * @return UShellOsalErr_e error code
+ * \brief Create the lock object
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[out] lockObjHandle - lock object handle that was created
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosLockObjCreate(void* const osalFreertos,
                                                        UShellOsalLockObjHandle_t* const lockObjHandle);
 
 /**
- * @brief Delete the lock object
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - lock object handle to be deleted
- * @return UShellOsalErr_e error code
+ * \brief Delete the lock object
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - lock object handle to be deleted
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosLockObjDelete(void* const osalFreertos,
                                                        const UShellOsalLockObjHandle_t lockObjHandle);
 
 /**
- * @brief Lock the operation
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - lock object handle
- * @return UShellOsalErr_e error code
+ * \brief Lock the operation
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - lock object handle
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosLock(void* const osalFreertos,
                                               const UShellOsalLockObjHandle_t lockObjHandle);
 
 /**
- * @brief Unlock the operation
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - lock object handle
- * @return UShellOsalErr_e error code
+ * \brief Unlock the operation
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - lock object handle
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosUnlock(void* const osalFreertos,
                                                 const UShellOsalLockObjHandle_t lockObjHandle);
 
 /**
- * @brief Create the thread
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[out] threadHandle - thread handle that was created
- * @param[in] threadCfg     - thread configuration structure
- * @return UShellOsalErr_e error code
+ * \brief Create the thread
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[out] threadHandle - thread handle that was created
+ * \param[in] threadCfg     - thread configuration structure
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosThreadCreate(void* const osalFreertos,
                                                       UShellOsalThreadHandle_t* const threadHandle,
                                                       UShellOsalThreadCfg_s threadCfg);
 
 /**
- * @brief Delete the thread
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] threadHandle  - thread handle to be deleted
- * @return UShellOsalErr_e error code
+ * \brief Delete the thread
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] threadHandle  - thread handle to be deleted
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosThreadDelete(void* const osalFreertos,
                                                       const UShellOsalThreadHandle_t threadHandle);
 
 /**
- * @brief Suspend the thread
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] threadHandle  - thread handle to be suspended
- * @return UShellOsalErr_e error code
+ * \brief Suspend the thread
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] threadHandle  - thread handle to be suspended
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosThreadSuspend(void* const osalFreertos,
                                                        const UShellOsalThreadHandle_t threadHandle);
 
 /**
- * @brief Resume the thread
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] threadHandle  - thread handle to be resumed
- * @return UShellOsalErr_e error code
+ * \brief Resume the thread
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] threadHandle  - thread handle to be resumed
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosThreadResume(void* const osalFreertos,
                                                       const UShellOsalThreadHandle_t threadHandle);
 
 /**
- * @brief delay the thread
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] msDelay       - delay in milliseconds
- * @return UShellOsalErr_e error code
+ * \brief delay the thread
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] msDelay       - delay in milliseconds
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosThreadDelay(const void* const osalFreertos,
                                                      const uint32_t msDelay);
@@ -241,7 +241,7 @@ static UShellOsalErr_e uShellOsalFreertosSemaphoreAcquire(void* const osalFreert
                                                           const UShellOsalSemaphoreHandle_t semaphoreHandle);
 
 /**
- * @brief Acquire a semaphore with timeout
+ * \brief Acquire a semaphore with timeout
  */
 static UShellOsalErr_e uShellOsalFreertosSemaphoreAcquirePend(void* const osalFreertos,
                                                               const UShellOsalSemaphoreHandle_t semaphoreHandle,
@@ -307,7 +307,7 @@ static size_t uShellOsalFreertosStreamBuffReceive(void* const osalFreertos,
                                                   const uint32_t msToWait);
 
 /**
- * @brief Receive data from the stream buffer (blocking, no timeout)
+ * \brief Receive data from the stream buffer (blocking, no timeout)
  */
 static size_t uShellOsalFreertosStreamBuffReceiveBlocking(void* const osalFreertos,
                                                           const UShellOsalStreamBuffHandle_t streamBuffHandle,
@@ -321,28 +321,28 @@ static UShellOsalErr_e uShellOsalFreertosStreamBuffReset(void* const osalFreerto
                                                          const UShellOsalStreamBuffHandle_t streamBuffHandle);
 
 /**
- * @brief Find the queue handle in the queue handles table
- * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
- * @param[in] queueHandle  - queue handle to be found
- * @return uint16_t - index of the queue handle in the table
+ * \brief Find the queue handle in the queue handles table
+ * \param[in] osalFreeRtos - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle  - queue handle to be found
+ * \return uint16_t - index of the queue handle in the table
  */
 static inline uint16_t uShellOsalFreertosFindQueueHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                          const UShellOsalQueueHandle_t queueHandle);
 
 /**
- * @brief Find the lock object handle in the lock objects table
- * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - lock object handle to be found
- * @return uint16_t - index of the lock object handle in the table
+ * \brief Find the lock object handle in the lock objects table
+ * \param[in] osalFreeRtos - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - lock object handle to be found
+ * \return uint16_t - index of the lock object handle in the table
  */
 static inline uint16_t uShellOsalFreertosFindLockObjHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                            const UShellOsalLockObjHandle_t lockObjHandle);
 
 /**
- * @brief Find the thread handle in the thread objects table
- * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
- * @param[in] threadHandle - thread handle to be found
- * @return uint16_t - index of the thread handle in the table
+ * \brief Find the thread handle in the thread objects table
+ * \param[in] osalFreeRtos - pointer to FreeRTOS osal instance
+ * \param[in] threadHandle - thread handle to be found
+ * \return uint16_t - index of the thread handle in the table
  */
 static inline uint16_t uShellOsalFreertosFindThreadHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                           const UShellOsalThreadHandle_t threadHandle);
@@ -354,7 +354,7 @@ static inline uint16_t uShellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_
                                                              const UShellOsalSemaphoreHandle_t semaphoreHandle);
 
 /**
- * @brief Find the stream buffer handle in the stream buffers table
+ * \brief Find the stream buffer handle in the stream buffers table
  */
 static inline uint16_t uShellOsalFreertosFindStreamBuffHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                               const UShellOsalStreamBuffHandle_t streamBuffHandle);
@@ -366,7 +366,7 @@ static inline uint16_t uShellOsalFreertosFindTimerHandle(UShellOsalFreertos_s* c
                                                          const UShellOsalTimerHandle_t timerHandle);
 
 /**
- * @brief Find the event group handle in the event groups table
+ * \brief Find the event group handle in the event groups table
  */
 static inline uint16_t uShellOsalFreertosFindEventGroupHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                               const UShellOsalEventGroupHandle_t eventGroupHandle);
@@ -437,55 +437,55 @@ static UShellOsalErr_e uShellOsalFreertosTimerSetPeriod(void* const osalFreertos
 static void uShellOsalFreertosTimerCallback(TimerHandle_t xTimer);
 
 /**
- * @brief Create an event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @return Error code indicating the result of the operation.
+ * \brief Create an event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupCreate(void* const osal,
                                                    UShellOsalEventGroupHandle_t* const eventGroupHandle);
 
 /**
- * @brief Create an event group with a specific name.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @param[in] name Name of the event group.
- * @return Error code indicating the result of the operation.
+ * \brief Create an event group with a specific name.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * \param[in] name Name of the event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupDelete(void* const osal,
                                                    const UShellOsalEventGroupHandle_t eventGroupHandle);
 
 /**
- * @brief Set a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToSet Bits to set in the event group.
- * @return Error code indicating the result of the operation.
+ * \brief Set a bit in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[in] bitsToSet Bits to set in the event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupSetBits(void* const osal,
                                                     const UShellOsalEventGroupHandle_t eventGroupHandle,
                                                     const UShellOsalEventGroupBits_e bitsToSet);
 
 /**
- * @brief Clear a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToClear Bits to clear in the event group.
- * @return Error code indicating the result of the operation.
+ * \brief Clear a bit in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[in] bitsToClear Bits to clear in the event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupClearBits(void* const osal,
                                                       const UShellOsalEventGroupHandle_t eventGroupHandle,
                                                       const UShellOsalEventGroupBits_e bitsToClear);
 
 /**
- * @brief Wait for bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToWait Bits to wait for in the event group.
- * @param[out] bitsReceived Pointer to store the received bits.
- * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
- * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
- * @return Error code indicating the result of the operation.
+ * \brief Wait for bits in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[in] bitsToWait Bits to wait for in the event group.
+ * \param[out] bitsReceived Pointer to store the received bits.
+ * \param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * \param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupBitsWait(void* const osal,
                                                      const UShellOsalEventGroupHandle_t eventGroupHandle,
@@ -495,26 +495,26 @@ UShellOsalErr_e uShellOsalFreertosEventGroupBitsWait(void* const osal,
                                                      const bool waitAllBits);
 
 /**
- * @brief Get the active bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[out] bitsActive Pointer to store the active bits.
- * @return Error code indicating the result of the operation.
+ * \brief Get the active bits in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[out] bitsActive Pointer to store the active bits.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupBitsActiveGet(void* const osal,
                                                           const UShellOsalEventGroupHandle_t eventGroupHandle,
                                                           UShellOsalEventGroupBits_e* const bitsActive);
 
 /**
- * @brief Perform thread parameters validation procedure
+ * \brief Perform thread parameters validation procedure
  *        in terms of the requirements of the FreeRTOS
- * @param[in] threadCfg - pointer to the thread configuration structure
- * @return bool - true if the parameters are valid, false otherwise
+ * \param[in] threadCfg - pointer to the thread configuration structure
+ * \return bool - true if the parameters are valid, false otherwise
  */
 static bool uShellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const threadCfg);
 
 /**
- * @brief FreeRTOS priority levels hash-table.
+ * \brief FreeRTOS priority levels hash-table.
  *
  * This static constant array defines the mapping of UShell OSAL thread priority levels
  * to FreeRTOS-specific priority levels. The array size is determined by the enumeration
@@ -528,7 +528,7 @@ static const UBaseType_t UShellOsalFreertosThreadPriority [USHELL_OSAL_THREAD_PR
         USHELL_OSAL_FREERTOS_THREAD_PRIO_ULTRA};
 
 /**
- * @brief UShell FreeRTOS OSAL portable structure.
+ * \brief UShell FreeRTOS OSAL portable structure.
  *
  * This static constant structure defines the function pointers for operations needed to port
  * the UShell Operating System Abstraction Layer (OSAL) to FreeRTOS. It includes functions for
@@ -582,11 +582,11 @@ static const UShellOsalPortable_s FreeRtosPortable =
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
 
 /**
- * @brief Initialize the UShell FreeRTOS osal instance
- * @param[in] osalFreertos - pointer to FreeRTOS osal instance
- * @param[in] name         - pointer to the name of the OSAL instance [optional]
- * @param[in] parent       - pointer to a parent object [optional]
- * @return UShellOsalErr_e error code.
+ * \brief Initialize the UShell FreeRTOS osal instance
+ * \param[in] osalFreertos - pointer to FreeRTOS osal instance
+ * \param[in] name         - pointer to the name of the OSAL instance [optional]
+ * \param[in] parent       - pointer to a parent object [optional]
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s* const osalFreertos,
                                        const char* name,
@@ -624,9 +624,9 @@ UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s* const osalFreertos,
 }
 
 /**
- * @brief Deinitialize UShell FreeRTOS OSAL instance
- * @param[in] osalFreertos - pointer to osal FreeRTOS instance
- * @return UShellOsalErr_e error code.
+ * \brief Deinitialize UShell FreeRTOS OSAL instance
+ * \param[in] osalFreertos - pointer to osal FreeRTOS instance
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreertos)
 {
@@ -733,12 +733,12 @@ static TickType_t uShellOsalFreertosSafeTimeoutToTicks(const uint32_t timeoutMs)
 }
 
 /**
- * @brief Create the queue
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueItemSize - the size of the queue item
- * @param[in] queueDepth    - queue depth
- * @param[out] queueHandle  - queue handle that was created
- * @return UShellOsalErr_e error code
+ * \brief Create the queue
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueItemSize - the size of the queue item
+ * \param[in] queueDepth    - queue depth
+ * \param[out] queueHandle  - queue handle that was created
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueCreate(void* const osalFreertos,
                                                      const size_t queueItemSize,
@@ -800,10 +800,10 @@ static UShellOsalErr_e uShellOsalFreertosQueueCreate(void* const osalFreertos,
 }
 
 /**
- * @brief Delete the queue
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - queue handle to be deleted
- * @return UShellOsalErr_e error code
+ * \brief Delete the queue
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - queue handle to be deleted
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueDelete(void* const osalFreertos,
                                                      const UShellOsalQueueHandle_t queueHandle)
@@ -860,11 +860,11 @@ static UShellOsalErr_e uShellOsalFreertosQueueDelete(void* const osalFreertos,
 }
 
 /**
- * @brief Put the item to the queue
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - the handle to the queue on which the item is to be put
- * @param[in] queueItemPtr  - pointer to the item source buff
- * @return UShellOsalErr_e error code
+ * \brief Put the item to the queue
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - the handle to the queue on which the item is to be put
+ * \param[in] queueItemPtr  - pointer to the item source buff
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemPut(void* const osalFreertos,
                                                       const UShellOsalQueueHandle_t queueHandle,
@@ -929,13 +929,13 @@ static UShellOsalErr_e uShellOsalFreertosQueueItemPut(void* const osalFreertos,
 }
 
 /**
- * @brief Put the item to the queue
+ * \brief Put the item to the queue
  * \note  (BLOCKING CALL WITH SPECIFIED WAIT)
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - the handle to the queue on which the item is to be posted.
- * @param[in] queueItemPtr  - pointer to the item source buff
- * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
- * @return UShellOsalErr_e error code
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - the handle to the queue on which the item is to be posted.
+ * \param[in] queueItemPtr  - pointer to the item source buff
+ * \param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemPost(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
@@ -1006,11 +1006,11 @@ static UShellOsalErr_e uShellOsalFreertosQueueItemPost(void* const osalFreertos,
 }
 
 /**
- * @brief Get the item from the queue [BLOCKING CALL]
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - the handle to the queue from which the item is to be received.
- * @param[in] queueItemPtr  - tointer to the buffer into which the received item will be copied
- * @return UShellOsalErr_e error code
+ * \brief Get the item from the queue [BLOCKING CALL]
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - the handle to the queue from which the item is to be received.
+ * \param[in] queueItemPtr  - tointer to the buffer into which the received item will be copied
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemGet(void* const osalFreertos,
                                                       const UShellOsalQueueHandle_t queueHandle,
@@ -1085,11 +1085,11 @@ static UShellOsalErr_e uShellOsalFreertosQueueItemGet(void* const osalFreertos,
 }
 
 /**
- * @brief Get the item from the queue [BLOCKING CALL]
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - the handle to the queue from which the item is to be received.
- * @param[in] queueItemPtr  - pointer to the buffer into which the received item will be copied
- * @return UShellOsalErr_e error code
+ * \brief Get the item from the queue [BLOCKING CALL]
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - the handle to the queue from which the item is to be received.
+ * \param[in] queueItemPtr  - pointer to the buffer into which the received item will be copied
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemWait(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
@@ -1154,13 +1154,13 @@ static UShellOsalErr_e uShellOsalFreertosQueueItemWait(void* const osalFreertos,
 }
 
 /**
- * @brief Get the item from the queue
+ * \brief Get the item from the queue
  * \note  (BLOCKING CALL WITH SPECIFIED WAIT)
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] queueHandle   - the handle to the queue from which the item is to be received.
- * @param[in] queueItemPtr  - pointer to the buffer into which the received item will be copied
- * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
- * @return UShellOsalErr_e error code
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle   - the handle to the queue from which the item is to be received.
+ * \param[in] queueItemPtr  - pointer to the buffer into which the received item will be copied
+ * \param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueItemPend(void* const osalFreertos,
                                                        const UShellOsalQueueHandle_t queueHandle,
@@ -1231,10 +1231,10 @@ static UShellOsalErr_e uShellOsalFreertosQueueItemPend(void* const osalFreertos,
 }
 
 /**
- * @brief Reset the queue
- * @param[in][in]  osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in][in]  queueHandle   - the handle the queue to reset .
- * @return UShellOsalErr_e error code
+ * \brief Reset the queue
+ * \param[in][in]  osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in][in]  queueHandle   - the handle the queue to reset .
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosQueueReset(void* const osalFreertos,
                                                     const UShellOsalQueueHandle_t queueHandle)
@@ -1294,10 +1294,10 @@ static UShellOsalErr_e uShellOsalFreertosQueueReset(void* const osalFreertos,
 }
 
 /**
- * @brief Create the lock object
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - lock object handle that was created
- * @return UShellOsalErr_e error code.
+ * \brief Create the lock object
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - lock object handle that was created
+ * \return UShellOsalErr_e error code.
  */
 static UShellOsalErr_e uShellOsalFreertosLockObjCreate(void* const osalFreertos,
                                                        UShellOsalLockObjHandle_t* const lockObjHandle)
@@ -1349,10 +1349,10 @@ static UShellOsalErr_e uShellOsalFreertosLockObjCreate(void* const osalFreertos,
 }
 
 /**
- * @brief Delete the lock object
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - lock object to deleted
- * @return UShellOsalErr_e error code.
+ * \brief Delete the lock object
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - lock object to deleted
+ * \return UShellOsalErr_e error code.
  */
 static UShellOsalErr_e uShellOsalFreertosLockObjDelete(void* const osalFreertos,
                                                        const UShellOsalLockObjHandle_t lockObjHandle)
@@ -1389,10 +1389,10 @@ static UShellOsalErr_e uShellOsalFreertosLockObjDelete(void* const osalFreertos,
 }
 
 /**
- * @brief Lock the operation
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - the lock object handle
- * @return UShellOsalErr_e error code.
+ * \brief Lock the operation
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - the lock object handle
+ * \return UShellOsalErr_e error code.
  */
 static UShellOsalErr_e uShellOsalFreertosLock(void* const osalFreertos,
                                               const UShellOsalLockObjHandle_t lockObjHandle)
@@ -1431,10 +1431,10 @@ static UShellOsalErr_e uShellOsalFreertosLock(void* const osalFreertos,
 }
 
 /**
- * @brief Unlock the operation
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - the lock object handle
- * @return UShellOsalErr_e error code.
+ * \brief Unlock the operation
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - the lock object handle
+ * \return UShellOsalErr_e error code.
  */
 static UShellOsalErr_e uShellOsalFreertosUnlock(void* const osalFreertos,
                                                 const UShellOsalLockObjHandle_t lockObjHandle)
@@ -1473,11 +1473,11 @@ static UShellOsalErr_e uShellOsalFreertosUnlock(void* const osalFreertos,
 }
 
 /**
- * @brief Create the thread
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] threadHandle  - thread handle by which created thread can be referenced
- * @param[in] threadCfg     - thread configuration
- * @return UShellOsalErr_e error code
+ * \brief Create the thread
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] threadHandle  - thread handle by which created thread can be referenced
+ * \param[in] threadCfg     - thread configuration
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosThreadCreate(void* const osalFreertos,
                                                       UShellOsalThreadHandle_t* const threadHandle,
@@ -1546,10 +1546,10 @@ static UShellOsalErr_e uShellOsalFreertosThreadCreate(void* const osalFreertos,
 }
 
 /**
- * @brief Delete the thread
- * @param[in] osalFreertos - pointer to FreeRTOS osal instance
- * @param[in] threadHandle - the handle of the thread being deleted
- * @return UShellOsalErr_e error code
+ * \brief Delete the thread
+ * \param[in] osalFreertos - pointer to FreeRTOS osal instance
+ * \param[in] threadHandle - the handle of the thread being deleted
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosThreadDelete(void* const osalFreertos,
                                                       const UShellOsalThreadHandle_t threadHandle)
@@ -1594,10 +1594,10 @@ static UShellOsalErr_e uShellOsalFreertosThreadDelete(void* const osalFreertos,
 }
 
 /**
- * @brief Suspend the thread
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] threadObj     - the handle of the thread being suspend
- * @return UShellOsalErr_e error code
+ * \brief Suspend the thread
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] threadObj     - the handle of the thread being suspend
+ * \return UShellOsalErr_e error code
  */
 static UShellOsalErr_e uShellOsalFreertosThreadSuspend(void* const osalFreertos,
                                                        const UShellOsalThreadHandle_t threadHandle)
@@ -1632,10 +1632,10 @@ static UShellOsalErr_e uShellOsalFreertosThreadSuspend(void* const osalFreertos,
 }
 
 /**
- * @brief Resume the thread
- * @param[in] osalFreertos  - pointer to FreeRTOS osal instance
- * @param[in] threadObj     - the handle of the thread being resumed
- * @return UShellOsalErr_e error code.
+ * \brief Resume the thread
+ * \param[in] osalFreertos  - pointer to FreeRTOS osal instance
+ * \param[in] threadObj     - the handle of the thread being resumed
+ * \return UShellOsalErr_e error code.
  */
 static UShellOsalErr_e uShellOsalFreertosThreadResume(void* const osalFreertos,
                                                       const UShellOsalThreadHandle_t threadHandle)
@@ -1670,11 +1670,11 @@ static UShellOsalErr_e uShellOsalFreertosThreadResume(void* const osalFreertos,
 }
 
 /**
- * @brief       Perform some delay
- * @param[in][in]   osalFreertos - pointer to FreeRTOS osal instance;
- * @param[in][in]   msDelay - delay in ms;
- * @param[in][out]  no;
- * @return      UShellOsalErr_e  - error code. non-zero = an error has occurred;
+ * \brief       Perform some delay
+ * \param[in][in]   osalFreertos - pointer to FreeRTOS osal instance;
+ * \param[in][in]   msDelay - delay in ms;
+ * \param[in][out]  no;
+ * \return      UShellOsalErr_e  - error code. non-zero = an error has occurred;
  */
 static UShellOsalErr_e uShellOsalFreertosThreadDelay(const void* const osalFreertos,
                                                      const uint32_t msDelay)
@@ -1846,7 +1846,7 @@ static UShellOsalErr_e uShellOsalFreertosSemaphoreAcquire(void* const osalFreert
 }
 
 /**
- * @brief Acquire a semaphore with timeout
+ * \brief Acquire a semaphore with timeout
  */
 static UShellOsalErr_e uShellOsalFreertosSemaphoreAcquirePend(void* const osalFreertos,
                                                               const UShellOsalSemaphoreHandle_t semaphoreHandle,
@@ -2243,7 +2243,7 @@ uShellOsalFreertosStreamBuffReceive(void* const osalFreertos,
 }
 
 /**
- * @brief Receive data from the stream buffer (blocking, no timeout)
+ * \brief Receive data from the stream buffer (blocking, no timeout)
  */
 static size_t uShellOsalFreertosStreamBuffReceiveBlocking(void* const osalFreertos,
                                                           const UShellOsalStreamBuffHandle_t streamBuffHandle,
@@ -2327,10 +2327,10 @@ static UShellOsalErr_e uShellOsalFreertosStreamBuffReset(void* const osalFreerto
 }
 
 /**
- * @brief Find the queue handle in the queue handles table
- * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
- * @param[in] queueHandle  - queue handle to be found
- * @return uint16_t handle index + 1, 0 - if the handle wasn't found.
+ * \brief Find the queue handle in the queue handles table
+ * \param[in] osalFreeRtos - pointer to FreeRTOS osal instance
+ * \param[in] queueHandle  - queue handle to be found
+ * \return uint16_t handle index + 1, 0 - if the handle wasn't found.
  */
 static inline uint16_t uShellOsalFreertosFindQueueHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                          const UShellOsalQueueHandle_t queueHandle)
@@ -2356,10 +2356,10 @@ static inline uint16_t uShellOsalFreertosFindQueueHandle(UShellOsalFreertos_s* c
 }
 
 /**
- * @brief Find the lock object handle in the lock objects table
- * @param[in] osalFreeRtos  - pointer to FreeRTOS osal instance
- * @param[in] lockObjHandle - lock object handle to be found
- * @return uint16_t handle index + 1, 0 - if the handle wasn't found.
+ * \brief Find the lock object handle in the lock objects table
+ * \param[in] osalFreeRtos  - pointer to FreeRTOS osal instance
+ * \param[in] lockObjHandle - lock object handle to be found
+ * \return uint16_t handle index + 1, 0 - if the handle wasn't found.
  */
 static inline uint16_t uShellOsalFreertosFindLockObjHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                            const UShellOsalLockObjHandle_t lockObjHandle)
@@ -2385,10 +2385,10 @@ static inline uint16_t uShellOsalFreertosFindLockObjHandle(UShellOsalFreertos_s*
 }
 
 /**
- * @brief Find the thread handle in the thread objects table
- * @param[in] osalFreeRtos - pointer to FreeRTOS osal instance
- * @param[in] threadHandle - thread handle to be found
- * @return uint16_t handleIndex + 1, 0 - if the handle wasn't found.
+ * \brief Find the thread handle in the thread objects table
+ * \param[in] osalFreeRtos - pointer to FreeRTOS osal instance
+ * \param[in] threadHandle - thread handle to be found
+ * \return uint16_t handleIndex + 1, 0 - if the handle wasn't found.
  */
 static inline uint16_t uShellOsalFreertosFindThreadHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                           const UShellOsalThreadHandle_t threadHandle)
@@ -2733,10 +2733,10 @@ static void uShellOsalFreertosTimerCallback(TimerHandle_t xTimer)
 }
 
 /**
- * @brief Create an event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @return Error code indicating the result of the operation.
+ * \brief Create an event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupCreate(void* const osal,
                                                    UShellOsalEventGroupHandle_t* const eventGroupHandle)
@@ -2805,11 +2805,11 @@ UShellOsalErr_e uShellOsalFreertosEventGroupCreate(void* const osal,
 }
 
 /**
- * @brief Create an event group with a specific name.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @param[in] name Name of the event group.
- * @return Error code indicating the result of the operation.
+ * \brief Create an event group with a specific name.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * \param[in] name Name of the event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupDelete(void* const osal,
                                                    const UShellOsalEventGroupHandle_t eventGroupHandle)
@@ -2867,11 +2867,11 @@ UShellOsalErr_e uShellOsalFreertosEventGroupDelete(void* const osal,
 }
 
 /**
- * @brief Set a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToSet Bits to set in the event group.
- * @return Error code indicating the result of the operation.
+ * \brief Set a bit in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[in] bitsToSet Bits to set in the event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupSetBits(void* const osal,
                                                     const UShellOsalEventGroupHandle_t eventGroupHandle,
@@ -2944,11 +2944,11 @@ UShellOsalErr_e uShellOsalFreertosEventGroupSetBits(void* const osal,
 }
 
 /**
- * @brief Clear a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToClear Bits to clear in the event group.
- * @return Error code indicating the result of the operation.
+ * \brief Clear a bit in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[in] bitsToClear Bits to clear in the event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupClearBits(void* const osal,
                                                       const UShellOsalEventGroupHandle_t eventGroupHandle,
@@ -3023,14 +3023,14 @@ UShellOsalErr_e uShellOsalFreertosEventGroupClearBits(void* const osal,
 }
 
 /**
- * @brief Wait for bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToWait Bits to wait for in the event group.
- * @param[out] bitsReceived Pointer to store the received bits.
- * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
- * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
- * @return Error code indicating the result of the operation.
+ * \brief Wait for bits in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[in] bitsToWait Bits to wait for in the event group.
+ * \param[out] bitsReceived Pointer to store the received bits.
+ * \param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * \param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupBitsWait(void* const osal,
                                                      const UShellOsalEventGroupHandle_t eventGroupHandle,
@@ -3115,11 +3115,11 @@ UShellOsalErr_e uShellOsalFreertosEventGroupBitsWait(void* const osal,
 }
 
 /**
- * @brief Get the active bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[out] bitsActive Pointer to store the active bits.
- * @return Error code indicating the result of the operation.
+ * \brief Get the active bits in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[out] bitsActive Pointer to store the active bits.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e uShellOsalFreertosEventGroupBitsActiveGet(void* const osal,
                                                           const UShellOsalEventGroupHandle_t eventGroupHandle,
@@ -3187,7 +3187,7 @@ UShellOsalErr_e uShellOsalFreertosEventGroupBitsActiveGet(void* const osal,
 }
 
 /**
- * @brief Find the event group handle in the event groups table
+ * \brief Find the event group handle in the event groups table
  */
 static inline uint16_t uShellOsalFreertosFindEventGroupHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                               const UShellOsalEventGroupHandle_t eventGroupHandle)
@@ -3215,11 +3215,11 @@ static inline uint16_t uShellOsalFreertosFindEventGroupHandle(UShellOsalFreertos
 }
 
 /**
- * @brief Perform thread configuration parameters validation procedure
+ * \brief Perform thread configuration parameters validation procedure
  *        in terms of the requirements of the FreeRTOS
- * @param[in] threadCfg - pointer to a thread configuration structure being checked
- * @return true - if configuration is OK\
- * @return false - if not
+ * \param[in] threadCfg - pointer to a thread configuration structure being checked
+ * \return true - if configuration is OK\
+ * \return false - if not
  */
 static bool uShellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const threadCfg)
 {
@@ -3286,7 +3286,7 @@ static inline uint16_t uShellOsalFreertosFindSemaphoreHandle(UShellOsalFreertos_
 }
 
 /**
- * @brief Find the stream buffer handle in the stream buffers table
+ * \brief Find the stream buffer handle in the stream buffers table
  */
 static inline uint16_t uShellOsalFreertosFindStreamBuffHandle(UShellOsalFreertos_s* const osalFreeRtos,
                                                               const UShellOsalStreamBuffHandle_t streamBuffHandle)

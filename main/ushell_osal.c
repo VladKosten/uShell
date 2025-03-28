@@ -1,6 +1,6 @@
 /**
  * \file        ushell_osal.c
- * @brief       UShell OSAL layer interface implementation.
+ * \brief       UShell OSAL layer interface implementation.
  * \author      Vladislav Kosten (vladkosten@gmail.com)
  * \copyright    MIT License (c) 2025
  * \warning     A warning may be placed here...
@@ -19,13 +19,13 @@
 //=====================================================================[ INTERNAL MACRO DEFENITIONS ]==============================================================================
 
 /**
- * @brief UShell OSAL ASSERT macro definition.
+ * \brief UShell OSAL ASSERT macro definition.
  *
  * This macro is used to perform assertions in the UShell Operating System Abstraction Layer (OSAL).
  * If `USHELL_ASSERT` is defined, `USHELL_OSAL_ASSERT` will use it to perform the assertion.
  * Otherwise, `USHELL_OSAL_ASSERT` will be defined as an empty macro.
  *
- * @param[in] cond The condition to be asserted.
+ * \param[in] cond The condition to be asserted.
  */
 #ifndef USHELL_OSAL_ASSERT
     #ifdef USHELL_ASSERT
@@ -42,14 +42,14 @@
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
 
 /**
- * @brief Initialize UShell OSAL instance
+ * \brief Initialize UShell OSAL instance
  *        Sets name, parent, clears all internal objects etc.
- * @param[in] osal - pointer to OSAL instance
- * @param[in] name - pointer to the name of the OSAL instance
- * @param[in] parent - pointer to a parent object
- * @param[in] portable - pointer to the portable table
- * @param[out] none
- * @return UShellOsalErr_e error code.
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] name - pointer to the name of the OSAL instance
+ * \param[in] parent - pointer to a parent object
+ * \param[in] portable - pointer to the portable table
+ * \param[out] none
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
                                const char* name,
@@ -90,10 +90,10 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
 }
 
 /**
- * @brief Deinitialize UShell OSAL instance
+ * \brief Deinitialize UShell OSAL instance
  * @note  Call this function when all functionality has been stopped
- * @param[in] osal - pointer to OSAL instance
- * @return UShellOsalErr_e error code.
+ * \param[in] osal - pointer to OSAL instance
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal)
 {
@@ -122,10 +122,10 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal)
 }
 
 /**
- * @brief Get pointer to a parent of the given OSAL object
- * @param[in]  osal      - pointer to osal instance which parent object will be returned
- * @param[out] parent    - pointer to an object into which the current osal parent pointer will be copied
- * @return UShellOsalErr_e error code
+ * \brief Get pointer to a parent of the given OSAL object
+ * \param[in]  osal      - pointer to osal instance which parent object will be returned
+ * \param[out] parent    - pointer to an object into which the current osal parent pointer will be copied
+ * \return UShellOsalErr_e error code
  */
 UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const parent)
 {
@@ -156,10 +156,10 @@ UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const paren
 }
 
 /**
- * @brief Set the parent object for the given OSAL instance
- * @param[in] osal      - pointer to osal instance being modified
- * @param[in] parent    - pointer to parent object being set
- * @return UShellOsalErr_e error code
+ * \brief Set the parent object for the given OSAL instance
+ * \param[in] osal      - pointer to osal instance being modified
+ * \param[in] parent    - pointer to parent object being set
+ * \return UShellOsalErr_e error code
  */
 UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent)
 {
@@ -189,10 +189,10 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent
 }
 
 /**
- * @brief Get pointer to the name field of the given OSAL instance
- * @param[in] osal  - pointer to osal instance
- * @param[out] name  - pointer to an object into which the current osal name will be copied
- * @return UShellOsalErr_e error code
+ * \brief Get pointer to the name field of the given OSAL instance
+ * \param[in] osal  - pointer to osal instance
+ * \param[out] name  - pointer to an object into which the current osal name will be copied
+ * \return UShellOsalErr_e error code
  */
 UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const name)
 {
@@ -223,10 +223,10 @@ UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const n
 }
 
 /**
- * @brief Set name for the given OSAL instance
- * @param[in] osal  - pointer to osal instance being modified
- * @param[in] name  - pointer to name string being set
- * @return UShellOsalErr_e error code
+ * \brief Set name for the given OSAL instance
+ * \param[in] osal  - pointer to osal instance being modified
+ * \param[in] name  - pointer to name string being set
+ * \return UShellOsalErr_e error code
  */
 UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, char* const name)
 {
@@ -256,12 +256,12 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, char* const name)
 }
 
 /**
- * @brief Create the queue
- * @param[in]   osal          - OSAL descriptor;
- * @param[in]   queueItemSize - the size of the queue item
- * @param[in]   queueDepth    - the queue depth
- * @param[out]  queueHandle   - the queue handle was created
- * @return UShellOsalErr_e error code.
+ * \brief Create the queue
+ * \param[in]   osal          - OSAL descriptor;
+ * \param[in]   queueItemSize - the size of the queue item
+ * \param[in]   queueDepth    - the queue depth
+ * \param[out]  queueHandle   - the queue handle was created
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s* const osal,
                                       const size_t queueItemSize,
@@ -307,10 +307,10 @@ UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Delete the queue
- * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
- * @param[in]   queueHandle   - the queue handle to delete
- * @return UShellOsalErr_e error code.
+ * \brief Delete the queue
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   queueHandle   - the queue handle to delete
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s* const osal,
                                       const UShellOsalQueueHandle_t queueHandle)
@@ -348,11 +348,11 @@ UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Put item to the queue
- * @param[in] osal - OSAL descriptor;
- * @param[in] queueHandle   - the queue handle in which to put the item
- * @param[in] queueItemPtr  - pointer to the item source buffer
- * @return UShellOsalErr_e error code.
+ * \brief Put item to the queue
+ * \param[in] osal - OSAL descriptor;
+ * \param[in] queueHandle   - the queue handle in which to put the item
+ * \param[in] queueItemPtr  - pointer to the item source buffer
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s* const osal,
                                        const UShellOsalQueueHandle_t queueHandle,
@@ -392,13 +392,13 @@ UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Put item to the queue
+ * \brief Put item to the queue
  * @note  (BLOCKING CALL WITH SPECIFIED WAIT)
- * @param[in] osal - OSAL descriptor;
- * @param[in] queueHandle   - the queue handle in which to put the item
- * @param[in] queueItemPtr  - pointer to the item source buffer
- * @param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
- * @return UShellOsalErr_e error code.
+ * \param[in] osal - OSAL descriptor;
+ * \param[in] queueHandle   - the queue handle in which to put the item
+ * \param[in] queueItemPtr  - pointer to the item source buffer
+ * \param[in] timeoutMs     - timeout in milliseconds to wait for the queue being ready to receive the item
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s* const osal,
                                         const UShellOsalQueueHandle_t queueHandle,
@@ -440,12 +440,12 @@ UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Get item from the queue
+ * \brief Get item from the queue
  * @note  (NON-BLOCKING CALL)
- * @param[in]   osal - OSAL descriptor;
- * @param[in]   queueHandle   - the queue handle in which to put the item
- * @param[out]  queueItemPtr  - pointer to the destination buffer in which the item should be places
- * @return UShellOsalErr_e error code.
+ * \param[in]   osal - OSAL descriptor;
+ * \param[in]   queueHandle   - the queue handle in which to put the item
+ * \param[out]  queueItemPtr  - pointer to the destination buffer in which the item should be places
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s* const osal,
                                        const UShellOsalQueueHandle_t queueHandle,
@@ -486,12 +486,12 @@ UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Get item from the queue
+ * \brief Get item from the queue
  * @note  (BLOCKING CALL WITH INFINITE WAIT)
- * @param[in]  osal - OSAL descriptor;
- * @param[in]  queueHandle   - the queue handle in which to put the item
- * @param[out] queueItemPtr  - pointer to the destination buffer in which the item should be places
- * @return UShellOsalErr_e error code.
+ * \param[in]  osal - OSAL descriptor;
+ * \param[in]  queueHandle   - the queue handle in which to put the item
+ * \param[out] queueItemPtr  - pointer to the destination buffer in which the item should be places
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s* const osal,
                                         const UShellOsalQueueHandle_t queueHandle,
@@ -532,13 +532,13 @@ UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Get item from the queue
+ * \brief Get item from the queue
  * @note  (BLOCKING CALL WITH SPECIFIED WAIT)
- * @param[in]  UShellOsal_s* const osal - OSAL descriptor;
- * @param[in]  queueHandle   - the queue handle from which to get the item
- * @param[in]  queueItemPtr  - pointer to the destination buffer in which the item should be placed
- * @param[out] timeoutMs     - timeout in milliseconds to wait for the item
- * @return UShellOsalErr_e error code.
+ * \param[in]  UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]  queueHandle   - the queue handle from which to get the item
+ * \param[in]  queueItemPtr  - pointer to the destination buffer in which the item should be placed
+ * \param[out] timeoutMs     - timeout in milliseconds to wait for the item
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e ushellOsalQueueItemPend(UShellOsal_s* const osal,
                                         const UShellOsalQueueHandle_t queueHandle,
@@ -580,10 +580,10 @@ UShellOsalErr_e ushellOsalQueueItemPend(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Reset queue
- * @param[in] osal          - pointer to OSAL instance
- * @param[in] queueHandle   - the queue handle to reset
- * @return UShellOsalErr_e error code.
+ * \brief Reset queue
+ * \param[in] osal          - pointer to OSAL instance
+ * \param[in] queueHandle   - the queue handle to reset
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s* const osal,
                                      const UShellOsalQueueHandle_t queueHandle)
@@ -621,10 +621,10 @@ UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Create the lock object
- * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
- * @param[out]  lockObjHandle - lock object handle that was created
- * @return UShellOsalErr_e error code.
+ * \brief Create the lock object
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[out]  lockObjHandle - lock object handle that was created
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s* const osal,
                                         UShellOsalLockObjHandle_t* const lockObjHandle)
@@ -662,10 +662,10 @@ UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Delete the lock object
- * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
- * @param[in]   lockObjHandle - lock object handle to delete
- * @return UShellOsalErr_e error code.
+ * \brief Delete the lock object
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   lockObjHandle - lock object handle to delete
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s* const osal, const UShellOsalLockObjHandle_t lockObjHandle)
 {
@@ -702,10 +702,10 @@ UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s* const osal, const UShellOs
 }
 
 /**
- * @brief Lock access to the resource for third-party collaborators
- * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
- * @param[in]   lockObjHandle - lock object handle
- * @return UShellOsalErr_e error code.
+ * \brief Lock access to the resource for third-party collaborators
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   lockObjHandle - lock object handle
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal, const UShellOsalLockObjHandle_t lockObjHandle)
 {
@@ -742,10 +742,10 @@ UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal, const UShellOsalLockObj
 }
 
 /**
- * @brief Unlock access to the resource for third-party collaborators
- * @param[in]   UShellOsal_s* const osal - OSAL descriptor;
- * @param[in]   lockObjHandle - lock object handle
- * @return UShellOsalErr_e error code.
+ * \brief Unlock access to the resource for third-party collaborators
+ * \param[in]   UShellOsal_s* const osal - OSAL descriptor;
+ * \param[in]   lockObjHandle - lock object handle
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal,
                                  const UShellOsalLockObjHandle_t lockObjHandle)
@@ -783,11 +783,11 @@ UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Create the thread
- * @param[in]   osal - OSAL descriptor;
- * @param[out]  threadHandle  - thread handle by which created thread can be referenced
- * @param[in]   threadCfg     - thread configuration
- * @return UShellOsalErr_e error code
+ * \brief Create the thread
+ * \param[in]   osal - OSAL descriptor;
+ * \param[out]  threadHandle  - thread handle by which created thread can be referenced
+ * \param[in]   threadCfg     - thread configuration
+ * \return UShellOsalErr_e error code
  */
 UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s* const osal,
                                        UShellOsalThreadHandle_t* const threadHandle,
@@ -826,12 +826,12 @@ UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Delete the thread
+ * \brief Delete the thread
  * @note The operation must be stopped before deleting the thread
  *        to not to damage the system.
- * @param[in]   osal - OSAL descriptor;
- * @param[in]   threadHandle  - the handle of the thread being deleted
- * @return UShellOsalErr_e error code
+ * \param[in]   osal - OSAL descriptor;
+ * \param[in]   threadHandle  - the handle of the thread being deleted
+ * \return UShellOsalErr_e error code
  */
 UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s* const osal,
                                        const UShellOsalThreadHandle_t threadHandle)
@@ -869,10 +869,10 @@ UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Suspend the thread
- * @param[in] osal - OSAL descriptor;
- * @param[in] threadHandle  - the handle of the thread being suspend
- * @return UShellOsalErr_e error code
+ * \brief Suspend the thread
+ * \param[in] osal - OSAL descriptor;
+ * \param[in] threadHandle  - the handle of the thread being suspend
+ * \return UShellOsalErr_e error code
  */
 UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s* const osal,
                                         const UShellOsalThreadHandle_t threadHandle)
@@ -910,11 +910,11 @@ UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s* const osal,
 }
 
 /**
- * @brief       Perform some delay
- * @param[in]   osal - OSAL descriptor;
- * @param[in]   msDelay - the delay timeout value expressed in ms;
- * @param[out]  no;
- * @return      MatrixKbdOsalErr_e  - error code. non-zero = an error has occurred;
+ * \brief       Perform some delay
+ * \param[in]   osal - OSAL descriptor;
+ * \param[in]   msDelay - the delay timeout value expressed in ms;
+ * \param[out]  no;
+ * \return      MatrixKbdOsalErr_e  - error code. non-zero = an error has occurred;
  */
 UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
                                       const UShellOsalTimeMs_t msDelay)
@@ -950,10 +950,10 @@ UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
 }
 
 /**
- * @brief Resume the thread
- * @param[in] osal - OSAL descriptor;
- * @param[in] threadHandle  - the handle of the thread being resumed
- * @return UShellOsalErr_e error code
+ * \brief Resume the thread
+ * \param[in] osal - OSAL descriptor;
+ * \param[in] threadHandle  - the handle of the thread being resumed
+ * \return UShellOsalErr_e error code
  */
 UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
                                        const UShellOsalThreadHandle_t threadHandle)
@@ -1080,11 +1080,11 @@ UShellOsalErr_e UShellOsalSemaphoreAcquire(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Acquire the semaphore
- * @param osal             - pointer to OSAL instance
- * @param semaphoreHandle   - semaphore object handle to acquire
- * @param timeoutMs       - timeout in milliseconds to wait for the semaphore
- * @return UShellOsalErr_e error code.
+ * \brief Acquire the semaphore
+ * \param osal             - pointer to OSAL instance
+ * \param semaphoreHandle   - semaphore object handle to acquire
+ * \param timeoutMs       - timeout in milliseconds to wait for the semaphore
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalSemaphoreAcquirePend(UShellOsal_s* const osal,
                                                const UShellOsalSemaphoreHandle_t semaphoreHandle,
@@ -1259,16 +1259,16 @@ size_t UShellOsalStreamBuffSend(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Send data to a stream buffer (blocking, no timeout).
+ * \brief Send data to a stream buffer (blocking, no timeout).
  *
  * This function writes data to the specified stream buffer, blocking until
  * all data has been written or an error occurs.
  *
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] streamBuffHandle Handle of the stream buffer.
- * @param[in] txData Pointer to the data to be sent.
- * @param[in] dataLengthBytes Length of the data to be sent in bytes.
- * @return Number of bytes actually written to the stream buffer.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] streamBuffHandle Handle of the stream buffer.
+ * \param[in] txData Pointer to the data to be sent.
+ * \param[in] dataLengthBytes Length of the data to be sent in bytes.
+ * \return Number of bytes actually written to the stream buffer.
  */
 size_t UShellOsalStreamBuffSendBlocking(UShellOsal_s* const osal,
                                         const UShellOsalStreamBuffHandle_t streamBuffHandle,
@@ -1336,14 +1336,14 @@ size_t UShellOsalStreamBuffReceive(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Receive data from a stream buffer.
+ * \brief Receive data from a stream buffer.
  *
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] streamBuffHandle Handle of the stream buffer.
- * @param[out] rxData Pointer to the buffer to store the received data.
- * @param[in] dataLengthBytes Length of the data to be received in bytes.
- * @param[in] msToWait Timeout in milliseconds.
- * @return Number of bytes received.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] streamBuffHandle Handle of the stream buffer.
+ * \param[out] rxData Pointer to the buffer to store the received data.
+ * \param[in] dataLengthBytes Length of the data to be received in bytes.
+ * \param[in] msToWait Timeout in milliseconds.
+ * \return Number of bytes received.
  *
  */
 size_t UShellOsalStreamBuffReceiveBlocking(UShellOsal_s* const osal,
@@ -1600,10 +1600,10 @@ UShellOsalErr_e UShellOsalTimerPeriodChange(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Create an event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @return Error code indicating the result of the operation.
+ * \brief Create an event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
                                        UShellOsalEventGroupHandle_t* const eventGroupHandle)
@@ -1629,11 +1629,11 @@ UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Create an event group with a specific name.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
- * @param[in] name Name of the event group.
- * @return Error code indicating the result of the operation.
+ * \brief Create an event group with a specific name.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * \param[in] name Name of the event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e UShellEventGroupDelete(UShellOsal_s* const osal,
                                        const UShellOsalEventGroupHandle_t eventGroupHandle)
@@ -1659,11 +1659,11 @@ UShellOsalErr_e UShellEventGroupDelete(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Set a bit in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToSet Bits to set in the event group.
- * @return Error code indicating the result of the operation.
+ * \brief Set a bit in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[in] bitsToSet Bits to set in the event group.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
@@ -1690,14 +1690,14 @@ UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Wait for bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[in] bitsToWait Bits to wait for in the event group.
- * @param[out] bitsReceived Pointer to store the received bits.
- * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
- * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
- * @return Error code indicating the result of the operation.
+ * \brief Wait for bits in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[in] bitsToWait Bits to wait for in the event group.
+ * \param[out] bitsReceived Pointer to store the received bits.
+ * \param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * \param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
@@ -1733,11 +1733,11 @@ UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Get the active bits in the event group.
- * @param[in] osal Pointer to the OSAL instance.
- * @param[in] eventGroupHandle Handle of the event group.
- * @param[out] bitsActive Pointer to store the active bits.
- * @return Error code indicating the result of the operation.
+ * \brief Get the active bits in the event group.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] eventGroupHandle Handle of the event group.
+ * \param[out] bitsActive Pointer to store the active bits.
+ * \return Error code indicating the result of the operation.
  */
 UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
                                               const UShellOsalEventGroupHandle_t eventGroupHandle,
@@ -1765,11 +1765,11 @@ UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Get an event group handle of the given OSAL object
- * @param[in] osal - pointer to OSAL instance
- * @param[in] eventGroupSlotInd - index of event group slots
- * @param[in] eventGroupHandle - pointer to an object into which the event group handle will be copied
- * @return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ * \brief Get an event group handle of the given OSAL object
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] eventGroupSlotInd - index of event group slots
+ * \param[in] eventGroupHandle - pointer to an object into which the event group handle will be copied
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
  */
 UShellOsalErr_e UShellOsalEventGroupHandleGet(UShellOsal_s* const osal,
                                               const size_t eventGroupSlotInd,

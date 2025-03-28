@@ -31,7 +31,7 @@
 #endif
 
 /**
- * @brief Enumeration of ASCII control characters used in uShell.
+ * \brief Enumeration of ASCII control characters used in uShell.
  *
  * This enumeration defines several ASCII control characters that are used
  * to manage user input, such as carriage return, line feed, backspace, etc.
@@ -89,51 +89,51 @@ static UShellErr_e uShellFindCmd(const UShell_s* const uShell,
                                  uint8_t* const ind);
 
 /**
- * @brief Initialize the runtime environment
- * @param uShell - uShell object
- * @param osal - osal object
- * @param hal - hal object
- * @param cfg - configuration object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Initialize the runtime environment
+ * \param uShell - uShell object
+ * \param osal - osal object
+ * \param hal - hal object
+ * \param cfg - configuration object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellOsal_s* const osal,
                                    UShellCfg_s* const cfg);
 
 /**
- * @brief Deinitialize the runtime environment
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Deinitialize the runtime environment
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvDeInit(UShell_s* const uShell);
 
 /**
- * @brief Initialize the runtime environment OSAL
- * @param[in] uShell - uShell object
- * @param[in] osal - osal object
- * @return UShellErr_e - error code. non-zero = an error has occurred;
+ * \brief Initialize the runtime environment OSAL
+ * \param[in] uShell - uShell object
+ * \param[in] osal - osal object
+ * \return UShellErr_e - error code. non-zero = an error has occurred;
  */
 static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
                                        UShellOsal_s* const osal);
 
 /**
- * @brief Deinitialize the runtime environment OSAL
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Deinitialize the runtime environment OSAL
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell);
 
 /**
- * @brief Initialize the runtime environment history
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Initialize the runtime environment history
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvFuncHistoryInit(UShell_s* const uShell);
 
 /**
- * @brief Deinitialize the runtime environment history
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Deinitialize the runtime environment history
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell);
 
@@ -172,8 +172,8 @@ static inline void uShellTerminalClearLine(const UShell_s* const uShell);
 static inline void uShellPrintUserPrompt(const UShell_s* const uShell);
 
 /**
- * @brief Print IO buffer
- * @param uShell - uShell object
+ * \brief Print IO buffer
+ * \param uShell - uShell object
  */
 static inline void uShellPrintIo(UShell_s* const uShell);
 
@@ -188,14 +188,14 @@ uShellTerminalDelChar(const UShell_s* const uShell);
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
- * @brief Init uShell object
+ * \brief Init uShell object
  * \param[in] uShell - uShell object to be initialized
  * \param[in] osal - osal object
  * \param[in] vcs - vcp object
  * \param[in] parent - parent object
  * \param[in] name - name of the object
  * \param[out] none
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
@@ -633,12 +633,12 @@ static UShellErr_e uShellFindCmd(const UShell_s* const uShell, const char* const
 }
 
 /**
- * @brief Initialize the runtime environment
- * @param uShell - uShell object
- * @param osal - osal object
- * @param hal - hal object
- * @param cfg - configuration object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Initialize the runtime environment
+ * \param uShell - uShell object
+ * \param osal - osal object
+ * \param hal - hal object
+ * \param cfg - configuration object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellOsal_s* const osal,
@@ -695,9 +695,9 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
 }
 
 /**
- * @brief Deinitialize the runtime environment
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Deinitialize the runtime environment
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvDeInit(UShell_s* const uShell)
 {
@@ -728,10 +728,10 @@ static UShellErr_e uShellRtEnvDeInit(UShell_s* const uShell)
 }
 
 /**
- * @brief Initialize the runtime environment OSAL
- * @param[in] uShell - uShell object
- * @param[in] osal - osal object
- * @return UShellErr_e - error code. non-zero = an error has occurred;
+ * \brief Initialize the runtime environment OSAL
+ * \param[in] uShell - uShell object
+ * \param[in] osal - osal object
+ * \return UShellErr_e - error code. non-zero = an error has occurred;
  */
 static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
                                        UShellOsal_s* const osal)
@@ -795,9 +795,9 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
 }
 
 /**
- * @brief Deinitialize the runtime environment OSAL
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Deinitialize the runtime environment OSAL
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 {
@@ -856,9 +856,9 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 }
 
 /**
- * @brief Initialize the runtime environment history
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Initialize the runtime environment history
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvFuncHistoryInit(UShell_s* const uShell)
 {
@@ -891,9 +891,9 @@ static UShellErr_e uShellRtEnvFuncHistoryInit(UShell_s* const uShell)
 }
 
 /**
- * @brief Deinitialize the runtime environment history
- * @param uShell - uShell object
- * @return USHELL_NO_ERR if success, otherwise error code
+ * \brief Deinitialize the runtime environment history
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell)
 {
@@ -1097,8 +1097,8 @@ static inline void uShellPrintUserPrompt(const UShell_s* const uShell)
 }
 
 /**
- * @brief Print IO buffer
- * @param uShell - uShell object
+ * \brief Print IO buffer
+ * \param uShell - uShell object
  */
 static inline void uShellPrintIo(UShell_s* const uShell)
 {

@@ -1,6 +1,6 @@
 /**
  * \file         UShell_hal.c
- * @brief        The file contains the implementation of the UShell hardware abstraction layer module.
+ * \brief        The file contains the implementation of the UShell hardware abstraction layer module.
  *               The module is interface between the UShell and the hardware.
  * \authors      Vladislav Kosten (vladkosten@gmail.com)
  * \copyright    MIT License (c) 2025
@@ -14,7 +14,7 @@
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
 /**
- * @brief Assert macro for the UShellHal module.
+ * \brief Assert macro for the UShellHal module.
  */
 #ifndef USHELL_HAL_ASSERT
     #ifdef USHELL_ASSERT
@@ -31,14 +31,14 @@
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
- * @brief Initialize the UShellHal object
+ * \brief Initialize the UShellHal object
  * \param[in] hal - pointer to the UShellHal object to be initialized
  * \param[in] parent - pointer to the parent object (e.g. UShellHalStm32)
  * \param[in] name - pointer to the name of the object (e.g. "UShellHal")
  * \param[in] cbTable - pointer to the callback table to be used ()
  * \param[in] portTable Pointer to the port table
  * \param[out] none
- * @return UShellHalErr_e Error code. UShell_NO_ERR if success, otherwise error code
+ * \return UShellHalErr_e Error code. UShell_NO_ERR if success, otherwise error code
  */
 UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
                              const void* const parent,
@@ -81,10 +81,10 @@ UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
 }
 
 /**
- * @brief Deinitialize the UShellHal object
+ * \brief Deinitialize the UShellHal object
  * \param[in] hal - pointer to the UShellHal object to be deinitialized
  * \param[out] none
- * @return UShellHalErr_e Error code. UShell_NO_ERR if success, otherwise error code
+ * \return UShellHalErr_e Error code. UShell_NO_ERR if success, otherwise error code
  */
 UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal)
 {
@@ -112,11 +112,11 @@ UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal)
 }
 
 /**
- * @brief Set the parent of the UShellHal object
+ * \brief Set the parent of the UShellHal object
  * @param[in] hal - UShellHal object to set the parent
  * @param[in] parent - pointer to the parent object
  * @param[out] none
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
                                   const void* const parent)
@@ -146,10 +146,10 @@ UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
 }
 
 /**
- * @brief Get parent from the UShellHal object
+ * \brief Get parent from the UShellHal object
  * \param[in] hal - UShellHal object to get the parent
  * \param[out] parent - pointer to store the parent
- * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ * \return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
  */
 UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal,
                                   void** const parent)
@@ -181,10 +181,10 @@ UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal,
 }
 
 /**
- * @brief Get the name of the UShellHal object
+ * \brief Get the name of the UShellHal object
  * \param[in] hal - UShellHal object to get the name
  * \param[out] name - pointer to store the name
- * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ * \return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
  */
 UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal,
                                 const char** const name)
@@ -216,12 +216,12 @@ UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal,
 }
 
 /**
- * @brief Attach callback to the UShellHal object
+ * \brief Attach callback to the UShellHal object
  * \param[in] hal - UShellHal object to attach the callback
  * \param[in] cbType - type of the callback to attach
  * \param[in] cb - callback to attach
  * \param[out] none
- * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ * \return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
  */
 UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
                                  const UShellHalCallback_e cbType,
@@ -281,11 +281,11 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
 }
 
 /**
- * @brief Detach callback from the UShellHal object
+ * \brief Detach callback from the UShellHal object
  * \param[in] hal - UShellHal object to detach the callback
  * \param[in] cbType - type of the callback to detach
  * \param[out] none
- * @return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
+ * \return UShellHalErr_e Error code. UShell_NO_ERR if success otherwise, error code
  */
 UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
                                  const UShellHalCallback_e cbType)
@@ -342,10 +342,10 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
 }
 
 /**
- * @brief  Open the UShellHal object
+ * \brief  Open the UShellHal object
  * @param[in] hal - UShellHal object to open
  * @param[out] none
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
 {
@@ -382,10 +382,10 @@ UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
 }
 
 /**
- * @brief Close the UShellHal object
+ * \brief Close the UShellHal object
  * @param[in] hal - UShellHal object to close
  * @param[out] none
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalClose(UShellHal_s* const hal)
 {
@@ -422,11 +422,11 @@ UShellHalErr_e UShellHalClose(UShellHal_s* const hal)
 }
 
 /**
- * @brief Write data to the UShellHal object
+ * \brief Write data to the UShellHal object
  * @param[in] hal - UShellHal object to write
  * @param[in] data - pointer to the data to write
  * @param[in] size - size of the data to write
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
                               const UShellHalItem_t* const data,
@@ -467,12 +467,12 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
 }
 
 /**
- * @brief Read data from the UShellHal object
+ * \brief Read data from the UShellHal object
  * @param[in] hal - UShellHal object to read
  * @param[in] data - pointer to the data to read
  * @param[in] buffSize - size of buffer
  * @param[out] usedSize - size used in buffer
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
                              UShellHalItem_t* const data,
@@ -517,10 +517,10 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
 }
 
 /**
- * @brief Set the tx mode of the UShellHal object
+ * \brief Set the tx mode of the UShellHal object
  * @param[in] hal - UShellHal object to set the tx mode
  * @param[out] none
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
 {
@@ -557,9 +557,9 @@ UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
 }
 
 /**
- * @brief Set the rx mode of the UShellHal object
+ * \brief Set the rx mode of the UShellHal object
  * @param[in] hal - UShellHal object to set the rx mode
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalSetRxMode(UShellHal_s* const hal)
 {

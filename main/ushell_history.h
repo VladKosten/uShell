@@ -34,7 +34,7 @@ extern "C" {
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
- * @brief Enumeration of possible error codes
+ * \brief Enumeration of possible error codes
  */
 typedef enum
 {
@@ -46,27 +46,27 @@ typedef enum
 } UShellHistoryErr_e;
 
 /**
- * @brief Description of the uShell history object
+ * \brief Description of the uShell history object
  */
 typedef struct
 {
     /**
-     * @brief Parent object
+     * \brief Parent object
      */
     const void* parent;
 
     /**
-     * @brief Pointer to the ring buffer array of strings
+     * \brief Pointer to the ring buffer array of strings
      */
     char ringBuffer [USHELL_HISTORY_SIZE][USHELL_HISTORY_MAX_STR_LEN];
 
     /**
-     * @brief Index for the newest entry in the ring buffer
+     * \brief Index for the newest entry in the ring buffer
      */
     size_t headIndex;
 
     /**
-     * @brief Index for the oldest entry in the ring buffer
+     * \brief Index for the oldest entry in the ring buffer
      */
     size_t tailIndex;
 
@@ -75,47 +75,47 @@ typedef struct
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
- * @brief Initialize UShell history object
+ * \brief Initialize UShell history object
  * @param[in] history - uShell history object to be initialized
  * @param[in] parent - parent object
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryInit(UShellHistory_s* const history,
                                      const void* const parent);
 
 /**
- * @brief Deinit UShell history object
+ * \brief Deinit UShell history object
  * @param[in] history - uShell history object to be deinitialized
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryDeInit(UShellHistory_s* const history);
 
 /**
- * @brief Add command string to the history buffer
+ * \brief Add command string to the history buffer
  * @param history - uShell history object
  * @param str - command string to be added
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryAdd(UShellHistory_s* const history,
                                     const char* const str);
 
 /**
- * @brief Get command string from the history buffer
+ * \brief Get command string from the history buffer
  * @param[in] history - uShell history object
  * @param[in] str - command string to be added
  * @param[in] index - index of the command string in the history buffer
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryGetByIndex(UShellHistory_s* const history,
                                            char* const str,
                                            const size_t index);
 
 /**
- * @brief Find cmd in the history buffer
+ * \brief Find cmd in the history buffer
  * @param[in] history - uShell history object
  * @param[in] str - command string to be found
  * @param[in] index - index of the command string in the history buffer
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryFindCmd(UShellHistory_s* const history,
                                         const char* const str,

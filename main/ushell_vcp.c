@@ -261,15 +261,15 @@ static inline void uShellVcpStreamRxFlush(UShellVcp_s* const vcp);
 static inline void uShellVcpStreamTxFlush(UShellVcp_s* const vcp);
 
 /**
- * @brief Callback function for the timer expiration
- * @param timerParam - parameter for the timer expiration callback
- * @return none
+ * \brief Callback function for the timer expiration
+ * \param timerParam - parameter for the timer expiration callback
+ * \return none
  */
 static void uShellVcpTimerExpiredCb(void* const timerParam);
 
 #if (USHELL_VCP_REDIRECT_STDIO == TRUE)
 /**
- * @brief Used for stdio redirection
+ * \brief Used for stdio redirection
  */
 static UShellVcp_s* vcpStdIO = NULL;
 #endif
@@ -2223,9 +2223,9 @@ static inline void uShellVcpStreamTxFlush(UShellVcp_s* const vcp)
 }
 
 /**
- * @brief Callback function for the timer expiration
- * @param timerParam - parameter for the timer expiration callback
- * @return none
+ * \brief Callback function for the timer expiration
+ * \param timerParam - parameter for the timer expiration callback
+ * \return none
  */
 static void uShellVcpTimerExpiredCb(void* const timerParam)
 {
@@ -2256,14 +2256,14 @@ static void uShellVcpTimerExpiredCb(void* const timerParam)
 
 #if (USHELL_VCP_REDIRECT_STDIO == TRUE)
 /**
- * @brief Reads data from the virtual COM port.
+ * \brief Reads data from the virtual COM port.
  *
  * This function is a weak override for the standard _read syscall.
  *
- * @param file Unused file descriptor.
- * @param ptr Pointer to where read bytes should be stored.
- * @param len Maximum number of bytes to read.
- * @return The number of bytes actually read.
+ * \param file Unused file descriptor.
+ * \param ptr Pointer to where read bytes should be stored.
+ * \param len Maximum number of bytes to read.
+ * \return The number of bytes actually read.
  */
 int __attribute__((weak)) _read(int file, char* ptr, int len)
 {
@@ -2335,14 +2335,14 @@ int __attribute__((weak)) _read(int file, char* ptr, int len)
 }
 
 /**
- * @brief Writes data to the virtual COM port.
+ * \brief Writes data to the virtual COM port.
  *
  * This function is a weak override for the standard _write syscall.
  *
- * @param file Unused file descriptor.
- * @param ptr Pointer to the data to be written.
- * @param len Number of bytes to write.
- * @return The number of bytes actually written.
+ * \param file Unused file descriptor.
+ * \param ptr Pointer to the data to be written.
+ * \param len Number of bytes to write.
+ * \return The number of bytes actually written.
  */
 int __attribute__((weak)) _write(int file, char* ptr, int len)
 {
