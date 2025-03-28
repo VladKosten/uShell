@@ -54,6 +54,11 @@ UShell_s uShellObj = {0};
 UShellVcp_s uShellVcpObj = {0};
 
 /**
+ * \brief Instance of the uShell OSAL
+ */
+static UShellStartupOsal_s uShellStartupOsalObj = {0};
+
+/**
  * \brief Instance of the uShell OSAL for the uShell
  */
 static UShellStartupOsal_s uShellStartupVcpOsalObj = {0};
@@ -95,23 +100,35 @@ int16_t UShellStartup(void)
             break;
         }
 
+#ifdef USHELL_STARTUP_OSAL_PORT_FREERTOS
+        /* Initialize the uShell OSAL */
+        UShellOsalErr_e osalErr = UShellOsalFreertosInit(&uShellStartupOsalObj,
+                                                         &uShellObj,
+                                                         USHELL_STARTUP_OSAL_PORT_NAME);
+        USHELL_STARTUP_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
+        if (osalErr != USHELL_OSAL_NO_ERR)
+        {
+            return -1;
+        }
+#endif
+
         /* Initialize the uShell */
-        // UShellCfg_s ushellCfg = {
-        //     .authIsEn = USHELL_STARTUP_AUTH_IS_EN,
-        //     .echoIsEn = USHELL_STARTUP_ECHO_IS_EN,
-        //     .historyIsEn = USHELL_STARTUP_HISTORY_IS_EN,
-        //     .promptIsEn = USHELL_STARTUP_PROMPT_IS_EN};
-        // ushellErr = UShellInit(&uShellObj,
-        //                        &uShellStartupOsalObj.base,
-        //                        &uShellStartupHalObj.base,
-        //                        ushellCfg,
-        //                        NULL,
-        //                        USHELL_STARTUP_NAME);
-        // USHELL_STARTUP_ASSERT(ushellErr == USHELL_NO_ERR);
-        // if (ushellErr != USHELL_NO_ERR)
-        // {
-        //     return -1;
-        // }
+        UShellCfg_s ushellCfg = {
+            .authIsEn = USHELL_STARTUP_AUTH_IS_EN,
+            .echoIsEn = USHELL_STARTUP_ECHO_IS_EN,
+            .historyIsEn = USHELL_STARTUP_HISTORY_IS_EN,
+            .promptIsEn = USHELL_STARTUP_PROMPT_IS_EN};
+        UShellErr_e ushellErr = UShellInit(&uShellObj,
+                                           &uShellStartupOsalObj.base,
+                                           &uShellVcpObj,
+                                           ushellCfg,
+                                           NULL,
+                                           USHELL_STARTUP_NAME);
+        USHELL_STARTUP_ASSERT(ushellErr == USHELL_NO_ERR);
+        if (ushellErr != USHELL_NO_ERR)
+        {
+            return -1;
+        }
 
     } while (0);
 
@@ -157,6 +174,10 @@ static int16_t uShellVcpInit(void)
                                    &uShellObj,
                                    USHELL_STARTUP_HAL_PORT_NAME);
     USHELL_STARTUP_ASSERT(halPortErr == USHELL_HAL_PORT_NO_ERR);
+    if (halPortErr != USHELL_HAL_PORT_NO_ERR)
+    {
+        return -1;
+    }
 
 #endif
 
@@ -164,6 +185,7 @@ static int16_t uShellVcpInit(void)
     vcpErr = UShellVcpInit(&uShellVcpObj,
                            &uShellStartupVcpOsalObj.base,
                            &uShellStartupVcpHalObj.base,
+                           true,
                            &uShellObj,
                            USHELL_VCP_NAME);
     USHELL_STARTUP_ASSERT(vcpErr == USHELL_VCP_NO_ERR);

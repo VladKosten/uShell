@@ -25,7 +25,7 @@ extern "C" {
  * This macro defines the maximum size of the buffer used in the UShell.
  */
 #ifndef USHELL_VCP_BUFFER_SIZE
-    #define USHELL_VCP_BUFFER_SIZE 64
+    #define USHELL_VCP_BUFFER_SIZE 128U
 #endif
 
 /**
@@ -62,6 +62,34 @@ extern "C" {
  */
 #ifndef USHELL_VCP_TX_TIMEOUT_MS
     #define USHELL_VCP_TX_TIMEOUT_MS 3000U
+#endif
+
+/**
+ * @brief Redirect standard input/output to the uShell VCP.
+ *
+ * This macro enables or disables the redirection of standard input/output to the uShell VCP.
+ * getc() and putc() functions are redirected to the uShell VCP. (NOW only for gcc compiler)
+ */
+#ifndef USHELL_VCP_REDIRECT_STDIO
+    #define USHELL_VCP_REDIRECT_STDIO TRUE
+#endif
+
+/**
+ * @brief Timer period for the uShell VCP.
+ *
+ * This macro defines the timer period used in the uShell VCP.
+ */
+#ifndef USHELL_VCP_TIMER_NAME
+    #define USHELL_VCP_TIMER_NAME "USHELL_VCP_TIMER"
+#endif
+
+/**
+ * @brief Timer period for the uShell VCP.
+ *
+ * This macro defines the timer period used in the uShell VCP for inspection.
+ */
+#ifndef USHELL_VCP_TIMER_INSPECT_PERIOD_MS
+    #define USHELL_VCP_TIMER_INSPECT_PERIOD_MS 1000U
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -111,7 +139,8 @@ typedef struct
     const UShellHal_s* hal;      ///< HAL object
 
     /* Internal use  */
-    UShellVcpIo_s io;    ///< IO object
+    UShellVcpIo_s io;     ///< IO object
+    bool usedForStdIO;    ///< Flag to indicate if the object is used for stdio (ONLY ONE INSTANCE CAN BE USED FOR STDIO)
 
 } UShellVcp_s;
 
@@ -122,6 +151,7 @@ typedef struct
  * \param[in] vcp - uShell object to be initialized
  * \param[in] osal - osal object
  * \param[in] hal - hal object
+ * \param[in] usedForStdIO - flag to indicate if the object is used for stdio (ONLY ONE INSTANCE CAN BE USED FOR STDIO)
  * \param[in] parent - parent object
  * \param[in] name - name of the object
  * \param[out] none
@@ -130,6 +160,7 @@ typedef struct
 UShellVcpErr_e UShellVcpInit(UShellVcp_s* const vcp,
                              const UShellOsal_s* const osal,
                              const UShellHal_s* const hal,
+                             const bool usedForStdIO,
                              void* const parent,
                              const char* const name);
 

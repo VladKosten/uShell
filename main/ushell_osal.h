@@ -27,7 +27,7 @@ extern "C" {
  * Defines the number of lock objects available in the UShell OSAL.
  */
 #ifndef USHELL_OSAL_LOCK_OBJS_NUM
-    #define USHELL_OSAL_LOCK_OBJS_NUM (1)
+    #define USHELL_OSAL_LOCK_OBJS_NUM (2)
 #endif
 
 /**
@@ -51,6 +51,20 @@ extern "C" {
  */
 #ifndef USHELL_OSAL_STREAM_BUFF_SLOTS_NUM
     #define USHELL_OSAL_STREAM_BUFF_SLOTS_NUM (2)
+#endif
+
+/**
+ * \brief UShell OSAL timer number
+ */
+#ifndef USHELL_OSAL_TIMER_NUM
+    #define USHELL_OSAL_TIMER_NUM (1)
+#endif
+
+/**
+ * @brief UShell OSAL event groups number.
+ */
+#ifndef USHELL_OSAL_EVENT_GROUPS_NUM
+    #define USHELL_OSAL_EVENT_GROUPS_NUM (1)
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -197,6 +211,77 @@ typedef enum
      */
     USHELL_OSAL_STREAM_BUFF_RESET_ERR,
 
+    /**
+     * @brief Timer create error.
+     *
+     * Indicates that an error occurred while creating a timer.
+     */
+    USHELL_OSAL_TIMER_MEM_ALLOCATION_ERR,
+
+    /**
+     * @brief Timer start error.
+     *
+     * Indicates that an error occurred while starting a timer.
+     */
+    USHELL_OSAL_TIMER_START_ERR,
+
+    /**
+     * @brief Timer stop error.
+     *
+     * Indicates that an error occurred while stopping a timer.
+     */
+    USHELL_OSAL_TIMER_STOP_ERR,
+
+    /**
+     * @brief Timer reset error.
+     *
+     * Indicates that an error occurred while resetting a timer.
+     */
+    USHELL_OSAL_TIMER_RESET_ERR,
+
+    /**
+     * @brief Timer set period error.
+     *
+     * Indicates that an error occurred while setting the period of a timer.
+     */
+    USHELL_OSAL_TIMER_SET_PERIOD_ERR,
+
+    /**
+     * @brief Event group creation error.
+     *
+     * Indicates that an error occurred while creating an event group.
+     *
+     */
+    USHELL_OSAL_EVENT_GROUP_CREATE_ERR,
+
+    /**
+     * @brief Event group memory allocation error.
+     *
+     * Indicates that an error occurred while allocating memory for an event group.
+     */
+    USHELL_OSAL_EVENT_GROUP_MEM_ALLOCATION_ERR,
+
+    /**
+     * @brief Event group set error.
+     *
+     * Indicates that an error occurred while setting an event in the event group.
+     */
+    USHELL_OSAL_EVENT_GROUP_SET_ERR,
+
+    /**
+     * @brief Event group clear error.
+     *
+     * Indicates that an error occurred while clearing an event in the event group.
+     */
+    USHELL_OSAL_EVENT_GROUP_CLEAR_ERR,
+
+    /**
+     * @brief Event group wait error.
+     *
+     * Indicates that an error occurred while waiting for an event in the event group.
+     */
+    USHELL_OSAL_EVENT_GROUP_WAIT_ERR,
+
 } UShellOsalErr_e;
 
 /**
@@ -248,6 +333,23 @@ typedef void* UShellOsalSemaphoreHandle_t;
 typedef uint32_t UShellOsalSemaphoreCount_t;
 
 /**
+ * \brief UShell Osal Timer handle type definition
+ */
+typedef void* UShellOsalTimerHandle_t;
+
+/**
+ * \brief UShell Osal Timer auto reload state type definition
+ */
+typedef bool UShellOsalTimerAutoReloadState_b;
+
+/**
+ * @brief Event group handle type definition.
+ *
+ * This type defines a handle for an event group in the UShell OSAL.s
+ */
+typedef void* UShellOsalEventGroupHandle_t;
+
+/**
  * @brief UShell OSAL thread worker prototype.
  *
  * This type defines the prototype for a thread worker function in the UShell OSAL.
@@ -258,6 +360,28 @@ typedef uint32_t UShellOsalSemaphoreCount_t;
  * @param[in] threadParam Pointer to the parameter passed to the thread worker function.
  */
 typedef void (*UShellOsalThreadWorker_t)(void* const threadParam);
+
+/**
+ * @brief UShell OSAL event group bits enumeration.
+ */
+typedef enum
+{
+    USHELL_OSAL_EVENT_GROUP_BIT_NONE = 0x00, /**< No event group bits set */
+
+    USHELL_OSAL_EVENT_GROUP_BIT_0 = 0x01, /**< Event group bit 0 */
+    USHELL_OSAL_EVENT_GROUP_BIT_1 = 0x02, /**< Event group bit 1 */
+    USHELL_OSAL_EVENT_GROUP_BIT_2 = 0x04, /**< Event group bit 2 */
+    USHELL_OSAL_EVENT_GROUP_BIT_3 = 0x08, /**< Event group bit 3 */
+    USHELL_OSAL_EVENT_GROUP_BIT_4 = 0x10, /**< Event group bit 4 */
+    USHELL_OSAL_EVENT_GROUP_BIT_5 = 0x20, /**< Event group bit 5 */
+    USHELL_OSAL_EVENT_GROUP_BIT_6 = 0x40, /**< Event group bit 6 */
+    USHELL_OSAL_EVENT_GROUP_BIT_7 = 0x80, /**< Event group bit 7 */
+
+    /* Add more bits as needed */
+
+    USHELL_OSAL_EVENT_GROUP_BIT_ALL = 0xFFFFFFFF,
+
+} UShellOsalEventGroupBits_e;
 
 /**
  * @brief Enumeration of thread priority levels for UShell OSAL.
@@ -351,6 +475,40 @@ typedef struct
     UShellOsalThreadPriority_e threadPriority;
 
 } UShellOsalThreadCfg_s;
+
+/**
+ * @brief UShell OSAL timer expired callback prototype.
+ *
+ * This callback is invoked when the OSAL timer expires.
+ *
+ * @param[in] timerParam  Parameter assigned in UShellOsalTimerCfg_s.
+ */
+typedef void (*UShellOsalTimerExpiredCb_f)(void* const timerParam);
+
+/**
+ * @brief UShell OSAL timer parameters structure.
+ *
+ * This structure holds the configuration required for an OSAL timer.
+ */
+typedef struct
+{
+    const char* name;                                    ///< Timer name
+    void* timerParam;                                    ///< Parameter passed to the timer callback
+    UShellOsalTimerExpiredCb_f timerExpiredCb;           ///< Timer expiration callback
+    UShellOsalTimerAutoReloadState_b autoReloadState;    ///< Auto-reload setting (true or false)
+    UShellOsalTimeMs_t periodMs;                         ///< Period in milliseconds
+} UShellOsalTimerCfg_s;
+
+/**
+ * @brief UShell OSAL timer object structure.
+ *
+ * This structure associates the timer configuration with the underlying timer handle.
+ */
+typedef struct
+{
+    UShellOsalTimerCfg_s timerCfg;          ///< Timer configuration
+    UShellOsalTimerHandle_t timerHandle;    ///< OS-specific timer handle
+} UShellOsalTimer_s;
 
 /**
  * @brief UShell OSAL thread object structure.
@@ -789,6 +947,149 @@ typedef struct
     UShellOsalErr_e (*streamBuffReset)(void* const osal,
                                        const UShellOsalStreamBuffHandle_t streamBuffHandle);
 
+    /**
+     * @brief Create a timer.
+     *
+     * This function creates a timer with the specified configuration.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[out] timerHandle Pointer to store the handle of the created timer.
+     * @param[in] timerCfg Configuration parameters for the timer.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*timerCreate)(void* const osal,
+                                   UShellOsalTimerHandle_t* const timerHandle,
+                                   UShellOsalTimerCfg_s timerCfg);
+
+    /**
+     * @brief Delete a timer.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] timerHandle Handle of the timer to be deleted.
+     * @return Error code indicating the result of the operation.
+     * @note  This function should be called when the timer is not used anymore.
+     */
+    UShellOsalErr_e (*timerDelete)(void* const osal,
+                                   const UShellOsalTimerHandle_t timerHandle);
+
+    /**
+     * @brief Start a timer.
+     *
+     * This function starts the specified timer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] timerHandle Handle of the timer to be started.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*timerStart)(void* const osal,
+                                  const UShellOsalTimerHandle_t timerHandle);
+
+    /**
+     * @brief Stop a timer.
+     *
+     * This function stops the specified timer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] timerHandle Handle of the timer to be stopped.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*timerStop)(void* const osal,
+                                 const UShellOsalTimerHandle_t timerHandle);
+
+    /**
+     * @brief Reset a timer.
+     *
+     * This function resets the specified timer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] timerHandle Handle of the timer to be reset.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*timerReset)(void* const osal,
+                                  const UShellOsalTimerHandle_t timerHandle);
+
+    /**
+     * @brief Change the period of a timer.
+     *
+     * This function changes the period of the specified timer.
+     *
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] timerHandle Handle of the timer.
+     * @param[in] periodMs New period in milliseconds.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*timerPeriodChange)(void* const osal,
+                                         const UShellOsalTimerHandle_t timerHandle,
+                                         const UShellOsalTimeMs_t periodMs);
+
+    /**
+     * @brief Create an event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupCreate)(void* const osal,
+                                        UShellOsalEventGroupHandle_t* const eventGroupHandle);
+
+    /**
+     * @brief Create an event group with a specific name.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+     * @param[in] name Name of the event group.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupDelete)(void* const osal,
+                                        const UShellOsalEventGroupHandle_t eventGroupHandle);
+
+    /**
+     * @brief Set a bit in the event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] eventGroupHandle Handle of the event group.
+     * @param[in] bitsToSet Bits to set in the event group.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupSetBits)(void* const osal,
+                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                         const UShellOsalEventGroupBits_e bitsToSet);
+
+    /**
+     * @brief Clear a bit in the event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] eventGroupHandle Handle of the event group.
+     * @param[in] bitsToClear Bits to clear in the event group.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupClearBits)(void* const osal,
+                                           const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                           const UShellOsalEventGroupBits_e bitsToClear);
+
+    /**
+     * @brief Wait for bits in the event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] eventGroupHandle Handle of the event group.
+     * @param[in] bitsToWait Bits to wait for in the event group.
+     * @param[out] bitsReceived Pointer to store the received bits.
+     * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+     * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupBitsWait)(void* const osal,
+                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                          const UShellOsalEventGroupBits_e bitsToWait,
+                                          UShellOsalEventGroupBits_e* const bitsReceived,
+                                          const bool clearOnExit,
+                                          const bool waitAllBits);
+
+    /**
+     * @brief Get the active bits in the event group.
+     * @param[in] osal Pointer to the OSAL instance.
+     * @param[in] eventGroupHandle Handle of the event group.
+     * @param[out] bitsActive Pointer to store the active bits.
+     * @return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*eventGroupBitsActiveGet)(void* const osal,
+                                               const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                               UShellOsalEventGroupBits_e* const bitsActive);
+
 } UShellOsalPortable_s;
 
 /**
@@ -853,6 +1154,21 @@ typedef struct
      *
      */
     UShellOsalStreamBuffHandle_t streamBuffHandle [USHELL_OSAL_STREAM_BUFF_SLOTS_NUM];
+
+    /**
+     * @brief Event groups handles table.
+     *
+     * This array contains handles for the event groups available in the OSAL.
+     */
+    UShellOsalEventGroupHandle_t eventGroupHandle [USHELL_OSAL_EVENT_GROUPS_NUM];
+
+    /**
+     * @brief Timer objects handles table.
+     *
+     * This array contains handles for the timer objects available in the OSAL.
+     * @note  The number of timers is limited by the USHELL_OSAL_TIMER_NUM constant.
+     */
+    UShellOsalTimer_s timerObj [USHELL_OSAL_TIMER_NUM];
 
     /**
      * @brief Portable methods table.
@@ -1260,6 +1576,159 @@ size_t UShellOsalStreamBuffReceiveBlocking(UShellOsal_s* const osal,
  */
 UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
                                           const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+/**
+ * \brief Create the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - timer handle by which created timer can be referenced
+ * \param[in] timerCfg - timer configuration
+ * \param[out] UShellOsalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerCreate(UShellOsal_s* const osal,
+                                      UShellOsalTimerHandle_t* const timerHandle,
+                                      UShellOsalTimerCfg_s timerCfg);
+
+/**
+ * \brief Delete the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - the handle of the timer being deleted
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerDelete(UShellOsal_s* const osal,
+                                      const UShellOsalTimerHandle_t timerHandle);
+
+/**
+ * \brief Start the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - handle of the timer to start
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerStart(UShellOsal_s* const osal,
+                                     const UShellOsalTimerHandle_t timerHandle);
+
+/**
+ * \brief Stop the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - handle of the timer to stop
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerStop(UShellOsal_s* const osal, const UShellOsalTimerHandle_t timerHandle);
+
+/**
+ * \brief Reset the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - handle of the timer to reset
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerReset(UShellOsal_s* const osal, const UShellOsalTimerHandle_t timerHandle);
+
+/**
+ * \brief Get a timer handle of the given OSAL object
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerSlotInd - index of timer slots
+ * \param[in] timerHandle - pointer to an object into which the timer handle will be copied
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerHandleGet(UShellOsal_s* const osal,
+                                         const size_t timerSlotInd,
+                                         UShellOsalTimerHandle_t* const timerHandle);
+
+/**
+ * \brief Change the period of the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - handle of the timer to change the period
+ * \param[in] periodMs - the new period in milliseconds
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerPeriodChange(UShellOsal_s* const osal,
+                                            const UShellOsalTimerHandle_t timerHandle,
+                                            const UShellOsalTimeMs_t periodMs);
+
+/**
+ * @brief Create an event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
+                                       UShellOsalEventGroupHandle_t* const eventGroupHandle);
+
+/**
+ * @brief Create an event group with a specific name.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @param[in] name Name of the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupDelete(UShellOsal_s* const osal,
+                                       const UShellOsalEventGroupHandle_t eventGroupHandle);
+
+/**
+ * @brief Set a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToSet Bits to set in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
+                                        const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                        const UShellOsalEventGroupBits_e bitsToSet);
+
+/**
+ * @brief Clear a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToClear Bits to clear in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupClearBits(UShellOsal_s* const osal,
+                                          const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                          const UShellOsalEventGroupBits_e bitsToClear);
+
+/**
+ * @brief Wait for bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToWait Bits to wait for in the event group.
+ * @param[out] bitsReceived Pointer to store the received bits.
+ * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
+                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                         const UShellOsalEventGroupBits_e bitsToWait,
+                                         UShellOsalEventGroupBits_e* const bitsReceived,
+                                         const bool clearOnExit,
+                                         const bool waitAllBits);
+
+/**
+ * @brief Get the active bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[out] bitsActive Pointer to store the active bits.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
+                                              const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                              UShellOsalEventGroupBits_e* const bitsActive);
+
+/**
+ * @brief Get an event group handle of the given OSAL object
+ * @param[in] osal - pointer to OSAL instance
+ * @param[in] eventGroupSlotInd - index of event group slots
+ * @param[in] eventGroupHandle - pointer to an object into which the event group handle will be copied
+ * @return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalEventGroupHandleGet(UShellOsal_s* const osal,
+                                              const size_t eventGroupSlotInd,
+                                              UShellOsalEventGroupHandle_t* const eventGroupHandle);
 
 /**
  * \brief Get a queue handle of the given OSAL object

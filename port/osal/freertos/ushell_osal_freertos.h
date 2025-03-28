@@ -11,7 +11,9 @@ extern "C" {
 #include <task.h>
 #include <semphr.h>
 #include <queue.h>
+#include <timers.h>
 #include <stream_buffer.h>
+#include <event_groups.h>
 
 #include "ushell_osal.h"
 

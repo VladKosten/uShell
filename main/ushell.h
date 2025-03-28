@@ -18,6 +18,7 @@ extern "C" {
 #include "ushell_hal.h"
 #include "ushell_osal.h"
 #include "ushell_history.h"
+#include "ushell_vcp.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -32,7 +33,7 @@ extern "C" {
  * @brief Description of the maximum size of the buffer in the UShell
  */
 #ifndef USHELL_BUFFER_SIZE
-    #define USHELL_BUFFER_SIZE 64
+    #define USHELL_BUFFER_SIZE 256
 #endif
 
 /**
@@ -47,7 +48,7 @@ extern "C" {
 #endif
 
 #ifndef USHELL_THREAD_STACK_SIZE
-    #define USHELL_THREAD_STACK_SIZE 1024U
+    #define USHELL_THREAD_STACK_SIZE 2048U
 #endif
 
 #ifndef USHELL_THREAD_PRIORITY
@@ -163,6 +164,7 @@ typedef struct
     /* Dependencies */
     const UShellOsal_s* osal;    ///< OSAL object
     const UShellHal_s* hal;      ///< HAL object
+    const UShellVcp_s* vcp;      ///< VCP object
 
     /* Optional fields */
     UShellFsmState_e fsmState;            ///< Finite state machine state
@@ -179,6 +181,7 @@ typedef struct
  * @brief Init uShell object
  * \param[in] uShell - uShell object to be initialized
  * \param[in] osal - osal object
+ * \param[in] vcs - vcp object
  * \param[in] parent - parent object
  * \param[in] name - name of the object
  * \param[out] none
@@ -186,6 +189,7 @@ typedef struct
  */
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
+                       const UShellVcp_s* const vcp,
                        const UShellCfg_s cfg,
                        void* const parent,
                        const char* const name);

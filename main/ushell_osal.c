@@ -1400,6 +1400,394 @@ UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
 }
 
 /**
+ * \brief Create the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - timer handle by which created timer can be referenced
+ * \param[in] timerCfg - timer configuration
+ * \param[out] UShellOsalErr_e - error code. non-zero = an error has occurred;
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerCreate(UShellOsal_s* const osal,
+                                      UShellOsalTimerHandle_t* const timerHandle,
+                                      UShellOsalTimerCfg_s timerCfg)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == timerHandle) ||
+        (timerCfg.timerExpiredCb == NULL))
+    {
+        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->timerCreate))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
+    }
+
+    UShellOsalErr_e osalStatus = osal->portable->timerCreate(osal, timerHandle, timerCfg);
+
+    return osalStatus;    // Exit: no errors
+}
+
+/**
+ * \brief Delete the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - the handle of the timer being deleted
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerDelete(UShellOsal_s* const osal,
+                                      const UShellOsalTimerHandle_t timerHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == timerHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->timerDelete))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
+    }
+
+    UShellOsalErr_e osalStatus = osal->portable->timerDelete(osal, timerHandle);
+
+    return osalStatus;    // Exit: no errors
+}
+
+/**
+ * \brief Start the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - handle of the timer to start
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerStart(UShellOsal_s* const osal,
+                                     const UShellOsalTimerHandle_t timerHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == timerHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->timerStart))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
+    }
+
+    UShellOsalErr_e osalStatus = osal->portable->timerStart(osal, timerHandle);
+
+    return osalStatus;    // Exit: no errors
+}
+
+/**
+ * \brief Stop the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - handle of the timer to stop
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerStop(UShellOsal_s* const osal, const UShellOsalTimerHandle_t timerHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == timerHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->timerStop))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
+    }
+
+    UShellOsalErr_e osalStatus = osal->portable->timerStop(osal, timerHandle);
+
+    return osalStatus;    // Exit: no errors
+}
+
+/**
+ * \brief Reset the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - handle of the timer to reset
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerReset(UShellOsal_s* const osal, const UShellOsalTimerHandle_t timerHandle)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == timerHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->timerReset))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
+    }
+
+    UShellOsalErr_e osalStatus = osal->portable->timerReset(osal, timerHandle);
+
+    return osalStatus;    // Exit: no errors
+}
+
+/**
+ * \brief Get a timer handle of the given OSAL object
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerSlotInd - index of timer slots
+ * \param[in] timerHandle - pointer to an object into which the timer handle will be copied
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerHandleGet(UShellOsal_s* const osal,
+                                         const size_t timerSlotInd,
+                                         UShellOsalTimerHandle_t* const timerHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == timerHandle) ||
+        (USHELL_OSAL_TIMER_NUM <= timerSlotInd))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    *timerHandle = osal->timerObj [timerSlotInd].timerHandle;
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+/**
+ * \brief Change the period of the timer
+ * \param[in] osal - pointer to OSAL instance
+ * \param[in] timerHandle - handle of the timer to change the period
+ * \param[in] periodMs - the new period in milliseconds
+ * \param[out] none
+ * \return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimerPeriodChange(UShellOsal_s* const osal,
+                                            const UShellOsalTimerHandle_t timerHandle,
+                                            const UShellOsalTimeMs_t periodMs)
+{
+    /* Checking of params */
+    if ((NULL == osal) ||
+        (NULL == timerHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
+    }
+
+    /* Checking is init obj */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->timerPeriodChange))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
+    }
+
+    UShellOsalErr_e osalStatus = osal->portable->timerPeriodChange(osal, timerHandle, periodMs);
+
+    return osalStatus;    // Exit: no errors
+}
+
+/**
+ * @brief Create an event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
+                                       UShellOsalEventGroupHandle_t* const eventGroupHandle)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupCreate))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Create the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupCreate(osal, eventGroupHandle);
+
+    return retStatus;
+}
+
+/**
+ * @brief Create an event group with a specific name.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[out] eventGroupHandle Pointer to store the handle of the created event group.
+ * @param[in] name Name of the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupDelete(UShellOsal_s* const osal,
+                                       const UShellOsalEventGroupHandle_t eventGroupHandle)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupDelete))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Delete the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupDelete(osal, eventGroupHandle);
+
+    return retStatus;
+}
+
+/**
+ * @brief Set a bit in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToSet Bits to set in the event group.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
+                                        const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                        const UShellOsalEventGroupBits_e bitsToSet)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupSetBits))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Set the bits in the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupSetBits(osal, eventGroupHandle, bitsToSet);
+
+    return retStatus;
+}
+
+/**
+ * @brief Wait for bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[in] bitsToWait Bits to wait for in the event group.
+ * @param[out] bitsReceived Pointer to store the received bits.
+ * @param[in] clearOnExit Flag indicating whether to clear the bits on exit.
+ * @param[in] waitAllBits Flag indicating whether to wait for all bits or any bit.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
+                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                         const UShellOsalEventGroupBits_e bitsToWait,
+                                         UShellOsalEventGroupBits_e* const bitsReceived,
+                                         const bool clearOnExit,
+                                         const bool waitAllBits)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle) ||
+        (NULL == bitsReceived))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupClearBits))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Clear the bits in the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupBitsWait(osal,
+                                                                   eventGroupHandle,
+                                                                   bitsToWait,
+                                                                   bitsReceived,
+                                                                   clearOnExit,
+                                                                   waitAllBits);
+
+    return retStatus;
+}
+
+/**
+ * @brief Get the active bits in the event group.
+ * @param[in] osal Pointer to the OSAL instance.
+ * @param[in] eventGroupHandle Handle of the event group.
+ * @param[out] bitsActive Pointer to store the active bits.
+ * @return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
+                                              const UShellOsalEventGroupHandle_t eventGroupHandle,
+                                              UShellOsalEventGroupBits_e* const bitsActive)
+{
+    /* Check input parameter */
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle) ||
+        (NULL == bitsActive))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    /* Check if the OSAL object is initialized */
+    if ((NULL == osal->portable) ||
+        (NULL == osal->portable->eventGroupClearBits))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    /* Clear the bits in the event group */
+    UShellOsalErr_e retStatus = osal->portable->eventGroupBitsActiveGet(osal, eventGroupHandle, bitsActive);
+
+    return retStatus;
+}
+
+/**
+ * @brief Get an event group handle of the given OSAL object
+ * @param[in] osal - pointer to OSAL instance
+ * @param[in] eventGroupSlotInd - index of event group slots
+ * @param[in] eventGroupHandle - pointer to an object into which the event group handle will be copied
+ * @return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalEventGroupHandleGet(UShellOsal_s* const osal,
+                                              const size_t eventGroupSlotInd,
+                                              UShellOsalEventGroupHandle_t* const eventGroupHandle)
+{
+    if ((NULL == osal) ||
+        (NULL == eventGroupHandle) ||
+        (USHELL_OSAL_EVENT_GROUPS_NUM <= eventGroupSlotInd))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    *eventGroupHandle = osal->eventGroupHandle [eventGroupSlotInd];
+
+    return USHELL_OSAL_NO_ERR;
+}
+
+/**
  * \brief Get a queue handle of the given OSAL object
  * \param[in] osal          - pointer to OSAL instance
  * \param[in] queueSlotInd  - index of queue slot
@@ -1514,6 +1902,5 @@ UShellOsalErr_e UShellOsalStreamBuffHandleGet(UShellOsal_s* const osal,
 
     return USHELL_OSAL_NO_ERR;
 }
-
 
 //============================================================================[PRIVATE FUNCTIONS]==================================================================================
