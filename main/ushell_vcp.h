@@ -110,6 +110,7 @@ typedef enum
     USHELL_VCP_PORT_ERR,            ///< Exit: error - port error (e.g. port layer error)
     USHELL_VCP_XFER_ERR,            ///< Exit: error - transfer error
     USHELL_VCP_TIMEOUT_ERR,         ///< Exit: error - timeout error
+    USHELL_VCP_EMPTY_ERR,           ///< Exit: error - empty buffer error
 
 } UShellVcpErr_e;
 
@@ -191,6 +192,7 @@ UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch);
 
 /**
  * \brief Scan char from the uShell vcp object
+ * \note: This function is blocking and will wait for the character to be received.
  * @param[in] vcp - uShell object to be scanned
  * @param[in] ch - char to be scanned
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
@@ -199,7 +201,19 @@ UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
                                  char* const ch);
 
 /**
+ * @brief Scan character from the uShell vcp object in non-blocking mode
+ * @note: This function is non-blocking and will return immediately.
+ * @note: This function will return USHELL_VCP_EMPTY_ERR if no character is available.
+ * @param[in] vcp - uShell object to be scanned
+ * @param[in] ch - character to be scanned
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+UShellVcpErr_e UShellVcpScanCharNonBlock(UShellVcp_s* const vcp,
+                                         char* const ch);
+
+/**
  * \brief Scan string from the uShell vcp object
+ * \note: This function is blocking and will wait for the string to be received.
  * @param[in] vcp - uShell object to be scanned
  * @param[in] str - string to be scanned
  * @param[in] size - size of the string to be scanned
@@ -208,6 +222,15 @@ UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
 UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
                                 char* const str,
                                 const size_t maxSize);
+
+/**
+ * @brief Check if the uShell vcp object is empty
+ * @param vcp - uShell object to be checked
+ * @param isEmpty - pointer to store the result indicating if the object is empty
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+UShellVcpErr_e UShellVcpScanIsEmpty(UShellVcp_s* const vcp,
+                                    bool* const isEmpty);
 
 #ifdef __cplusplus
 }
