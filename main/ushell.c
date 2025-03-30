@@ -735,15 +735,16 @@ static void uShellWorker(void* const uShell)
 
                             /* Find cmd */
                             ushell->currCmd = uShellCmdFindByName(ushell, ushell->io.buffer);
+
+                            /* Flush the io */
+                            uShellIoFlush(ushell);
+
                             if (ushell->currCmd == NULL)
                             {
                                 /* Print error msg */
                                 uShellPrintStr(ushell, USHELL_CMD_NOT_FOUND_MSG);
                                 break;
                             }
-
-                            /* Flush the io */
-                            uShellIoFlush(ushell);
 
                             /* Change state to proc cmd */
                             ushell->fsmState = USHELL_STATE_PROC_CMD;

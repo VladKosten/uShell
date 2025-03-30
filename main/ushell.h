@@ -89,7 +89,7 @@ extern "C" {
  * @brief The default message displayed when the UShell is started.
  */
 #ifndef USHELL_HELLO_MSG
-    #define USHELL_HELLO_MSG "Press Enter to start the UShell..."
+    #define USHELL_HELLO_MSG "Press Enter to start ..."
 #endif
 
 /**
