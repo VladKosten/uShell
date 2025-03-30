@@ -948,6 +948,18 @@ typedef struct
                                        const UShellOsalStreamBuffHandle_t streamBuffHandle);
 
     /**
+     * @brief Stream buffer is empty.
+     *
+     * \param[in] osal Pointer to the OSAL instance.
+     * \param[in] streamBuffHandle Handle of the stream buffer.
+     * \param[out] isEmpty Pointer to store the result indicating if the stream buffer is empty.
+     * \return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*streamBuffIsEmpty)(void* const osal,
+                                         const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                         bool* const isEmpty);
+
+    /**
      * \brief Create a timer.
      *
      * This function creates a timer with the specified configuration.
@@ -1576,6 +1588,18 @@ size_t UShellOsalStreamBuffReceiveBlocking(UShellOsal_s* const osal,
  */
 UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
                                           const UShellOsalStreamBuffHandle_t streamBuffHandle);
+
+/**
+ * @brief Stream buffer is empty.
+ *
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] streamBuffHandle Handle of the stream buffer.
+ * \param[out] isEmpty Pointer to store the result indicating if the stream buffer is empty.
+ * \return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellOsalStreamBuffIsEmpty(UShellOsal_s* const osal,
+                                            const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                            bool* const isEmpty);
 
 /**
  * \brief Create the timer

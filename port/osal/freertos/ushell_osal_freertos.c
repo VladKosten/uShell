@@ -315,6 +315,13 @@ static size_t uShellOsalFreertosStreamBuffReceiveBlocking(void* const osalFreert
                                                           const size_t dataLengthBytes);
 
 /**
+ * \brief Receive data from the stream buffer with specified waiting time
+ */
+static UShellOsalErr_e uShellOsalFreertosStreamBuffIsEmpty(void* const osalFreertos,
+                                                           const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                                           bool* const isEmpty);
+
+/**
  * \brief Reset a stream buffer to its initial empty state
  */
 static UShellOsalErr_e uShellOsalFreertosStreamBuffReset(void* const osalFreertos,
@@ -566,6 +573,7 @@ static const UShellOsalPortable_s FreeRtosPortable =
         .streamBuffReceive = uShellOsalFreertosStreamBuffReceive,
         .streamBuffReceiveBlocking = uShellOsalFreertosStreamBuffReceiveBlocking,
         .streamBuffSendBlocking = uShellOsalFreertosStreamBuffSendBlocking,
+        .streamBuffIsEmpty = uShellOsalFreertosStreamBuffIsEmpty,
         .timerCreate = uShellOsalFreertosTimerCreate,
         .timerDelete = uShellOsalFreertosTimerDelete,
         .timerStart = uShellOsalFreertosTimerStart,
@@ -2322,6 +2330,38 @@ static UShellOsalErr_e uShellOsalFreertosStreamBuffReset(void* const osalFreerto
         // or read from the stream buffer then the stream buffer will not be reset and pdFAIL is returned.
         return USHELL_OSAL_STREAM_BUFF_RESET_ERR;
     }
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
+}
+
+/**
+ * \brief Receive data from the stream buffer with specified waiting time
+ */
+static UShellOsalErr_e uShellOsalFreertosStreamBuffIsEmpty(void* const osalFreertos,
+                                                           const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                                           bool* const isEmpty)
+{
+    // Must be validated by the caller
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != osalFreertos);
+    USHELL_OSAL_FREERTOS_ASSERT(NULL != streamBuffHandle);
+
+    // Find handle
+    uint16_t streamBuffIndexNum = uShellOsalFreertosFindStreamBuffHandle(osalFreertos, streamBuffHandle);
+    if (0 == streamBuffIndexNum)
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM < streamBuffIndexNum)
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    // Reset the stream buffer
+    BaseType_t resetStatus = xStreamBufferIsEmpty((UShellOsalStreamBuffHandle_t) streamBuffHandle);
+
+    // Return the result
+    *isEmpty = (pdTRUE == resetStatus) ? true : false;
 
     return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }

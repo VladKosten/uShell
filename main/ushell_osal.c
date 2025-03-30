@@ -1400,6 +1400,36 @@ UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
 }
 
 /**
+ * @brief Stream buffer is empty.
+ *
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[in] streamBuffHandle Handle of the stream buffer.
+ * \param[out] isEmpty Pointer to store the result indicating if the stream buffer is empty.
+ * \return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e UShellOsalStreamBuffIsEmpty(UShellOsal_s* const osal,
+                                            const UShellOsalStreamBuffHandle_t streamBuffHandle,
+                                            bool* const isEmpty)
+{
+    if ((NULL == osal) ||
+        (NULL == streamBuffHandle))
+    {
+        return USHELL_OSAL_INVALID_ARGS;
+    }
+
+    if ((NULL == osal->portable->streamBuffIsEmpty))
+    {
+        return USHELL_OSAL_PORT_SPECIFIC_ERR;
+    }
+
+    UShellOsalErr_e retStatus = osal->portable->streamBuffIsEmpty(osal,
+                                                                  streamBuffHandle,
+                                                                  isEmpty);
+
+    return retStatus;
+}
+
+/**
  * \brief Create the timer
  * \param[in] osal - pointer to OSAL instance
  * \param[in] timerHandle - timer handle by which created timer can be referenced
