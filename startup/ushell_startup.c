@@ -115,7 +115,6 @@ int16_t UShellStartup(void)
         /* Initialize the uShell */
         UShellCfg_s ushellCfg = {
             .authIsEn = USHELL_STARTUP_AUTH_IS_EN,
-            .echoIsEn = USHELL_STARTUP_ECHO_IS_EN,
             .historyIsEn = USHELL_STARTUP_HISTORY_IS_EN,
             .promptIsEn = USHELL_STARTUP_PROMPT_IS_EN};
         UShellErr_e ushellErr = UShellInit(&uShellObj,
