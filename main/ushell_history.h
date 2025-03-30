@@ -42,6 +42,7 @@ typedef enum
     USHELL_HISTORY_INVALID_ARGS_ERR,     ///< Exit: error - invalid pointers (e.g. null pointers)
     USHELL_HISTORY_NOT_INIT_ERR,         ///< Exit: error - not initialized
     USHELL_HISTORY_CMD_NOT_FOUND_ERR,    ///< Exit: error - command not found
+    USHELL_HISTORY_SIZE_ERR,             ///< Exit: error - size error (e.g. buffer overflow)
 
 } UShellHistoryErr_e;
 
@@ -69,6 +70,11 @@ typedef struct
      * \brief Index for the oldest entry in the ring buffer
      */
     size_t tailIndex;
+
+    /**
+     * \brief Number of entries in the ring buffer
+     */
+    size_t currentIndex;    ///< Index of the current command in the history buffer
 
 } UShellHistory_s;
 
@@ -100,26 +106,26 @@ UShellHistoryErr_e UShellHistoryAdd(UShellHistory_s* const history,
                                     const char* const str);
 
 /**
- * \brief Get command string from the history buffer
+ * @brief Get the previous command string from the history buffer
  * @param[in] history - uShell history object
  * @param[in] str - command string to be added
- * @param[in] index - index of the command string in the history buffer
- * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * @param[in] bufferSize - size of the buffer
+ * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
-UShellHistoryErr_e UShellHistoryGetByIndex(UShellHistory_s* const history,
+UShellHistoryErr_e UShellHistoryCmdPrevGet(UShellHistory_s* const history,
                                            char* const str,
-                                           const size_t index);
+                                           const size_t bufferSize);
 
 /**
- * \brief Find cmd in the history buffer
+ * @brief Get the next command string from the history buffer
  * @param[in] history - uShell history object
- * @param[in] str - command string to be found
- * @param[in] index - index of the command string in the history buffer
- * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * @param[in] str - command string to be added
+ * @param[in] bufferSize - size of the buffer
+ * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
-UShellHistoryErr_e UShellHistoryFindCmd(UShellHistory_s* const history,
-                                        const char* const str,
-                                        size_t* const index);
+UShellHistoryErr_e UShellHistoryCmdNextGet(UShellHistory_s* const history,
+                                           char* const str,
+                                           const size_t bufferSize);
 
 #ifdef __cplusplus
 }

@@ -125,47 +125,74 @@ UShellHistoryErr_e UShellHistoryAdd(UShellHistory_s* const history,
         /* Add the command string */
         strncpy(history->ringBuffer [history->headIndex], str, USHELL_HISTORY_MAX_STR_LEN);
 
+        /* Force null termination */
+        history->ringBuffer [history->headIndex][USHELL_HISTORY_MAX_STR_LEN - 1] = '\0';
+
         /* Update the head index */
         history->headIndex = (history->headIndex + 1) % USHELL_HISTORY_SIZE;
 
+        /* Set current index to the last command in the history */
+        history->currentIndex = (history->headIndex + USHELL_HISTORY_SIZE - 1) % USHELL_HISTORY_SIZE;
+
     } while (0);
 
     return status;
 }
 
 /**
- * \brief Get command string from the history buffer
- * @param[in] history - uShell history object
- * @param[out] str - buffer for the retrieved command string
- * @param[in] index - offset from the last command in the history
- * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * @brief Get the previous (older) command string from the history buffer.
+ * @param[in] history - uShell history object.
+ * @param[in] str - buffer for storing the command.
+ * @return UShellHistoryErr_e - error code, non-zero value indicates an error.
  */
-UShellHistoryErr_e UShellHistoryGetByIndex(UShellHistory_s* const history,
+UShellHistoryErr_e UShellHistoryCmdPrevGet(UShellHistory_s* const history,
                                            char* const str,
-                                           const size_t index)
+                                           const size_t bufferSize)
 {
     /* Check input parameter */
     USHELL_HISTORY_ASSERT(history != NULL);
-
-    /* Local variable */
     UShellHistoryErr_e status = USHELL_HISTORY_NO_ERR;
+    size_t tries = 0;
 
-    /* Get the command string */
+    /* Get prev cmd */
     do
     {
         /* Check input parameter */
         if ((history == NULL) ||
             (str == NULL) ||
-            (index >= USHELL_HISTORY_SIZE))
+            (bufferSize == 0))
         {
             status = USHELL_HISTORY_INVALID_ARGS_ERR;
             break;
         }
 
-        /* Сalculate the real index */
-        size_t realIndex = (history->headIndex + USHELL_HISTORY_SIZE - 1 - index) % USHELL_HISTORY_SIZE;
+        /*  Find nearest non-empty command */
+        while ((tries < USHELL_HISTORY_SIZE) &&
+               (history->ringBuffer [history->currentIndex][0] == '\0'))
+        {
+            history->currentIndex = (history->currentIndex + USHELL_HISTORY_SIZE - 1) % USHELL_HISTORY_SIZE;
+            tries++;
+        }
 
-        strncpy(str, history->ringBuffer [realIndex], USHELL_HISTORY_MAX_STR_LEN);
+        /* Check if there are no commands in the history */
+        if (tries == USHELL_HISTORY_SIZE)
+        {
+            str [0] = '\0';
+            break;
+        }
+
+        /* Check if the buffer is large enough */
+        if (bufferSize < strlen(history->ringBuffer [history->currentIndex]) + 1)
+        {
+            status = USHELL_HISTORY_SIZE_ERR;
+            break;
+        }
+
+        /* Copy the found non-empty command */
+        strncpy(str, history->ringBuffer [history->currentIndex], USHELL_HISTORY_MAX_STR_LEN);
+
+        /* Force null termination */
+        history->currentIndex = (history->currentIndex + USHELL_HISTORY_SIZE - 1) % USHELL_HISTORY_SIZE;
 
     } while (0);
 
@@ -173,45 +200,62 @@ UShellHistoryErr_e UShellHistoryGetByIndex(UShellHistory_s* const history,
 }
 
 /**
- * \brief Find cmd in the history buffer
- * @param[in] history - uShell history object
- * @param[in] str - command string to be found
- * @param[in] index - index of the command string in the history buffer
- * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * @brief Get the next (newer) command string from the history buffer.
+ * @param[in] history - uShell history object.
+ * @param[in] str - buffer for storing the command.
+ * @return UShellHistoryErr_e - error code, non-zero value indicates an error.
  */
-UShellHistoryErr_e UShellHistoryFindCmd(UShellHistory_s* const history,
-                                        const char* const str,
-                                        size_t* const index)
+UShellHistoryErr_e UShellHistoryCmdNextGet(UShellHistory_s* const history,
+                                           char* const str,
+                                           const size_t bufferSize)
 {
     /* Check input parameter */
     USHELL_HISTORY_ASSERT(history != NULL);
-    USHELL_HISTORY_ASSERT(str != NULL);
-    USHELL_HISTORY_ASSERT(index != NULL);
 
     /* Local variable */
     UShellHistoryErr_e status = USHELL_HISTORY_NO_ERR;
+    size_t tries = 0;
 
-    /* Find the command string */
+    /* Get next cmd */
     do
     {
         /* Check input parameter */
         if ((history == NULL) ||
             (str == NULL) ||
-            (index == NULL))
+            (bufferSize == 0))
         {
             status = USHELL_HISTORY_INVALID_ARGS_ERR;
             break;
         }
 
-        /* Find the command string */
-        for (size_t i = 0; i < USHELL_HISTORY_SIZE; i++)
+        /* Find nearest non-empty command */
+        while ((tries < USHELL_HISTORY_SIZE) &&
+               (history->ringBuffer [history->currentIndex][0] == '\0'))
         {
-            if (strncmp(str, history->ringBuffer [i], USHELL_HISTORY_MAX_STR_LEN) == 0)
-            {
-                *index = i;
-                break;
-            }
+            history->currentIndex = (history->currentIndex + 1) % USHELL_HISTORY_SIZE;
+            tries++;
         }
+
+        /* Check if there are no commands in the history */
+        if (tries == USHELL_HISTORY_SIZE)
+        {
+            str [0] = '\0';
+            break;
+        }
+
+        /* Check if the buffer is large enough */
+        if (bufferSize < strlen(history->ringBuffer [history->currentIndex]) + 1)
+        {
+            status = USHELL_HISTORY_SIZE_ERR;
+            break;
+        }
+
+        /* Copy the found non-empty command */
+        strncpy(str, history->ringBuffer [history->currentIndex], USHELL_HISTORY_MAX_STR_LEN);
+        str [USHELL_HISTORY_MAX_STR_LEN - 1] = '\0';
+
+        /* Update the current index */
+        history->currentIndex = (history->currentIndex + 1) % USHELL_HISTORY_SIZE;
 
     } while (0);
 
