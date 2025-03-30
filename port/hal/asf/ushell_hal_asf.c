@@ -125,6 +125,15 @@ static UShellHalErr_e uShellHalPortSetTxMode(void* const hal);
 static UShellHalErr_e uShellHalPortSetRxMode(void* const hal);
 
 /**
+ * @brief Check if data is available for reading.
+ * @param[in] hal - Pointer to the HAL instance.
+ * @param[in] isAvailable - Pointer to a boolean indicating if data is available.
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellHalErr_e uShellHalPortIsReadDataAvailable(void* const hal,
+                                                       bool* const isAvailable);
+
+/**
  * \brief Callback for error in the usart (portable)
  * \param[in] usart - the usart descriptor (from Atmel Start) which has an error;
  * \param[out] no;
@@ -159,6 +168,7 @@ static UShellHalPortTable_s ushellHalPortTable = {
     .read = uShellHalPortRead,
     .setTxMode = uShellHalPortSetTxMode,
     .setRxMode = uShellHalPortSetRxMode,
+    .isReadDataAvailable = uShellHalPortIsReadDataAvailable,
 };
 
 /**
@@ -715,6 +725,46 @@ static UShellHalErr_e uShellHalPortSetRxMode(void* const hal)
         /* Set rx tx pin */
         gpio_set_pin_level(halPort->cfg.transceiverPins.txPin, !halPort->cfg.transceiverPins.txPinActive);
         gpio_set_pin_level(halPort->cfg.transceiverPins.rxPin, halPort->cfg.transceiverPins.rxPinActive);
+
+    } while (0);
+
+    /* Return status */
+    return status;
+}
+
+/**
+ * @brief Check if data is available for reading.
+ * @param[in] hal - Pointer to the HAL instance.
+ * @param[in] isAvailable - Pointer to a boolean indicating if data is available.
+ * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellHalErr_e uShellHalPortIsReadDataAvailable(void* const hal,
+                                                       bool* const isAvailable)
+{
+    /* Check input parameters */
+    USHELL_HAL_PORT_ASSERT(hal != NULL);
+
+    /* Local variable */
+    UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+    int32_t asfStatus = 0;
+
+    /* Open the port */
+    do
+    {
+        /* Check input parameters */
+        if ((halPort == NULL) ||
+            (isAvailable == NULL))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check if data is available */
+        asfStatus = usart_async_is_rx_not_empty(halPort->uart);
+
+        /* Return status */
+        *isAvailable = (asfStatus == 0) ? false : true;
 
     } while (0);
 

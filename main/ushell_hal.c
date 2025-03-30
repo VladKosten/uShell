@@ -517,6 +517,49 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
 }
 
 /**
+ * @brief Check if data is available for reading.
+ * @param[in] hal Pointer to the HAL instance.
+ * @param[out] isAvailable Pointer to a boolean indicating if data is available.
+ * \return Error code indicating the result of the operation.
+ */
+UShellHalErr_e UShellHalIsReadDataAvailable(UShellHal_s* const hal,
+                                            bool* const isAvailable)
+{
+    /* Check input parameter */
+    USHELL_HAL_ASSERT(hal != NULL);
+    USHELL_HAL_ASSERT(isAvailable != NULL);
+
+    /* Local variable */
+    UShellHalErr_e status = USHELL_HAL_NO_ERR;
+
+    /* Process */
+    do
+    {
+        /* Check input parameter */
+        if ((hal == NULL) ||
+            (isAvailable == NULL))
+        {
+            status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Check is init */
+        if ((hal->port == NULL) ||
+            (hal->port->isReadDataAvailable == NULL))
+        {
+            status = USHELL_HAL_PORT_ERR;
+            break;
+        }
+
+        /* Close the port */
+        status = hal->port->isReadDataAvailable(hal, isAvailable);
+
+    } while (0);
+
+    return status;
+}
+
+/**
  * \brief Set the tx mode of the UShellHal object
  * @param[in] hal - UShellHal object to set the tx mode
  * @param[out] none

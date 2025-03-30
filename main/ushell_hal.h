@@ -131,6 +131,15 @@ typedef struct
                            size_t* const usedSize);
 
     /**
+     * @brief Check if data is available for reading.
+     * @param[in] hal Pointer to the HAL instance.
+     * @param[out] isAvailable Pointer to a boolean indicating if data is available.
+     * \return Error code indicating the result of the operation.
+     */
+    UShellHalErr_e (*isReadDataAvailable)(void* const hal,
+                                          bool* const isAvailable);
+
+    /**
      * \brief Set Tx mode
      *
      * This function tx mode
@@ -377,6 +386,15 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
                              UShellHalItem_t* const data,
                              const size_t buffSize,
                              size_t* const usedSize);
+
+/**
+ * @brief Check if data is available for reading.
+ * @param[in] hal Pointer to the HAL instance.
+ * @param[out] isAvailable Pointer to a boolean indicating if data is available.
+ * \return Error code indicating the result of the operation.
+ */
+UShellHalErr_e UShellHalIsReadDataAvailable(UShellHal_s* const hal,
+                                            bool* const isAvailable);
 
 /**
  * \brief Set the tx mode of the UShellHal object
