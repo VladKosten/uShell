@@ -113,6 +113,13 @@ extern "C" {
     #define USHELL_AUTH_FAIL_MSG " \n\rAuthentication FAIL \n\r"
 #endif
 
+/**
+ * @brief The message displayed when the command is not found.
+ */
+#ifndef USHELL_CMD_NOT_FOUND_MSG
+    #define USHELL_CMD_NOT_FOUND_MSG " \n\rCommand not found \n\r"
+#endif
+
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
@@ -159,12 +166,12 @@ typedef struct
  */
 typedef enum
 {
-    USHELL_STATE_INIT,        ///< uShell is in initialization state
-    USHELL_STATE_AUTH,        ///< uShell is in authentication state
-    USHELL_STATE_PROC_INP,    ///< uShell is processing input
-    USHELL_STATE_PROC_CMD,    ///< uShell is processing command
-    USHELL_STATE_PROC_ESC,    ///< uShell is processing escape sequence
-    USHELL_STATE_ERROR,       ///< uShell is in error state
+    USHELL_STATE_INIT,            ///< uShell is in initialization state
+    USHELL_STATE_AUTH,            ///< uShell is in authentication state
+    USHELL_STATE_PROC_INP,        ///< uShell is processing input
+    USHELL_STATE_PROC_CMD,        ///< uShell is processing command
+    USHELL_STATE_PROC_ESC_SEQ,    ///< uShell is processing escape sequence
+    USHELL_STATE_ERROR,           ///< uShell is in error state
 } UShellFsmState_e;
 
 /**

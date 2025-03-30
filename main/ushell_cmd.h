@@ -41,40 +41,33 @@ typedef char* UShellCmdHelp_t;
 typedef char UShellCmdItem_t;
 
 /**
- * \brief Describe a cmd port table.
+ * \brief Describe a cmd exec function.
+ */
+typedef UShellCmdErr_e(UShellCmdExec_f)(void* const cmd,
+                                        const UShellCmdItem_t* const arg);
+
+/**
+ * @brief Describe a cmd hook function.
  */
 typedef struct
 {
-    /**
-     * \brief Execute cmd
-     * \param[in] cmd - pointer to the cmd object
-     * \param[in] arg - pointer to the arguments (Can be NULL and it means no arguments)
-     * \param[in] out - pointer to the output buffer (Can be NULL and it means no output)
-     */
-    UShellCmdErr_e (*exec)(void* const cmd,
-                           const UShellCmdItem_t* const arg,
-                           UShellCmdItem_t* const out);
-} UShellCmdPortTable_s;
+    void (*lock)(void* const cmd);      ///< Pointer to the lock function
+    void (*unlock)(void* const cmd);    ///< Pointer to the unlock function
+
+} UShellCmdHookTable_s;
 
 /**
  * \brief Describe UShellCmd.
- *
- * This structure represents a UShell command.
- *
- * \param parent Pointer to the parent object (ushell object).
- * \param name Pointer to the name of the command.
- * \param help Pointer to the help string (must be a valid string).
  */
 typedef struct UShellCmd_t
 {
     /* Mandatory */
-    const void* parent;                      ///< Pointer to the parent object
-    const char* name;                        ///< Pointer to the name of the object (aka command)
-    bool isSudo;                             ///< Cmd is sudo(Execute with root privilege)
-    const UShellCmdHelp_t* help;             ///< Pointer to the help string (Must be string)
-    const UShellCmdPortTable_s* portable;    ///< Pointer to the port table
-
-    struct UShellCmd_t* next;
+    const void* parent;             ///< Pointer to the parent object
+    const char* name;               ///< Pointer to the name of the object (aka command)
+    const UShellCmdHelp_t* help;    ///< Pointer to the help string (Must be string)
+    UShellCmdExec_f* execFunc;      ///< Pointer to the function to be executed
+    struct UShellCmd_t* next;       ///< Pointer to the next command in the list
+    UShellCmdHookTable_s* hook;     ///< Pointer to the hook table
 
 } UShellCmd_s;
 
@@ -94,15 +87,33 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
                              const char* const name,
                              const void* const parent,
                              const UShellCmdHelp_t* const help,
-                             const UShellCmdPortTable_s* const portable);
+                             const UShellCmdExec_f* const execFunc);
 
 /**
  * \brief Deinitialize the UShell  module.
- * \param [in] cmd - UShellOsal obj to be deinitialized
+ * \param [in] cmd - UShellCmd obj to be deinitialized
  * \param [out] none
  * \return UShellOsalErr_e - error code
  */
 UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd);
+
+/**
+ * @brief Set the parent
+ * @param[in] cmd - the cmd to be set
+ * @param[in] parent - the parent to be set
+ * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
+UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
+                                  const void* const parent);
+
+/**
+ * @brief Execute the cmd
+ * @param[in] cmd - UShellCmd obj to be executed
+ * @param[in] arg - pointer to the arguments (Can be NULL and it means no arguments)
+ * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
+UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
+                             const UShellCmdItem_t* const arg);
 
 /**
  * \brief Get the name of the UShell  module.
@@ -122,18 +133,43 @@ UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd,
 UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd,
                                 UShellCmdHelp_t** const help);
 
+/**
+ * @brief Add cmd to the list
+ * @param cmdRoot - the root of the list
+ * @param cmd - the cmd to be added
+ * @return - error code
+ */
 UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
                                 UShellCmd_s* const cmd);
 
+/**
+ * @brief Remove cmd from the list
+ * @param[in] cmdRoot - the root of the list
+ * @param[in] cmd - the cmd to be removed
+ * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
 UShellCmdErr_e UShellCmdListRemove(UShellCmd_s* const cmdRoot,
                                    UShellCmd_s* const cmd);
 
+/**
+ * @brief Find cmd by name
+ * @param[in] cmdRoot - the root of the list
+ * @param[in] cmd - the cmd to be found
+ * @param[in] isInList - true if the cmd is in the list, false otherwise
+ * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
 UShellCmdErr_e UShellCmdIsInList(UShellCmd_s* const cmdRoot,
                                  UShellCmd_s* const cmd,
                                  bool* const isInList);
-
+/**
+ * @brief Get the next cmd in the list
+ * @param[in] cmdRoot - the root of the list
+ * @param[in] cmd - the cmd to be found
+ * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
 UShellCmdErr_e UShellCmdListNextGet(UShellCmd_s* const cmdRoot,
                                     UShellCmd_s** const cmd);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

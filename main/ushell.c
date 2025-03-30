@@ -144,6 +144,15 @@ static UShellErr_e uShellRtEnvFuncHistoryInit(UShell_s* const uShell);
 static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell);
 
 /**
+ * @brief Find cmd by name
+ * @param[in] uShell - uShell object
+ * @param[in] cmdName - command name
+ * @return UShellCmd_s* - error code. non-zero = an error has occurred;
+ */
+static UShellCmd_s* uShellCmdFindByName(UShell_s* const uShell,
+                                        const char* const cmdName);
+
+/**
  * \brief Lock the dio monitor
  * \param[in] dio - pointer to a UShell_s instance;
  * \return no;
@@ -724,17 +733,28 @@ static void uShellWorker(void* const uShell)
                             /* Add to history */
                             uShellHistoryCmdAdd(ushell);
 
+                            /* Find cmd */
+                            ushell->currCmd = uShellCmdFindByName(ushell, ushell->io.buffer);
+                            if (ushell->currCmd == NULL)
+                            {
+                                /* Print error msg */
+                                uShellPrintStr(ushell, USHELL_CMD_NOT_FOUND_MSG);
+                                break;
+                            }
+
                             /* Flush the io */
                             uShellIoFlush(ushell);
+
+                            /* Change state to proc cmd */
+                            ushell->fsmState = USHELL_STATE_PROC_CMD;
 
                             break;
                         }
 
                         case USHELL_ASCII_CHAR_ESC :
                         {
-
                             /* Change state to proc esc */
-                            ushell->fsmState = USHELL_STATE_PROC_ESC;
+                            ushell->fsmState = USHELL_STATE_PROC_ESC_SEQ;
                             break;
                         }
 
@@ -787,10 +807,25 @@ static void uShellWorker(void* const uShell)
             /* Processing command state */
             case USHELL_STATE_PROC_CMD :
             {
+
+                do
+                {
+                    /* Add to history */
+                    uShellHistoryCmdAdd(ushell);
+
+                    /* Flush the io */
+                    uShellIoFlush(ushell);
+
+                    /* Change state to input */
+                    ushell->fsmState = USHELL_STATE_PROC_INP;
+
+                } while (0);
+
                 break;
             }
 
-            case USHELL_STATE_PROC_ESC :
+            /* Processing escape state */
+            case USHELL_STATE_PROC_ESC_SEQ :
             {
 
                 do
@@ -849,7 +884,7 @@ static void uShellWorker(void* const uShell)
                     }
 
                     /* Check if we are in the escape state */
-                    if (ushell->fsmState != USHELL_STATE_PROC_ESC)
+                    if (ushell->fsmState != USHELL_STATE_PROC_ESC_SEQ)
                     {
                         break;
                     }
@@ -1184,6 +1219,19 @@ static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell)
     } while (0);
 
     return status;
+}
+
+/**
+ * @brief Find cmd by name
+ * @param[in] uShell - uShell object
+ * @param[in] cmdName - command name
+ * @return UShellCmd_s* - error code. non-zero = an error has occurred;
+ */
+static UShellCmd_s* uShellCmdFindByName(UShell_s* const uShell,
+                                        const char* const cmdName)
+{
+    /* Check input parameters */
+    return NULL;
 }
 
 /**
