@@ -23,48 +23,94 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * \brief Description of the maximum number of commands in the UShell
+ * @brief The maximum number of commands in the UShell.
  */
 #ifndef USHELL_MAX_CMD
     #define USHELL_MAX_CMD 10
 #endif
 
 /**
- * \brief Description of the maximum size of the buffer in the UShell
+ * @brief The maximum size of the buffer in the UShell.
  */
 #ifndef USHELL_BUFFER_SIZE
     #define USHELL_BUFFER_SIZE 256
 #endif
 
 /**
- * \brief Description of the default password in the UShell
+ * @brief The default password in the UShell.
  */
 #ifndef USHELL_AUTH_PASSWORD
     #define USHELL_AUTH_PASSWORD "admin"
 #endif
 
+/**
+ * @brief The name of the UShell thread.
+ */
 #ifndef USHELL_THREAD_NAME
     #define USHELL_THREAD_NAME "USHELL"
 #endif
 
+/**
+ * @brief The stack size of the UShell thread in bytes.
+ */
 #ifndef USHELL_THREAD_STACK_SIZE
     #define USHELL_THREAD_STACK_SIZE 2048U
 #endif
 
+/**
+ * @brief The OSAL thread priority for the UShell.
+ */
 #ifndef USHELL_THREAD_PRIORITY
     #define USHELL_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
 #endif
 
+/**
+ * @brief The CLI update timeout in milliseconds.
+ */
 #ifndef USHELL_CLI_UPDATE_TIMEOUT_MS
     #define USHELL_CLI_UPDATE_TIMEOUT_MS 3000U
 #endif
 
+/**
+ * @brief The CLI transmit timeout in milliseconds.
+ */
 #ifndef USHELL_CLI_TX_TIMEOUT_MS
     #define USHELL_CLI_TX_TIMEOUT_MS 1000U
 #endif
 
+/**
+ * @brief The default prompt displayed by the UShell.
+ */
 #ifndef USHELL_USER_PROMPT
     #define USHELL_USER_PROMPT "uShell> "
+#endif
+
+/**
+ * @brief The default message displayed when the UShell is started.
+ */
+#ifndef USHELL_HELLO_MSG
+    #define USHELL_HELLO_MSG "Press Enter to start the UShell..."
+#endif
+
+/**
+ * @brief The password prompt displayed by the UShell.
+ */
+#ifndef USHELL_PASSWORD_PROMPT
+    #define USHELL_PASSWORD_PROMPT "Password: "
+#endif
+
+/**
+ * @brief The message displayed when authentication is successful.
+ */
+#ifndef USHELL_AUTH_OK_MSG
+    #define USHELL_AUTH_OK_MSG " \n\rAuthentication OK \n\r"
+#endif
+
+/**
+ * @brief The message displayed when authentication fails.
+ */
+#ifndef USHELL_AUTH_FAIL_MSG
+    #define USHELL_AUTH_FAIL_MSG " \n\rAuthentication FAIL \n\r"
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -74,6 +120,7 @@ extern "C" {
  */
 
 typedef char UShellItem_t;
+
 /**
  * \brief Describe feature of the UShell
  */
@@ -109,17 +156,14 @@ typedef struct
  * \brief Enumeration of the uShell finite state machine states.
  *
  * This enumeration defines the different states in which the uShell can operate.
- * These states include:
- * - USHELL_STATE_IDLE: The shell is idle.
- * - USHELL_STATE_AUTH: The shell is waiting for authentication.
- * - USHELL_STATE_RUN: The shell is actively running commands.
- * - USHELL_STATE_ERROR: The shell encountered an error.
  */
 typedef enum
 {
-    USHELL_STATE_IDLE = 0,    ///< uShell is idle
+    USHELL_STATE_INIT,        ///< uShell is in initialization state
     USHELL_STATE_AUTH,        ///< uShell is in authentication state
-    USHELL_STATE_RUN,         ///< uShell is running
+    USHELL_STATE_PROC_INP,    ///< uShell is processing input
+    USHELL_STATE_PROC_CMD,    ///< uShell is processing command
+    USHELL_STATE_PROC_ESC,    ///< uShell is processing escape sequence
     USHELL_STATE_ERROR,       ///< uShell is in error state
 } UShellFsmState_e;
 
@@ -130,7 +174,6 @@ typedef enum
 
 {
     USHELL_FEATURE_AUTH = 0,    ///< Enable authentication
-    USHELL_FEATURE_ECHO,        ///< Enable echo feature
     USHELL_FEATURE_PROMPT,      ///< Enable prompt display
     USHELL_FEATURE_HISTORY,     ///< Enable command history
 
@@ -140,13 +183,12 @@ typedef enum
  * \brief Configuration settings for the uShell.
  *
  * This structure holds Boolean flags that enable or disable
- * various uShell features, such as authentication, echo, prompt,
+ * various uShell features, such as authentication, prompt,
  * and command history.
  */
 typedef struct
 {
     UShellFeature_b authIsEn;       ///< Enable authentication.
-    UShellFeature_b echoIsEn;       ///< Enable echo feature.
     UShellFeature_b promptIsEn;     ///< Enable prompt display.
     UShellFeature_b historyIsEn;    ///< Enable command history.
 
@@ -167,11 +209,12 @@ typedef struct
     const UShellVcp_s* vcp;      ///< VCP object
 
     /* Optional fields */
-    UShellFsmState_e fsmState;            ///< Finite state machine state
-    UShellCfg_s cfg;                      ///< Configuration object
-    UShellCmd_s* cmd [USHELL_MAX_CMD];    ///< Commands array
-    UShellHistory_s history;              ///< History object
-    UShellIo_s io;                        ///< IO object
+    UShellFsmState_e fsmState;                  ///< Finite state machine state
+    UShellCfg_s cfg;                            ///< Configuration object
+    const UShellCmd_s* cmd [USHELL_MAX_CMD];    ///< Commands array
+    UShellHistory_s history;                    ///< History object
+    UShellCmd_s* currCmd;                       ///< Current command
+    UShellIo_s io;                              ///< IO object
 
 } UShell_s;
 
