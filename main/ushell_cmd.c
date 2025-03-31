@@ -27,6 +27,20 @@
 
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]=====================================================================
 
+/**
+ * @brief Lock the cmd
+ * @param cmd - cmd to be locked
+ * @return none
+ */
+static void uShellCmdLock(UShellCmd_s* const cmd);
+
+/**
+ * @brief Unlock the cmd
+ * @param cmd - cmd to be unlocked
+ * @return none
+ */
+static void uShellCmdUnlock(UShellCmd_s* const cmd);
+
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
@@ -41,35 +55,40 @@
  */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
                              const char* const name,
-                             const void* const parent,
                              const UShellCmdHelp_t* const help,
                              const UShellCmdExec_f* const execFunc)
 {
-    /* Check input parameter */
-    if ((NULL == cmd) ||
-        (NULL == name) ||
-        (NULL == parent) ||
-        (NULL == execFunc))
+
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+
+    do
     {
-        return USHELL_CMD_INVALID_ARGS_ERR;
-    }
+        /* Check input parameter */
+        if ((NULL == cmd) ||
+            (NULL == name) ||
+            (NULL == execFunc) ||
+            (NULL == help))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Init the object */
-    memset((void*) cmd, 0, sizeof(UShellCmd_s));
+        /* Init the object */
+        memset((void*) cmd, 0, sizeof(UShellCmd_s));
 
-    /* Set the name */
-    cmd->name = name;
+        /* Set the name */
+        cmd->name = name;
 
-    /* Set the parent */
-    cmd->parent = parent;
+        /* Set the help string */
+        cmd->help = help;
 
-    /* Set the help string */
-    cmd->help = help;
+        /* Set the portable structure */
+        cmd->execFunc = execFunc;
 
-    /* Set the portable structure */
-    cmd->execFunc = execFunc;
+    } while (0);
 
-    return USHELL_CMD_NO_ERR;
+    return status;
 }
 
 /**
@@ -80,16 +99,24 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
  */
 UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd)
 {
-    /* Check input parameter */
-    if (NULL == cmd)
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+
+    do
     {
-        return USHELL_CMD_INVALID_ARGS_ERR;
-    }
+        /* Check input parameter */
+        if (NULL == cmd)
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Deinit the object */
-    memset((void*) cmd, 0, sizeof(UShellCmd_s));
+        /* Deinit the object */
+        memset((void*) cmd, 0, sizeof(UShellCmd_s));
 
-    return USHELL_CMD_NO_ERR;
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -101,16 +128,23 @@ UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd)
 UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
                                   const void* const parent)
 {
-    /* Check input parameter */
-    if ((NULL == cmd))
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+
+    do
     {
-        return USHELL_CMD_INVALID_ARGS_ERR;
-    }
+        /* Check input parameter */
+        if ((NULL == cmd))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Set the parent */
-    cmd->parent = parent;
+        /* Set the parent */
+        cmd->parent = parent;
+    } while (0);
 
-    return USHELL_CMD_NO_ERR;
+    return status;
 }
 
 /**
@@ -122,7 +156,40 @@ UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
 UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
                              const UShellCmdItem_t* const arg)
 {
-    return USHELL_CMD_NO_ERR;
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+
+    do
+    {
+        /* Check input parameter */
+        if ((NULL == cmd) ||
+            (cmd->execFunc == NULL))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* lock the cmd */
+        uShellCmdLock(cmd);
+
+        /* Thread safety */
+        do
+        {
+            /* Execute the cmd */
+            status = cmd->execFunc(cmd, arg);
+            if (status != USHELL_CMD_NO_ERR)
+            {
+                break;
+            }
+
+        } while (0);
+
+        /* unlock the cmd */
+        uShellCmdUnlock(cmd);
+
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -134,17 +201,25 @@ UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
 UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd,
                                 char** const name)
 {
-    /* Check input parameter */
-    if ((NULL == cmd) ||
-        (NULL == name))
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+
+    do
     {
-        return USHELL_CMD_INVALID_ARGS_ERR;
-    }
+        /* Check input parameter */
+        if ((NULL == cmd) ||
+            (NULL == name))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Get the name */
-    *name = (char*) cmd->name;
+        /* Get the name */
+        *name = (char*) cmd->name;
 
-    return USHELL_CMD_NO_ERR;
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -153,19 +228,27 @@ UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd,
  * \param [out] help - help string
  * \return UShellOsalErr_e - error code
  */
-UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const help)
+UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t* const help)
 {
-    /* Check input parameter */
-    if ((NULL == cmd) ||
-        (NULL == help))
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+
+    do
     {
-        return USHELL_CMD_INVALID_ARGS_ERR;    //< Invalid arguments
-    }
+        /* Check input parameter */
+        if ((NULL == cmd) ||
+            (NULL == help))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
 
-    /* Get the help string */
-    *help = (char*) cmd->help;
+        /* Get the help string */
+        *help = (UShellCmdHelp_t*) cmd->help;
 
-    return USHELL_CMD_NO_ERR;    //< Success
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -177,19 +260,126 @@ UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const 
 UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
                                 UShellCmd_s* const cmd)
 {
-    return USHELL_CMD_NO_ERR;
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+    UShellCmd_s* currCmd = cmdRoot;
+
+    do
+    {
+        /* Check input parameter */
+        if ((NULL == cmdRoot) ||
+            (NULL == cmd))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Ensure the list termination  */
+        cmd->next = NULL;
+
+        /* Lock */
+        uShellCmdLock(cmdRoot);
+
+        /* Thread safe */
+        do
+        {
+
+            /* Find the last cmd in the list */
+            while (currCmd->next != NULL)
+            {
+                /* Check if the cmd is already in the list */
+                if (currCmd == cmd)
+                {
+                    break;
+                }
+
+                /* Move to the next cmd */
+                currCmd = currCmd->next;
+            }
+
+            /* Add the cmd to the list */
+            currCmd->next = cmd;
+
+        } while (0);
+
+        /* Unlock */
+        uShellCmdUnlock(cmdRoot);
+
+    } while (0);
+
+    return status;
 }
 
 /**
- * @brief Remove cmd from the list
- * @param[in] cmdRoot - the root of the list
- * @param[in] cmd - the cmd to be removed
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * @brief Remove a command from the list.
+ *
+ * This function removes the specified command from the linked list.
+ * The command list is assumed to be singly linked.
+ *
+ * @param[in,out] cmdRoot Pointer to the pointer to the root of the list.
+ *                        This parameter is updated if the head command is removed.
+ * @param[in]     cmd     Pointer to the command to be removed.
+ * @return UShellCmdErr_e Error code; USHELL_CMD_NO_ERR if successful,
+ *         or an error code (e.g. USHELL_CMD_INVALID_ARGS_ERR or USHELL_CMD_NOT_FOUND_ERR).
  */
-UShellCmdErr_e UShellCmdListRemove(UShellCmd_s* const cmdRoot,
-                                   UShellCmd_s* const cmd)
+/**
+ * @brief Remove a command from the list.
+ *
+ * @param[in,out] cmdRoot Pointer to the pointer to the root of the list.
+ *                        This parameter is updated if the head command is removed.
+ * @param[in]     cmd     Pointer to the command to be removed.
+ * @return UShellCmdErr_e Error code; USHELL_CMD_NO_ERR if successful,
+ *         or an error code (e.g. USHELL_CMD_INVALID_ARGS_ERR or USHELL_CMD_NOT_FOUND_ERR).
+ */
+UShellCmdErr_e UShellCmdListRemove(UShellCmd_s** const cmdRoot, UShellCmd_s* const cmd)
 {
-    return USHELL_CMD_NO_ERR;
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+    UShellCmd_s* current = *cmdRoot;
+    UShellCmd_s* previous = NULL;
+    bool found = false;
+
+    do
+    {
+        /* Check input parameter */
+        if ((cmdRoot == NULL) ||
+            (*cmdRoot == NULL) ||
+            (cmd == NULL))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Lock the command list */
+        uShellCmdLock(*cmdRoot);
+
+        /* Thread safe */
+        while (current != NULL)
+        {
+            if (current == cmd)
+            {
+                found = true;
+                /* Remove the node */
+                if (previous == NULL)
+                {
+                    *cmdRoot = current->next;
+                }
+                else
+                {
+                    previous->next = current->next;
+                }
+                break;
+            }
+            previous = current;
+            current = current->next;
+        }
+
+        /* Unlock the command list */
+        uShellCmdUnlock(*cmdRoot);
+
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -203,7 +393,54 @@ UShellCmdErr_e UShellCmdIsInList(UShellCmd_s* const cmdRoot,
                                  UShellCmd_s* const cmd,
                                  bool* const isInList)
 {
-    return USHELL_CMD_NO_ERR;
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+    UShellCmd_s* currCmd = cmdRoot;
+    bool found = false;
+
+    do
+    {
+        /* Check input parameter */
+        if ((NULL == cmdRoot) ||
+            (NULL == cmd) ||
+            (NULL == isInList))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Lock */
+        uShellCmdLock(cmdRoot);
+
+        /* Thread safe */
+        do
+        {
+
+            /* Find the last cmd in the list */
+            while (currCmd->next != NULL)
+            {
+                /* Check if the cmd is already in the list */
+                if (currCmd == cmd)
+                {
+                    found = true;
+                    break;
+                }
+
+                /* Move to the next cmd */
+                currCmd = currCmd->next;
+            }
+
+            /* Set the result */
+            *isInList = found;
+
+        } while (0);
+
+        /* Unlock */
+        uShellCmdUnlock(cmdRoot);
+
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -215,7 +452,93 @@ UShellCmdErr_e UShellCmdIsInList(UShellCmd_s* const cmdRoot,
 UShellCmdErr_e UShellCmdListNextGet(UShellCmd_s* const cmdRoot,
                                     UShellCmd_s** const cmd)
 {
-    return USHELL_CMD_NO_ERR;
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+
+    do
+    {
+        /* Check input parameter */
+        if ((NULL == cmdRoot) ||
+            (NULL == cmd))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Lock */
+        uShellCmdLock(cmdRoot);
+
+        /* Thread safe */
+        *cmd = cmdRoot->next;
+
+        /* Unlock */
+        uShellCmdUnlock(cmdRoot);
+
+    } while (0);
+
+    return status;
 }
 
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
+
+/**
+ * @brief Lock the cmd
+ * @param cmd - cmd to be locked
+ * @return none
+ */
+static void uShellCmdLock(UShellCmd_s* const cmd)
+{
+    /* Check input parameter */
+    USHELL_CMD_ASSERT(cmd != NULL);
+
+    do
+    {
+        /* Check  input parameter */
+        if (cmd == NULL)
+        {
+            break;
+        }
+
+        /* Check hook table */
+        if ((cmd->hook == NULL) ||
+            (cmd->hook->lock == NULL))
+        {
+            break;
+        }
+
+        /* Lock the cmd */
+        cmd->hook->lock(cmd);
+
+    } while (0);
+}
+
+/**
+ * @brief Unlock the cmd
+ * @param cmd - cmd to be unlocked
+ * @return none
+ */
+static void uShellCmdUnlock(UShellCmd_s* const cmd)
+{
+    /* Check input parameter */
+    USHELL_CMD_ASSERT(cmd != NULL);
+
+    do
+    {
+        /* Check  input parameter */
+        if (cmd == NULL)
+        {
+            break;
+        }
+
+        /* Check hook table */
+        if ((cmd->hook == NULL) ||
+            (cmd->hook->unlock == NULL))
+        {
+            break;
+        }
+
+        /* Lock the cmd */
+        cmd->hook->unlock(cmd);
+
+    } while (0);
+}
