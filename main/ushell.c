@@ -84,17 +84,6 @@ typedef enum
 static void uShellWorker(void* const uShell);
 
 /**
- * \brief Find command
- * \param[in] uShell - uShell object
- * \param[in] str - string to be found
- * \param[out] ind - index of the command
- * \return USHELL_NO_ERR if success, otherwise error code
- */
-static UShellErr_e uShellFindCmd(const UShell_s* const uShell,
-                                 const char* const str,
-                                 uint8_t* const ind);
-
-/**
  * \brief Initialize the runtime environment
  * \param uShell - uShell object
  * \param osal - osal object
@@ -146,11 +135,9 @@ static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell);
 /**
  * @brief Find cmd by name
  * @param[in] uShell - uShell object
- * @param[in] cmdName - command name
  * @return UShellCmd_s* - error code. non-zero = an error has occurred;
  */
-static UShellCmd_s* uShellCmdFindByName(UShell_s* const uShell,
-                                        const char* const cmdName);
+static UShellCmd_s* uShellCmdFind(UShell_s* const uShell);
 
 /**
  * \brief Lock the dio monitor
@@ -172,6 +159,20 @@ static void uShellUnlock(const UShell_s* const dio);
  * @return none
  */
 static void uShellIoFlush(UShell_s* const uShell);
+
+/**
+ * @brief Execute the command
+ * @param[in] uShell - the uShell object
+ * @return none
+ */
+static void uShellCmdCurExec(UShell_s* const uShell);
+
+/**
+ * @brief Auto complete the command
+ * @param uShell - the uShell object
+ * @return none
+ */
+static void uShellCmdAutoComplete(UShell_s* const uShell);
 
 /**
  * @brief Print the string
@@ -451,9 +452,9 @@ UShellErr_e UShellCmdAttach(UShell_s* const uShell, const UShellCmd_s* const cmd
 
         for (uint8_t i = 0; i < USHELL_MAX_CMD; i++)
         {
-            if (uShell->cmd [i] == NULL)
+            if (uShell->cmdList [i] == NULL)
             {
-                uShell->cmd [i] = cmd;
+                uShell->cmdList [i] = cmd;
                 attachFlag = 1;
                 break;
             }
@@ -504,10 +505,10 @@ UShellErr_e UShellCmdDetach(UShell_s* const uShell, const UShellCmd_s* const cmd
         /* Detach command */
         for (uint8_t i = 0; i < USHELL_MAX_CMD; i++)
         {
-            if (uShell->cmd [i] == cmd)
+            if (uShell->cmdList [i] == cmd)
             {
 
-                uShell->cmd [i] = NULL;
+                uShell->cmdList [i] = NULL;
                 detachFlag = 1;
                 break;
             }
@@ -734,11 +735,9 @@ static void uShellWorker(void* const uShell)
                             uShellHistoryCmdAdd(ushell);
 
                             /* Find cmd */
-                            ushell->currCmd = uShellCmdFindByName(ushell, ushell->io.buffer);
+                            ushell->currCmd = uShellCmdFind(ushell);
 
-                            /* Flush the io */
-                            uShellIoFlush(ushell);
-
+                            /* Check we find cmd */
                             if (ushell->currCmd == NULL)
                             {
                                 /* Print error msg */
@@ -778,7 +777,15 @@ static void uShellWorker(void* const uShell)
                         /* Horizontal tab */
                         case USHELL_ASCII_CHAR_TAB :
                         {
-                            /* Process the command */
+                            /* Check autocomplete is enable */
+                            if (ushell->cfg.promptIsEn == false)
+                            {
+                                break;
+                            }
+
+                            /* Autocomplete */
+                            uShellCmdAutoComplete(ushell);
+
                             break;
                         }
 
@@ -811,8 +818,12 @@ static void uShellWorker(void* const uShell)
 
                 do
                 {
-                    /* Add to history */
-                    uShellHistoryCmdAdd(ushell);
+
+                    /* Exec curr cmd */
+                    uShellCmdCurExec(ushell);
+
+                    /* flush curr cmd */
+                    ushell->currCmd = NULL;
 
                     /* Flush the io */
                     uShellIoFlush(ushell);
@@ -911,20 +922,6 @@ static void uShellWorker(void* const uShell)
             }
         }
     }
-}
-
-/**
- * \brief Find command
- * \param[in] uShell - uShell object
- * \param[in] str - string to be found
- * \param[out] ind - index of the command
- * \return USHELL_NO_ERR if success, otherwise error code
- */
-static UShellErr_e uShellFindCmd(const UShell_s* const uShell,
-                                 const char* const str,
-                                 uint8_t* const ind)
-{
-    return USHELL_NO_ERR;
 }
 
 /**
@@ -1225,14 +1222,66 @@ static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell)
 /**
  * @brief Find cmd by name
  * @param[in] uShell - uShell object
- * @param[in] cmdName - command name
  * @return UShellCmd_s* - error code. non-zero = an error has occurred;
  */
-static UShellCmd_s* uShellCmdFindByName(UShell_s* const uShell,
-                                        const char* const cmdName)
+static UShellCmd_s* uShellCmdFind(UShell_s* const uShell)
 {
-    /* Check input parameters */
-    return NULL;
+    /* Local cmd */
+    UShellCmd_s* cmd = NULL;
+    UShellCmd_s* currCmd = (UShellCmd_s*) uShell->cmdList;
+    UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
+    char* cmdName = NULL;
+    size_t cmdNameLen = 0;
+    int cmpRes = 0;
+
+    /* Find cmd */
+    do
+    {
+        /* Check inp  */
+        if ((uShell == NULL) ||
+            (uShell->cmdList == NULL))
+        {
+            cmd = NULL;
+            break;
+        }
+
+        /* Check input parameters */
+        while (currCmd != NULL)
+        {
+            /* Get name of currCmd*/
+            cmdStatus = UShellCmdNameGet(currCmd, &cmdName);
+            if ((cmdStatus != USHELL_CMD_NO_ERR) ||
+                (cmdName == NULL))
+            {
+                cmd = NULL;
+                break;
+            }
+
+            /* Find len */
+            cmdNameLen = strlen(cmdName);
+
+            /* Check if the name is equal to the input string */
+            cmpRes = strncmp(uShell->io.buffer, cmdName, cmdNameLen);
+            if ((cmpRes == 0) &&
+                ((uShell->io.buffer [cmdNameLen] == ' ') ||
+                 (uShell->io.buffer [cmdNameLen] == 0)))
+            {
+                /* Check if the command is found */
+                cmd = currCmd;
+                break;
+            }
+
+            /* Move to the next command */
+            cmdStatus = UShellCmdListNextGet(currCmd, &currCmd);
+            if (cmdStatus != USHELL_CMD_NO_ERR)
+            {
+                cmd = NULL;
+                break;
+            }
+        }
+    } while (0);
+
+    return cmd;
 }
 
 /**
@@ -1331,6 +1380,138 @@ static void uShellIoFlush(UShell_s* const uShell)
 
     memset(uShell->io.buffer, 0, USHELL_BUFFER_SIZE);
     uShell->io.ind = 0;
+}
+
+/**
+ * @brief Execute the command
+ * @param[in] uShell - the uShell object
+ * @return none
+ */
+static void uShellCmdCurExec(UShell_s* const uShell)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(uShell != NULL);
+
+    /* Local variables */
+    UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
+    char* argv [USHELL_CMD_MAX_ARGV] = {NULL};
+    int argc = 0;
+    char* token = NULL;
+
+    do
+    {
+        /* Check if current command exists */
+        if ((uShell == NULL) ||
+            (uShell->currCmd == NULL))
+        {
+            return;
+        }
+
+        /* Check we have any arg */
+        token = strtok(uShell->io.buffer, " ");
+        if (token != NULL)
+        {
+            /* Пропускаем имя команды (так как оно уже в uShell->currCmd) */
+            token = strtok(NULL, " ");
+        }
+        while ((token != NULL) && (argc < USHELL_CMD_MAX_ARGV))
+        {
+            argv [argc++] = token;
+            token = strtok(NULL, " ");
+        }
+
+        /* Выполняем команду с разобранными аргументами */
+        cmdStatus = UShellCmdExec(uShell->currCmd, argc, argv);
+        USHELL_ASSERT(cmdStatus == USHELL_CMD_NO_ERR);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            break;
+        }
+
+    } while (0);
+}
+
+/**
+ * @brief Auto complete the command
+ * @param uShell - the uShell object
+ * @return none
+ *
+ * This function compares the current input buffer with the names of all available commands.
+ * If exactly one command matches the input, it auto-completes the command in the input buffer.
+ * If multiple matches are found, it prints out all matching command names.
+ */
+static void uShellCmdAutoComplete(UShell_s* const uShell)
+{
+    UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
+    UShellCmd_s* matches [USHELL_MAX_CMD] = {0};
+    uint8_t matchCount = 0;
+    UShellCmd_s* currCmd = (UShellCmd_s*) uShell->cmdList;
+    char* cmdName = NULL;
+    size_t inputLen = strlen(uShell->io.buffer);
+
+    do
+    {
+        /* Check input parameters */
+        if ((uShell == NULL) ||
+            (uShell->cmdList == NULL) ||
+            (inputLen == 0))
+        {
+            break;
+        }
+
+        /* Find qty of matches */
+        while (currCmd != NULL)
+        {
+            /* Get name of currCmd */
+            cmdStatus = UShellCmdNameGet(currCmd, &cmdName);
+            if ((cmdStatus != USHELL_CMD_NO_ERR) ||
+                (cmdName == NULL))
+            {
+                break;
+            }
+
+            /* Check if the name matches the input string */
+            if (strncmp(uShell->io.buffer, cmdName, inputLen) == 0)
+            {
+                matches [matchCount++] = currCmd;
+            }
+
+            /* Move to the next command */
+            cmdStatus = UShellCmdListNextGet(currCmd, &currCmd);
+            if (cmdStatus != USHELL_CMD_NO_ERR)
+            {
+                break;
+            }
+        }
+
+        if (matchCount == 1)
+        {
+            /* One match — auto-complete the input buffer with the full command name */
+            strcpy(uShell->io.buffer, matches [0]->name);
+            uShell->io.ind = strlen(uShell->io.buffer);
+        }
+
+        else if (matchCount > 1)
+        {
+            /* Multiple matches — print them */
+            uShellPrintChar(uShell, '\n');    // Terrible, but i don't give a f*ck
+            for (uint8_t i = 0; i < matchCount; i++)
+            {
+                /* Get name of current command */
+                cmdStatus = UShellCmdNameGet(matches [i], &cmdName);
+                if ((cmdStatus != USHELL_CMD_NO_ERR) ||
+                    (cmdName == NULL))
+                {
+                    break;
+                }
+
+                /* Print the command */
+                uShellPrintStr(uShell, cmdName);
+                uShellPrintChar(uShell, '\n');
+            }
+        }
+
+    } while (0);
 }
 
 /**

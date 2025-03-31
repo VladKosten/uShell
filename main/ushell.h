@@ -26,7 +26,7 @@ extern "C" {
  * @brief The maximum number of commands in the UShell.
  */
 #ifndef USHELL_MAX_CMD
-    #define USHELL_MAX_CMD 10
+    #define USHELL_MAX_CMD 15
 #endif
 
 /**
@@ -216,12 +216,12 @@ typedef struct
     const UShellVcp_s* vcp;      ///< VCP object
 
     /* Optional fields */
-    UShellFsmState_e fsmState;                  ///< Finite state machine state
-    UShellCfg_s cfg;                            ///< Configuration object
-    const UShellCmd_s* cmd [USHELL_MAX_CMD];    ///< Commands array
-    UShellHistory_s history;                    ///< History object
-    UShellCmd_s* currCmd;                       ///< Current command
-    UShellIo_s io;                              ///< IO object
+    UShellFsmState_e fsmState;                      ///< Finite state machine state
+    UShellCfg_s cfg;                                ///< Configuration object
+    const UShellCmd_s* cmdList [USHELL_MAX_CMD];    ///< Commands array
+    UShellHistory_s history;                        ///< History object
+    UShellCmd_s* currCmd;                           ///< Current command
+    UShellIo_s io;                                  ///< IO object
 
 } UShell_s;
 

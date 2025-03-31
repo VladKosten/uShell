@@ -150,11 +150,13 @@ UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
 /**
  * @brief Execute the cmd
  * @param[in] cmd - UShellCmd obj to be executed
- * @param[in] arg - pointer to the arguments (Can be NULL and it means no arguments)
+ * @param[in] argc - number of arguments
+ * @param[in] argv - array of arguments
  * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
-                             const UShellCmdItem_t* const arg)
+                             const int argc,
+                             char* const argv [])
 {
     /* Local variable */
     UShellCmdErr_e status = USHELL_CMD_NO_ERR;
@@ -176,7 +178,7 @@ UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
         do
         {
             /* Execute the cmd */
-            status = cmd->execFunc(cmd, arg);
+            status = cmd->execFunc(cmd, argc, argv);
             if (status != USHELL_CMD_NO_ERR)
             {
                 break;
@@ -228,7 +230,7 @@ UShellCmdErr_e UShellCmdNameGet(UShellCmd_s* const cmd,
  * \param [out] help - help string
  * \return UShellOsalErr_e - error code
  */
-UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t* const help)
+UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const help)
 {
     /* Local variable */
     UShellCmdErr_e status = USHELL_CMD_NO_ERR;
@@ -335,9 +337,8 @@ UShellCmdErr_e UShellCmdListRemove(UShellCmd_s** const cmdRoot, UShellCmd_s* con
 {
     /* Local variable */
     UShellCmdErr_e status = USHELL_CMD_NO_ERR;
-    UShellCmd_s* current = *cmdRoot;
+    UShellCmd_s* current;
     UShellCmd_s* previous = NULL;
-    bool found = false;
 
     do
     {
@@ -353,12 +354,12 @@ UShellCmdErr_e UShellCmdListRemove(UShellCmd_s** const cmdRoot, UShellCmd_s* con
         /* Lock the command list */
         uShellCmdLock(*cmdRoot);
 
-        /* Thread safe */
+        /* Thread safe removal */
+        current = *cmdRoot;
         while (current != NULL)
         {
             if (current == cmd)
             {
-                found = true;
                 /* Remove the node */
                 if (previous == NULL)
                 {

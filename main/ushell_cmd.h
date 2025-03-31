@@ -15,6 +15,15 @@ extern "C" {
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
+/**
+ * @brief The maximum number of arguments in the UShell command.
+ * This value is used to define the maximum number of arguments that can be
+ * passed to a command in the UShell.
+ */
+#ifndef USHELL_CMD_MAX_ARGV
+    #define USHELL_CMD_MAX_ARGV 5
+#endif
+
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
@@ -44,7 +53,8 @@ typedef char UShellCmdItem_t;
  * \brief Describe a cmd exec function.
  */
 typedef UShellCmdErr_e(UShellCmdExec_f)(void* const cmd,
-                                        const UShellCmdItem_t* const arg);
+                                        const int argc,
+                                        char* const argv []);
 
 /**
  * @brief Describe a cmd hook function.
@@ -77,7 +87,6 @@ typedef struct UShellCmd_t
  * \brief Initialize the UShell cmd  module.
  * \param [in] cmd - UShellCmd obj to be initialized
  * \param [in] name - name of the object
- * \param [in] parent - pointer to the parent object
  * \param [in] help - help string
  * \param [in] portable - pointer to the portable table
  * \param [out] none
@@ -85,7 +94,6 @@ typedef struct UShellCmd_t
  */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
                              const char* const name,
-                             const void* const parent,
                              const UShellCmdHelp_t* const help,
                              const UShellCmdExec_f* const execFunc);
 
@@ -109,11 +117,13 @@ UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
 /**
  * @brief Execute the cmd
  * @param[in] cmd - UShellCmd obj to be executed
- * @param[in] arg - pointer to the arguments (Can be NULL and it means no arguments)
+ * @param[in] argc - number of arguments
+ * @param[in] argv - array of arguments
  * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
-                             const UShellCmdItem_t* const arg);
+                             const int argc,
+                             char* const argv []);
 
 /**
  * \brief Get the name of the UShell  module.
@@ -148,7 +158,7 @@ UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
  * @param[in] cmd - the cmd to be removed
  * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
-UShellCmdErr_e UShellCmdListRemove(UShellCmd_s* const cmdRoot,
+UShellCmdErr_e UShellCmdListRemove(UShellCmd_s** const cmdRoot,
                                    UShellCmd_s* const cmd);
 
 /**
