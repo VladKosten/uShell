@@ -19,6 +19,7 @@ extern "C" {
 #include "ushell_osal.h"
 #include "ushell_history.h"
 #include "ushell_vcp.h"
+#include "ushell_cfg.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -32,8 +33,8 @@ extern "C" {
 /**
  * \brief The maximum number of arguments in the UShell.
  */
-#ifndef USHELL_UPD_TIME
-    #define USHELL_UPD_TIME 100U
+#ifndef USHELL_UPD_TIME_MS
+    #define USHELL_UPD_TIME_MS 100U
 #endif
 
 /**
@@ -60,8 +61,8 @@ extern "C" {
 /**
  * \brief The stack size of the UShell thread in bytes.
  */
-#ifndef USHELL_THREAD_STACK_SIZE
-    #define USHELL_THREAD_STACK_SIZE 2048U
+#ifndef USHELL_THREAD_STACK_SIZE_BYTE
+    #define USHELL_THREAD_STACK_SIZE_BYTE 2048U
 #endif
 
 /**
@@ -69,20 +70,6 @@ extern "C" {
  */
 #ifndef USHELL_THREAD_PRIORITY
     #define USHELL_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
-#endif
-
-/**
- * \brief The CLI update timeout in milliseconds.
- */
-#ifndef USHELL_CLI_UPDATE_TIMEOUT_MS
-    #define USHELL_CLI_UPDATE_TIMEOUT_MS 3000U
-#endif
-
-/**
- * \brief The CLI transmit timeout in milliseconds.
- */
-#ifndef USHELL_CLI_TX_TIMEOUT_MS
-    #define USHELL_CLI_TX_TIMEOUT_MS 1000U
 #endif
 
 /**
@@ -102,8 +89,8 @@ extern "C" {
 /**
  * \brief The password prompt displayed by the UShell.
  */
-#ifndef USHELL_PASSWORD_PROMPT
-    #define USHELL_PASSWORD_PROMPT "Password: "
+#ifndef USHELL_AUTH_PROMPT
+    #define USHELL_AUTH_PROMPT "Password: "
 #endif
 
 /**

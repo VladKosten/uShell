@@ -13,6 +13,8 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 
+#include "ushell_cfg.h"
+
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**

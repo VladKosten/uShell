@@ -16,6 +16,7 @@ extern "C" {
 /* Project includes */
 #include "ushell_hal.h"
 #include "ushell_osal.h"
+#include "ushell_cfg.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -36,8 +37,8 @@ extern "C" {
 /**
  * \brief Stack size for the uShell VCP  thread.
  */
-#ifndef USHELL_VCP_THREAD_STACK_SIZE
-    #define USHELL_VCP_THREAD_STACK_SIZE 512U
+#ifndef USHELL_VCP_THREAD_STACK_SIZE_BYTE
+    #define USHELL_VCP_THREAD_STACK_SIZE_BYTE 512U
 #endif
 
 /**
@@ -69,8 +70,8 @@ extern "C" {
  *
  * This macro defines the timer period used in the uShell VCP.
  */
-#ifndef USHELL_VCP_TIMER_NAME
-    #define USHELL_VCP_TIMER_NAME "USHELL_VCP_TIMER"
+#ifndef USHELL_VCP_TIMER_INSPECT_NAME
+    #define USHELL_VCP_TIMER_INSPECT_NAME "USHELL_VCP_TIMER"
 #endif
 
 /**
