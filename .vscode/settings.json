@@ -9,7 +9,21 @@
         "ushell_hal.h": "c",
         "ushell_osal.h": "c",
         "ushell_osal_freertos.h": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "string.h": "c",
+        "system_error": "c",
+        "ushell_history.h": "c",
+        "random": "c",
+        "array": "c",
+        "hash_map": "c",
+        "deque": "c",
+        "list": "c",
+        "string": "c",
+        "vector": "c",
+        "iterator": "c",
+        "string_view": "c",
+        "span": "c",
+        "unordered_map": "c"
     },
     "terminal.integrated.defaultProfile.linux": "zsh"
 }

@@ -1,0 +1,7 @@
+if(HAL_PORT_ASF)
+    add_subdirectory(asf)
+    message("-- UShell using ASF HAL port")
+elseif(HAL_PORT_CMOCK)
+    add_subdirectory(cmock)
+    message("-- UShell using CMOCK HAL port")
+endif()

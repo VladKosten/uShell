@@ -1,0 +1,7 @@
+if(OSAL_PORT_FREERTOS)
+    message("-- USHELL using FreeRTOS OSAL port")
+    add_subdirectory(freertos)
+elseif((OSAL_PORT_POSIX))
+    message("-- USHELL using POSIX OSAL port")
+    add_subdirectory(posix)
+endif()

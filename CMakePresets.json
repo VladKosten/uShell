@@ -1,0 +1,63 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "default",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {}
+        },
+        {
+            "name": "StaticLib",
+            "inherits": "default",
+            "description": "Configure for static library",
+            "displayName": "Static library",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "USHELL_UNIT_TEST_BUILD": "OFF",
+                "USHELL_INTEGRATION_TEST_BUILD": "OFF",
+                "USHELL_STANDALONE_BUILD": "ON"
+
+            }
+        },
+        {
+            "name": "UnitTests",
+            "inherits": "default",
+            "description": "Configure for unit tests",
+            "displayName": "Unit tests",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "USHELL_UNIT_TEST_BUILD": "ON",
+                "USHELL_INTEGRATION_TEST_BUILD": "OFF",
+                "USHELL_STANDALONE_BUILD": "OFF"
+            }
+        },
+        {
+            "name": "IntegrationTests",
+            "inherits": "default",
+            "description": "Configure for integration tests",
+            "displayName": "Integration tests",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "USHELL_UNIT_TEST_BUILD": "OFF",
+                "USHELL_INTEGRATION_TEST_BUILD": "ON",
+                "USHELL_STANDALONE_BUILD": "OFF"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "StaticLib",
+            "configurePreset": "StaticLib"
+        },
+        {
+            "name": "UnitTests",
+            "configurePreset": "UnitTests"
+        },
+        {
+            "name": "IntegrationTests",
+            "configurePreset": "IntegrationTests"
+        }
+    ]
+}

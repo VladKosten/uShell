@@ -11,13 +11,16 @@ extern "C" {
 #include <task.h>
 #include <semphr.h>
 #include <queue.h>
+#include <timers.h>
+#include <stream_buffer.h>
+#include <event_groups.h>
 
 #include "ushell_osal.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * @brief FreeRTOS-specific infinity timeout value.
+ * \brief FreeRTOS-specific infinity timeout value.
  *
  * This macro defines the value used to represent an infinite timeout in the
  * UShell Operating System Abstraction Layer (OSAL) when using FreeRTOS.
@@ -25,7 +28,7 @@ extern "C" {
 #define USHELL_OSAL_FREERTOS_INFINITY_TIMEOUT UINT32_MAX
 
 /**
- * @brief Low priority level for FreeRTOS threads.
+ * \brief Low priority level for FreeRTOS threads.
  *
  * This macro defines the low priority level for threads in FreeRTOS.
  */
@@ -34,7 +37,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Middle priority level for FreeRTOS threads.
+ * \brief Middle priority level for FreeRTOS threads.
  *
  * This macro defines the middle priority level for threads in FreeRTOS.
  */
@@ -43,7 +46,7 @@ extern "C" {
 #endif
 
 /**
- * @brief High priority level for FreeRTOS threads.
+ * \brief High priority level for FreeRTOS threads.
  *
  * This macro defines the high priority level for threads in FreeRTOS.
  */
@@ -52,7 +55,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Ultra priority level for FreeRTOS threads.
+ * \brief Ultra priority level for FreeRTOS threads.
  *
  * This macro defines the ultra priority level for threads in FreeRTOS.
  */
@@ -63,7 +66,7 @@ extern "C" {
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
- * @brief UShell FreeRTOS OSAL structure.
+ * \brief UShell FreeRTOS OSAL structure.
  *
  * This structure defines the UShell Operating System Abstraction Layer (OSAL)
  * specific to FreeRTOS. It includes the base OSAL structure and any additional
@@ -72,7 +75,7 @@ extern "C" {
 typedef struct
 {
     /**
-     * @brief Base OSAL structure.
+     * \brief Base OSAL structure.
      *
      * This field contains the base OSAL structure. It must be the first field
      * in the structure to ensure proper alignment and compatibility.
@@ -84,20 +87,20 @@ typedef struct
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
- * @brief Initialize the UShell FreeRTOS osal instance
+ * \brief Initialize the UShell FreeRTOS osal instance
  * @param[in] osalFreertos - pointer to FreeRTOS osal instance
  * @param[in] name         - pointer to the name of the OSAL instance [optional]
  * @param[in] parent       - pointer to a parent object [optional]
- * @return UShellOsalErr_e error code.
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s* const osalFreertos,
                                        const char* name,
                                        void* const parent);
 
 /**
- * @brief Deinitialize UShell FreeRTOS OSAL instance
+ * \brief Deinitialize UShell FreeRTOS OSAL instance
  * @param[in] osalFreertos - pointer to osal FreeRTOS instance
- * @return UShellOsalErr_e error code.
+ * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreertos);
 
