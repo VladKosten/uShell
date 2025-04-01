@@ -45,9 +45,6 @@ UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
                              const char* const name,
                              const UShellHalPortTable_s* const portTable)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(portTable != NULL);
 
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -59,6 +56,8 @@ UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
         if ((hal == NULL) ||
             (portTable == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -88,9 +87,6 @@ UShellHalErr_e UShellHalInit(UShellHal_s* const hal,
  */
 UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -100,6 +96,8 @@ UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal)
         /* Check input parameter */
         if (hal == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -121,9 +119,6 @@ UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal)
 UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
                                   const void* const parent)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -133,6 +128,8 @@ UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
         /* Check input parameter */
         if ((hal == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -154,10 +151,6 @@ UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
 UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal,
                                   void** const parent)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(parent != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -168,6 +161,8 @@ UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal,
         if ((hal == NULL) ||
             (parent == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -189,10 +184,6 @@ UShellHalErr_e UShellHalParentGet(UShellHal_s* const hal,
 UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal,
                                 const char** const name)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(name != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -203,6 +194,8 @@ UShellHalErr_e UShellHalNameGet(UShellHal_s* const hal,
         if ((hal == NULL) ||
             (name == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -227,11 +220,6 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
                                  const UShellHalCallback_e cbType,
                                  const UShellHalCb cb)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(cb != NULL);
-    USHELL_HAL_ASSERT(cbType & USHELL_HAL_CB_ALL != 0);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
     bool cbAttached = false;
@@ -243,6 +231,8 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
         if ((hal == NULL) ||
             (cb == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -271,6 +261,8 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
         /* Check if callback was attached */
         if (!cbAttached)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -290,10 +282,6 @@ UShellHalErr_e UShellHalCbAttach(UShellHal_s* const hal,
 UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
                                  const UShellHalCallback_e cbType)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(cbType & USHELL_HAL_CB_ALL != 0);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
     bool cbDetached = false;
@@ -304,6 +292,8 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
         /* Check input parameter */
         if (hal == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -332,6 +322,8 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
         /* Check if callback was detached */
         if (!cbDetached)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -349,9 +341,6 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
  */
 UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -361,6 +350,8 @@ UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
         /* Check input parameter */
         if (hal == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -369,6 +360,8 @@ UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
         if ((hal->port == NULL) ||
             (hal->port->open == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }
@@ -389,9 +382,6 @@ UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
  */
 UShellHalErr_e UShellHalClose(UShellHal_s* const hal)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -401,6 +391,8 @@ UShellHalErr_e UShellHalClose(UShellHal_s* const hal)
         /* Check input parameter */
         if (hal == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -409,6 +401,8 @@ UShellHalErr_e UShellHalClose(UShellHal_s* const hal)
         if ((hal->port == NULL) ||
             (hal->port->close == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }
@@ -432,10 +426,6 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
                               const UShellHalItem_t* const data,
                               const size_t size)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(data != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -446,6 +436,8 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
         if ((hal == NULL) ||
             (data == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -454,6 +446,8 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
         if ((hal->port == NULL) ||
             (hal->port->write == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }
@@ -479,10 +473,6 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
                              const size_t buffSize,
                              size_t* const usedSize)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(data != NULL);
-    USHELL_HAL_ASSERT(usedSize != NULL);
 
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -496,6 +486,8 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
             (usedSize == NULL) ||
             (buffSize == 0))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -504,6 +496,8 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
         if ((hal->port == NULL) ||
             (hal->port->read == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }
@@ -525,10 +519,6 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
 UShellHalErr_e UShellHalIsReadDataAvailable(UShellHal_s* const hal,
                                             bool* const isAvailable)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-    USHELL_HAL_ASSERT(isAvailable != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -539,6 +529,8 @@ UShellHalErr_e UShellHalIsReadDataAvailable(UShellHal_s* const hal,
         if ((hal == NULL) ||
             (isAvailable == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -547,6 +539,8 @@ UShellHalErr_e UShellHalIsReadDataAvailable(UShellHal_s* const hal,
         if ((hal->port == NULL) ||
             (hal->port->isReadDataAvailable == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }
@@ -567,9 +561,6 @@ UShellHalErr_e UShellHalIsReadDataAvailable(UShellHal_s* const hal,
  */
 UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -579,6 +570,8 @@ UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
         /* Check input parameter */
         if (hal == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -587,6 +580,8 @@ UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
         if ((hal->port == NULL) ||
             (hal->port->setTxMode == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }
@@ -606,9 +601,6 @@ UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
  */
 UShellHalErr_e UShellHalSetRxMode(UShellHal_s* const hal)
 {
-    /* Check input parameter */
-    USHELL_HAL_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
 
@@ -618,13 +610,18 @@ UShellHalErr_e UShellHalSetRxMode(UShellHal_s* const hal)
         /* Check input parameter */
         if (hal == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
+            break;
         }
 
         /* Check is init */
         if ((hal->port == NULL) ||
             (hal->port->setRxMode == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }
