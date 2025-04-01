@@ -674,6 +674,9 @@ static void uShellWorker(void* const uShell)
                             }
                             else
                             {
+                                /* New line */
+                                uShellPrintStr(ushell, USHELL_NEW_LINE);
+
                                 /* Print fail msg */
                                 uShellPrintStr(ushell, USHELL_AUTH_FAIL_MSG);
                             }
@@ -776,6 +779,9 @@ static void uShellWorker(void* const uShell)
                             {
                                 /* Flush the io */
                                 uShellIoFlush(ushell);
+
+                                /* New line */
+                                uShellPrintStr(ushell, USHELL_NEW_LINE);
 
                                 /* Print error msg */
                                 uShellPrintStr(ushell, USHELL_CMD_NOT_FOUND_MSG);

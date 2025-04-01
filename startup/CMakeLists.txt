@@ -4,4 +4,6 @@ target_include_directories(UShellStartup PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(UShellStartup PUBLIC UShellStartupConfig
                                     PUBLIC UShell
-                                    PUBLIC UShellCmdHelp)
+                                    PUBLIC UShellCmdHelp
+                                    PUBLIC UShellCmdClear
+                                    PUBLIC UShellCmdWhoAmI)

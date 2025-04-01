@@ -110,14 +110,14 @@ extern "C" {
  * @brief The message displayed when authentication fails.
  */
 #ifndef USHELL_AUTH_FAIL_MSG
-    #define USHELL_AUTH_FAIL_MSG " \n\rAuthentication FAIL \n\r"
+    #define USHELL_AUTH_FAIL_MSG "Authentication FAIL \n\r"
 #endif
 
 /**
  * @brief The message displayed when the command is not found.
  */
 #ifndef USHELL_CMD_NOT_FOUND_MSG
-    #define USHELL_CMD_NOT_FOUND_MSG " \n\rCommand not found \n\r"
+    #define USHELL_CMD_NOT_FOUND_MSG "Command not found \n\r"
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
