@@ -20,36 +20,28 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * \brief Description of the maximum size of the buffer in the UShell
- *
- * This macro defines the maximum size of the buffer used in the UShell.
+ * \brief Description of the maximum size of the buffer in the UShell VCP.
  */
 #ifndef USHELL_VCP_BUFFER_SIZE
     #define USHELL_VCP_BUFFER_SIZE 128U
 #endif
 
 /**
- * \brief Name of the uShell thread.
- *
- * This macro defines the name used when creating the uShell thread.
+ * \brief Name of the uShell VCP thread.
  */
 #ifndef USHELL_VCP_THREAD_NAME
     #define USHELL_VCP_THREAD_NAME "USHELL_VCP"
 #endif
 
 /**
- * \brief Stack size for the uShell thread.
- *
- * This macro defines the stack size allocated for the uShell thread.
+ * \brief Stack size for the uShell VCP  thread.
  */
 #ifndef USHELL_VCP_THREAD_STACK_SIZE
     #define USHELL_VCP_THREAD_STACK_SIZE 512U
 #endif
 
 /**
- * \brief Priority of the uShell thread.
- *
- * This macro defines the scheduling priority used by the uShell thread.
+ * \brief Priority of the uShell VCP thread.
  */
 #ifndef USHELL_VCP_THREAD_PRIORITY
     #define USHELL_VCP_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
@@ -57,8 +49,6 @@ extern "C" {
 
 /**
  * \brief Timeout for tx operation in the uShell VCP.
- *
- * This macro defines the timeout duration for the tx operation in the uShell VCP.
  */
 #ifndef USHELL_VCP_TX_TIMEOUT_MS
     #define USHELL_VCP_TX_TIMEOUT_MS 3000U
@@ -95,12 +85,12 @@ extern "C" {
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
- * \brief Describe size of one item in the UShell
+ * \brief Describe size of one item in the UShell VCP
  */
 typedef char UShellVcpItem_t;
 
 /**
- * \brief Enumeration of possible error codes returned by the UShell Hal module.
+ * \brief Enumeration of possible error codes
  */
 typedef enum
 {
@@ -115,7 +105,7 @@ typedef enum
 } UShellVcpErr_e;
 
 /**
- * \brief Description of the uShell IO object
+ * \brief Description of the uShell VCP IO object
  * \note This object is used to store the buffer for input/output operations in the uShell
  */
 typedef struct
@@ -126,7 +116,7 @@ typedef struct
 } UShellVcpIo_s;
 
 /**
- * \brief Description of the uShell object
+ * \brief Description of the uShell VCP object
  * \note This object is used to store the uShell VCP object
  */
 typedef struct
@@ -175,20 +165,24 @@ UShellVcpErr_e UShellVcpDeInit(UShellVcp_s* const vcp);
 
 /**
  * \brief Print string to the uShell vcp object
+ * \note This function is blocking and will wait for the string to be received.
  * \param[in] vcp - uShell object to be printed
  * \param[in] str - string to be printed
  * \param[out] none
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp, const char* const str);
+UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp,
+                                 const char* const str);
 
 /**
  * \brief Print char to the uShell vcp object
+ * \note This function is blocking and will wait for the string to be received.
  * \param vcp - uShell object to be printed
  * \param ch - char to be printed
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch);
+UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp,
+                                  const char ch);
 
 /**
  * \brief Scan char from the uShell vcp object
