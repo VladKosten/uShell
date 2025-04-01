@@ -113,9 +113,9 @@ UShellHalErr_e UShellHalDeinit(UShellHal_s* const hal)
 
 /**
  * \brief Set the parent of the UShellHal object
- * @param[in] hal - UShellHal object to set the parent
- * @param[in] parent - pointer to the parent object
- * @param[out] none
+ * \param[in] hal - UShellHal object to set the parent
+ * \param[in] parent - pointer to the parent object
+ * \param[out] none
  * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalParentSet(UShellHal_s* const hal,
@@ -343,8 +343,8 @@ UShellHalErr_e UShellHalCbDetach(UShellHal_s* const hal,
 
 /**
  * \brief  Open the UShellHal object
- * @param[in] hal - UShellHal object to open
- * @param[out] none
+ * \param[in] hal - UShellHal object to open
+ * \param[out] none
  * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
@@ -383,8 +383,8 @@ UShellHalErr_e UShellHalOpen(UShellHal_s* const hal)
 
 /**
  * \brief Close the UShellHal object
- * @param[in] hal - UShellHal object to close
- * @param[out] none
+ * \param[in] hal - UShellHal object to close
+ * \param[out] none
  * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalClose(UShellHal_s* const hal)
@@ -423,9 +423,9 @@ UShellHalErr_e UShellHalClose(UShellHal_s* const hal)
 
 /**
  * \brief Write data to the UShellHal object
- * @param[in] hal - UShellHal object to write
- * @param[in] data - pointer to the data to write
- * @param[in] size - size of the data to write
+ * \param[in] hal - UShellHal object to write
+ * \param[in] data - pointer to the data to write
+ * \param[in] size - size of the data to write
  * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
@@ -468,10 +468,10 @@ UShellHalErr_e UShellHalWrite(UShellHal_s* const hal,
 
 /**
  * \brief Read data from the UShellHal object
- * @param[in] hal - UShellHal object to read
- * @param[in] data - pointer to the data to read
- * @param[in] buffSize - size of buffer
- * @param[out] usedSize - size used in buffer
+ * \param[in] hal - UShellHal object to read
+ * \param[in] data - pointer to the data to read
+ * \param[in] buffSize - size of buffer
+ * \param[out] usedSize - size used in buffer
  * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
@@ -517,9 +517,9 @@ UShellHalErr_e UShellHalRead(UShellHal_s* const hal,
 }
 
 /**
- * @brief Check if data is available for reading.
- * @param[in] hal Pointer to the HAL instance.
- * @param[out] isAvailable Pointer to a boolean indicating if data is available.
+ * \brief Check if data is available for reading.
+ * \param[in] hal Pointer to the HAL instance.
+ * \param[out] isAvailable Pointer to a boolean indicating if data is available.
  * \return Error code indicating the result of the operation.
  */
 UShellHalErr_e UShellHalIsReadDataAvailable(UShellHal_s* const hal,
@@ -561,8 +561,8 @@ UShellHalErr_e UShellHalIsReadDataAvailable(UShellHal_s* const hal,
 
 /**
  * \brief Set the tx mode of the UShellHal object
- * @param[in] hal - UShellHal object to set the tx mode
- * @param[out] none
+ * \param[in] hal - UShellHal object to set the tx mode
+ * \param[out] none
  * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
@@ -601,7 +601,7 @@ UShellHalErr_e UShellHalSetTxMode(UShellHal_s* const hal)
 
 /**
  * \brief Set the rx mode of the UShellHal object
- * @param[in] hal - UShellHal object to set the rx mode
+ * \param[in] hal - UShellHal object to set the rx mode
  * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 UShellHalErr_e UShellHalSetRxMode(UShellHal_s* const hal)

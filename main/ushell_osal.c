@@ -91,7 +91,7 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
 
 /**
  * \brief Deinitialize UShell OSAL instance
- * @note  Call this function when all functionality has been stopped
+ * \note  Call this function when all functionality has been stopped
  * \param[in] osal - pointer to OSAL instance
  * \return UShellOsalErr_e error code.
  */
@@ -393,7 +393,7 @@ UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s* const osal,
 
 /**
  * \brief Put item to the queue
- * @note  (BLOCKING CALL WITH SPECIFIED WAIT)
+ * \note  (BLOCKING CALL WITH SPECIFIED WAIT)
  * \param[in] osal - OSAL descriptor;
  * \param[in] queueHandle   - the queue handle in which to put the item
  * \param[in] queueItemPtr  - pointer to the item source buffer
@@ -441,7 +441,7 @@ UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s* const osal,
 
 /**
  * \brief Get item from the queue
- * @note  (NON-BLOCKING CALL)
+ * \note  (NON-BLOCKING CALL)
  * \param[in]   osal - OSAL descriptor;
  * \param[in]   queueHandle   - the queue handle in which to put the item
  * \param[out]  queueItemPtr  - pointer to the destination buffer in which the item should be places
@@ -487,7 +487,7 @@ UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s* const osal,
 
 /**
  * \brief Get item from the queue
- * @note  (BLOCKING CALL WITH INFINITE WAIT)
+ * \note  (BLOCKING CALL WITH INFINITE WAIT)
  * \param[in]  osal - OSAL descriptor;
  * \param[in]  queueHandle   - the queue handle in which to put the item
  * \param[out] queueItemPtr  - pointer to the destination buffer in which the item should be places
@@ -533,7 +533,7 @@ UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s* const osal,
 
 /**
  * \brief Get item from the queue
- * @note  (BLOCKING CALL WITH SPECIFIED WAIT)
+ * \note  (BLOCKING CALL WITH SPECIFIED WAIT)
  * \param[in]  UShellOsal_s* const osal - OSAL descriptor;
  * \param[in]  queueHandle   - the queue handle from which to get the item
  * \param[in]  queueItemPtr  - pointer to the destination buffer in which the item should be placed
@@ -827,7 +827,7 @@ UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s* const osal,
 
 /**
  * \brief Delete the thread
- * @note The operation must be stopped before deleting the thread
+ * \note The operation must be stopped before deleting the thread
  *        to not to damage the system.
  * \param[in]   osal - OSAL descriptor;
  * \param[in]   threadHandle  - the handle of the thread being deleted
@@ -1400,7 +1400,7 @@ UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
 }
 
 /**
- * @brief Stream buffer is empty.
+ * \brief Stream buffer is empty.
  *
  * \param[in] osal Pointer to the OSAL instance.
  * \param[in] streamBuffHandle Handle of the stream buffer.

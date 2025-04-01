@@ -18,7 +18,7 @@ extern "C" {
 /**
  * @def USHELL_ASSERT
  * \brief Assert macro definition.
- * @param cond Condition to assert.
+ * \param cond Condition to assert.
  */
 #define USHELL_ASSERT(cond)                     assert((cond))
 

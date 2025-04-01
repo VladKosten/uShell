@@ -28,16 +28,16 @@
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]=====================================================================
 
 /**
- * @brief Lock the cmd
- * @param cmd - cmd to be locked
- * @return none
+ * \brief Lock the cmd
+ * \param cmd - cmd to be locked
+ * \return none
  */
 static void uShellCmdLock(UShellCmd_s* const cmd);
 
 /**
- * @brief Unlock the cmd
- * @param cmd - cmd to be unlocked
- * @return none
+ * \brief Unlock the cmd
+ * \param cmd - cmd to be unlocked
+ * \return none
  */
 static void uShellCmdUnlock(UShellCmd_s* const cmd);
 
@@ -120,10 +120,10 @@ UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd)
 }
 
 /**
- * @brief Set the parent
- * @param[in] cmd - the cmd to be set
- * @param[in] parent - the parent to be set
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Set the parent
+ * \param[in] cmd - the cmd to be set
+ * \param[in] parent - the parent to be set
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
                                   const void* const parent)
@@ -148,10 +148,10 @@ UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
 }
 
 /**
- * @brief Set the hook table
- * @param[in] cmd -  the cmd to be set
- * @param[in] hook -  the hook table to be set
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Set the hook table
+ * \param[in] cmd -  the cmd to be set
+ * \param[in] hook -  the hook table to be set
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdHookTableSet(UShellCmd_s* const cmd,
                                      UShellCmdHookTable_s* const hook)
@@ -177,11 +177,11 @@ UShellCmdErr_e UShellCmdHookTableSet(UShellCmd_s* const cmd,
 }
 
 /**
- * @brief Execute the cmd
- * @param[in] cmd - UShellCmd obj to be executed
- * @param[in] argc - number of arguments
- * @param[in] argv - array of arguments
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Execute the cmd
+ * \param[in] cmd - UShellCmd obj to be executed
+ * \param[in] argc - number of arguments
+ * \param[in] argv - array of arguments
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
                              const int argc,
@@ -283,10 +283,10 @@ UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const 
 }
 
 /**
- * @brief Add cmd to the list
- * @param cmdRoot - the root of the list
- * @param cmd - the cmd to be added
- * @return - error code
+ * \brief Add cmd to the list
+ * \param cmdRoot - the root of the list
+ * \param cmd - the cmd to be added
+ * \return - error code
  */
 UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
                                 UShellCmd_s* const cmd)
@@ -344,12 +344,12 @@ UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
 }
 
 /**
- * @brief Remove a command from the list.
+ * \brief Remove a command from the list.
  *
- * @param[in,out] cmdRoot Pointer to the pointer to the root of the list.
+ * \param[in,out] cmdRoot Pointer to the pointer to the root of the list.
  *                        This parameter is updated if the head command is removed.
- * @param[in]     cmd     Pointer to the command to be removed.
- * @return UShellCmdErr_e Error code; USHELL_CMD_NO_ERR if successful,
+ * \param[in]     cmd     Pointer to the command to be removed.
+ * \return UShellCmdErr_e Error code; USHELL_CMD_NO_ERR if successful,
  *         or an error code (e.g. USHELL_CMD_INVALID_ARGS_ERR or USHELL_CMD_NOT_FOUND_ERR).
  */
 UShellCmdErr_e UShellCmdListRemove(UShellCmd_s** const cmdRoot, UShellCmd_s* const cmd)
@@ -403,11 +403,11 @@ UShellCmdErr_e UShellCmdListRemove(UShellCmd_s** const cmdRoot, UShellCmd_s* con
 }
 
 /**
- * @brief Find cmd by name
- * @param[in] cmdRoot - the root of the list
- * @param[in] cmd - the cmd to be found
- * @param[in] isInList - true if the cmd is in the list, false otherwise
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Find cmd by name
+ * \param[in] cmdRoot - the root of the list
+ * \param[in] cmd - the cmd to be found
+ * \param[in] isInList - true if the cmd is in the list, false otherwise
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdIsInList(UShellCmd_s* const cmdRoot,
                                  UShellCmd_s* const cmd,
@@ -464,10 +464,10 @@ UShellCmdErr_e UShellCmdIsInList(UShellCmd_s* const cmdRoot,
 }
 
 /**
- * @brief Get the next cmd in the list
- * @param[in] cmdRoot - the root of the list
- * @param[in] cmd - the cmd to be found
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Get the next cmd in the list
+ * \param[in] cmdRoot - the root of the list
+ * \param[in] cmd - the cmd to be found
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdListNextGet(UShellCmd_s* const cmdRoot,
                                     UShellCmd_s** const cmd)
@@ -502,9 +502,9 @@ UShellCmdErr_e UShellCmdListNextGet(UShellCmd_s* const cmdRoot,
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
 
 /**
- * @brief Lock the cmd
- * @param cmd - cmd to be locked
- * @return none
+ * \brief Lock the cmd
+ * \param cmd - cmd to be locked
+ * \return none
  */
 static void uShellCmdLock(UShellCmd_s* const cmd)
 {
@@ -533,9 +533,9 @@ static void uShellCmdLock(UShellCmd_s* const cmd)
 }
 
 /**
- * @brief Unlock the cmd
- * @param cmd - cmd to be unlocked
- * @return none
+ * \brief Unlock the cmd
+ * \param cmd - cmd to be unlocked
+ * \return none
  */
 static void uShellCmdUnlock(UShellCmd_s* const cmd)
 {

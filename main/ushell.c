@@ -131,9 +131,9 @@ static UShellErr_e uShellRtEnvCmdRootInit(UShell_s* const uShell,
                                           UShellCmd_s* const cmdRoot);
 
 /**
- * @brief Deinitialize the runtime environment command
- * @param[in] uShell - uShell object
- * @return UShellErr_e - error code. non-zero = an error has occurred;
+ * \brief Deinitialize the runtime environment command
+ * \param[in] uShell - uShell object
+ * \return UShellErr_e - error code. non-zero = an error has occurred;
  */
 static UShellErr_e uShellRtEnvCmdRootDeInit(UShell_s* const uShell);
 
@@ -152,9 +152,9 @@ static UShellErr_e uShellRtEnvFuncHistoryInit(UShell_s* const uShell);
 static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell);
 
 /**
- * @brief Find cmd by name
- * @param[in] uShell - uShell object
- * @return UShellCmd_s* - error code. non-zero = an error has occurred;
+ * \brief Find cmd by name
+ * \param[in] uShell - uShell object
+ * \return UShellCmd_s* - error code. non-zero = an error has occurred;
  */
 static UShellCmd_s* uShellCmdFind(UShell_s* const uShell);
 
@@ -173,88 +173,105 @@ static void uShellLock(const UShell_s* const uShell);
 static void uShellUnlock(const UShell_s* const uShell);
 
 /**
- * @brief Lock the cmd
- * @param cmd - the cmd to be locked
- * @return none
+ * \brief Lock the cmd
+ * \param cmd - the cmd to be locked
+ * \return none
  */
 static void uShellCmdLock(void* const cmd);
 
 /**
- * @brief Unlock the cmd
- * @param cmd - the cmd to be unlocked
- * @return none
+ * \brief Unlock the cmd
+ * \param cmd - the cmd to be unlocked
+ * \return none
  */
 static void uShellCmdUnlock(void* const cmd);
 
 /**
- * @brief Io flush function
- * @param[in] uShell - uShell object
- * @return none
+ * \brief Io flush function
+ * \param[in] uShell - uShell object
+ * \return none
  */
 static void uShellIoFlush(UShell_s* const uShell);
 
 /**
- * @brief Execute the command
- * @param[in] uShell - the uShell object
- * @return none
+ * \brief Execute the command
+ * \param[in] uShell - the uShell object
+ * \return none
  */
 static void uShellCmdCurExec(UShell_s* const uShell);
 
 /**
- * @brief Auto complete the command
- * @param uShell - the uShell object
- * @return none
+ * \brief Auto complete the command
+ * \param uShell - the uShell object
+ * \return none
  */
 static void uShellCmdAutoComplete(UShell_s* const uShell);
 
 /**
- * @brief Print the string
- * @param[in] uShell - the uShell object
- * @param[in] str - string to be printed
- * @return none
+ * \brief Print the string
+ * \param[in] uShell - the uShell object
+ * \param[in] str - string to be printed
+ * \return none
  */
 static void uShellPrintStr(UShell_s* const uShell,
                            const char* const str);
 
 /**
- * @brief Print the char
- * @param[in] uShell - the uShell object
- * @param[in] ch - char to be printed
- * @return none
+ * \brief Print the char
+ * \param[in] uShell - the uShell object
+ * \param[in] ch - char to be printed
+ * \return none
  */
 static void uShellPrintChar(UShell_s* const uShell,
                             const char ch);
 /**
- * @brief Add cmd to history
- * @param[in] uShell - the uShell object
- * @return none
+ * \brief Add cmd to history
+ * \param[in] uShell - the uShell object
+ * \return none
  */
 static void uShellHistoryCmdAdd(UShell_s* const uShell);
 
 /**
- * @brief Get previous cmd from history
- * @param[in] uShell - the uShell object
- * @return none
+ * \brief Get previous cmd from history
+ * \param[in] uShell - the uShell object
+ * \return none
  */
 static void uShellHistoryPrevCmdGet(UShell_s* const uShell);
 
 /**
- * @brief Get next cmd from history
- * @param[in] uShell - the uShell object
- * @return none
+ * \brief Get next cmd from history
+ * \param[in] uShell - the uShell object
+ * \return none
  */
 static void uShellHistoryNextCmdGet(UShell_s* const uShell);
 
 /**
- * @brief Delay in milliseconds
- * @param[in] uShell - uShell object
- * @param[in] delayMs - delay in milliseconds
+ * \brief Delay in milliseconds
+ * \param[in] uShell - uShell object
+ * \param[in] delayMs - delay in milliseconds
  */
 static inline void uShellDelayMs(const UShell_s* const uShell,
                                  const uint32_t delayMs);
 
 /**
- * @brief Hook table for the cmd
+ * \brief Add char to the uShell
+ * \param[in] uShell - the uShell object
+ * \param[in] ch - char to be added
+ * \return none
+ */
+static void uShellIoAddChar(UShell_s* const uShell,
+                            const char ch);
+
+/**
+ * \brief Delete char from the uShell
+ * \param[in] uShell - the uShell object
+ * \param[in] ch - char to be deleted
+ * \return none
+ */
+static void uShellIoDelChar(UShell_s* const uShell);
+
+/**
+ * \brief Hook table for the cmd
  */
 static UShellCmdHookTable_s ushellCmdHookTable =
     {
@@ -586,7 +603,7 @@ static void uShellWorker(void* const uShell)
     while (1)
     {
         /* Little delay */
-        uShellDelayMs(ushell, 100U);
+        uShellDelayMs(ushell, USHELL_UPD_TIME);
 
         /* Check the state */
         switch (ushell->fsmState)
@@ -594,10 +611,8 @@ static void uShellWorker(void* const uShell)
             /* Initial state */
             case USHELL_STATE_INIT :
             {
-
                 do
                 {
-
                     /* Clear line */
                     uShellPrintStr(ushell, USHELL_CLEAR_LINE);
 
@@ -703,25 +718,8 @@ static void uShellWorker(void* const uShell)
                         /* Acknowledge */
                         default :
                         {
-                            do
-                            {
-                                /* Store the data */
-                                if (ushell->io.ind >= strlen(USHELL_AUTH_PASSWORD))
-                                {
-                                    break;
-                                }
-
-                                /* Only accept alphanumeric characters */
-                                if (!(item >= '0' && item <= '9') &&
-                                    !(item >= 'A' && item <= 'Z') &&
-                                    !(item >= 'a' && item <= 'z'))
-                                {
-                                    break;
-                                }
-
-                                ushell->io.buffer [ushell->io.ind++] = item;
-
-                            } while (0);
+                            /* Store the data */
+                            uShellIoAddChar(ushell, item);
 
                             break;
                         }
@@ -753,7 +751,7 @@ static void uShellWorker(void* const uShell)
                     /* Print IO */
                     uShellPrintStr(ushell, ushell->io.buffer);
 
-                    /* Get data*/
+                    /* Get data */
                     vcpStatus = UShellVcpScanCharNonBlock(vcp, &item);
                     if (vcpStatus != USHELL_VCP_NO_ERR)
                     {
@@ -797,6 +795,7 @@ static void uShellWorker(void* const uShell)
                             break;
                         }
 
+                        /* Escape sequence */
                         case USHELL_ASCII_CHAR_ESC :
                         {
                             /* Change state to proc esc */
@@ -808,11 +807,8 @@ static void uShellWorker(void* const uShell)
                         case USHELL_ASCII_CHAR_BS :
                         case USHELL_ASCII_CHAR_DEL :
                         {
-                            /* Remove the last char */
-                            if (ushell->io.ind > 0)
-                            {
-                                ushell->io.buffer [--ushell->io.ind] = 0;
-                            }
+                            /* Delete the last char */
+                            uShellIoDelChar(ushell);
 
                             /* Process the command */
                             uShellPrintStr(ushell, USHELL_DEL_CHAR);
@@ -838,11 +834,8 @@ static void uShellWorker(void* const uShell)
                         /* Acknowledge */
                         default :
                         {
-                            /* Store the data */
-                            if (ushell->io.ind < USHELL_BUFFER_SIZE)
-                            {
-                                ushell->io.buffer [ushell->io.ind++] = item;
-                            }
+                            /* Check if we have space in the buffer */
+                            uShellIoAddChar(ushell, item);
 
                             break;
                         }
@@ -853,6 +846,7 @@ static void uShellWorker(void* const uShell)
                     {
                         break;
                     }
+
                 } while (1);
 
                 break;
@@ -862,22 +856,17 @@ static void uShellWorker(void* const uShell)
             case USHELL_STATE_PROC_CMD :
             {
 
-                do
-                {
+                /* Exec curr cmd */
+                uShellCmdCurExec(ushell);
 
-                    /* Exec curr cmd */
-                    uShellCmdCurExec(ushell);
+                /* flush curr cmd */
+                ushell->currCmd = NULL;
 
-                    /* flush curr cmd */
-                    ushell->currCmd = NULL;
+                /* Flush the io */
+                uShellIoFlush(ushell);
 
-                    /* Flush the io */
-                    uShellIoFlush(ushell);
-
-                    /* Change state to input */
-                    ushell->fsmState = USHELL_STATE_PROC_INP;
-
-                } while (0);
+                /* Change state to input */
+                ushell->fsmState = USHELL_STATE_PROC_INP;
 
                 break;
             }
@@ -1313,9 +1302,9 @@ static UShellErr_e uShellRtEnvCmdRootInit(UShell_s* const uShell,
 }
 
 /**
- * @brief Deinitialize the runtime environment command
- * @param[in] uShell - uShell object
- * @return UShellErr_e - error code. non-zero = an error has occurred;
+ * \brief Deinitialize the runtime environment command
+ * \param[in] uShell - uShell object
+ * \return UShellErr_e - error code. non-zero = an error has occurred;
  */
 static UShellErr_e uShellRtEnvCmdRootDeInit(UShell_s* const uShell)
 {
@@ -1442,9 +1431,9 @@ static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell)
 }
 
 /**
- * @brief Find cmd by name
- * @param[in] uShell - uShell object
- * @return UShellCmd_s* - error code. non-zero = an error has occurred;
+ * \brief Find cmd by name
+ * \param[in] uShell - uShell object
+ * \return UShellCmd_s* - error code. non-zero = an error has occurred;
  */
 static UShellCmd_s* uShellCmdFind(UShell_s* const uShell)
 {
@@ -1591,9 +1580,9 @@ static void uShellUnlock(const UShell_s* const uShell)
 }
 
 /**
- * @brief Lock the cmd
- * @param cmd - the cmd to be locked
- * @return none
+ * \brief Lock the cmd
+ * \param cmd - the cmd to be locked
+ * \return none
  */
 static void uShellCmdLock(void* const cmd)
 {
@@ -1635,9 +1624,9 @@ static void uShellCmdLock(void* const cmd)
 }
 
 /**
- * @brief Unlock the cmd
- * @param cmd - the cmd to be unlocked
- * @return none
+ * \brief Unlock the cmd
+ * \param cmd - the cmd to be unlocked
+ * \return none
  */
 static void uShellCmdUnlock(void* const cmd)
 {
@@ -1679,9 +1668,9 @@ static void uShellCmdUnlock(void* const cmd)
 }
 
 /**
- * @brief Io flush function
- * @param[in] uShell - uShell object
- * @return none
+ * \brief Io flush function
+ * \param[in] uShell - uShell object
+ * \return none
  */
 static void uShellIoFlush(UShell_s* const uShell)
 {
@@ -1693,9 +1682,9 @@ static void uShellIoFlush(UShell_s* const uShell)
 }
 
 /**
- * @brief Execute the command
- * @param[in] uShell - the uShell object
- * @return none
+ * \brief Execute the command
+ * \param[in] uShell - the uShell object
+ * \return none
  */
 static void uShellCmdCurExec(UShell_s* const uShell)
 {
@@ -1742,9 +1731,9 @@ static void uShellCmdCurExec(UShell_s* const uShell)
 }
 
 /**
- * @brief Auto complete the command
- * @param uShell - the uShell object
- * @return none
+ * \brief Auto complete the command
+ * \param uShell - the uShell object
+ * \return none
  *
  * This function compares the current input buffer with the names of all available commands.
  * If exactly one command matches the input, it auto-completes the command in the input buffer.
@@ -1825,10 +1814,10 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
 }
 
 /**
- * @brief Print the string
- * @param[in] uShell - the uShell object
- * @param[in] str - string to be printed
- * @return none
+ * \brief Print the string
+ * \param[in] uShell - the uShell object
+ * \param[in] str - string to be printed
+ * \return none
  */
 static void uShellPrintStr(UShell_s* const uShell,
                            const char* const str)
@@ -1863,10 +1852,10 @@ static void uShellPrintStr(UShell_s* const uShell,
 }
 
 /**
- * @brief Print the char
- * @param[in] uShell - the uShell object
- * @param[in] ch - char to be printed
- * @return none
+ * \brief Print the char
+ * \param[in] uShell - the uShell object
+ * \param[in] ch - char to be printed
+ * \return none
  */
 static void uShellPrintChar(UShell_s* const uShell,
                             const char ch)
@@ -1900,9 +1889,9 @@ static void uShellPrintChar(UShell_s* const uShell,
 }
 
 /**
- * @brief Add cmd to history
- * @param[in] uShell - the uShell object
- * @return none
+ * \brief Add cmd to history
+ * \param[in] uShell - the uShell object
+ * \return none
  */
 static void uShellHistoryCmdAdd(UShell_s* const uShell)
 {
@@ -1940,9 +1929,9 @@ static void uShellHistoryCmdAdd(UShell_s* const uShell)
 }
 
 /**
- * @brief Get previous cmd from history
- * @param[in] uShell - the uShell object
- * @return none
+ * \brief Get previous cmd from history
+ * \param[in] uShell - the uShell object
+ * \return none
  */
 static void uShellHistoryPrevCmdGet(UShell_s* const uShell)
 {
@@ -1988,9 +1977,9 @@ static void uShellHistoryPrevCmdGet(UShell_s* const uShell)
 }
 
 /**
- * @brief Get next cmd from history
- * @param[in] uShell - the uShell object
- * @return none
+ * \brief Get next cmd from history
+ * \param[in] uShell - the uShell object
+ * \return none
  */
 static void uShellHistoryNextCmdGet(UShell_s* const uShell)
 {
@@ -2036,9 +2025,9 @@ static void uShellHistoryNextCmdGet(UShell_s* const uShell)
 }
 
 /**
- * @brief Delay in milliseconds
- * @param[in] uShell - uShell object
- * @param[in] delayMs - delay in milliseconds
+ * \brief Delay in milliseconds
+ * \param[in] uShell - uShell object
+ * \param[in] delayMs - delay in milliseconds
  */
 static inline void uShellDelayMs(const UShell_s* const uShell,
                                  const uint32_t delayMs)
@@ -2068,6 +2057,77 @@ static inline void uShellDelayMs(const UShell_s* const uShell,
         {
             break;
         }
+
+    } while (0);
+}
+
+/**
+ * \brief Add char to the uShell
+ * \param[in] uShell - the uShell object
+ * \param[in] ch - char to be added
+ * \return none
+ */
+static void uShellIoAddChar(UShell_s* const uShell,
+                            const char ch)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(uShell != NULL);
+    USHELL_ASSERT(ch != NULL);
+
+    do
+    {
+        /* Check input parameters */
+        if (uShell == NULL)
+        {
+            break;
+        }
+
+        /* Check size of buffer */
+        if (uShell->io.ind >= USHELL_BUFFER_SIZE)
+        {
+            break;
+        }
+
+        /* Check char */
+        if ((ch < ' ') ||
+            (ch > '~'))
+        {
+            break;
+        }
+
+        /* Add char to the buffer */
+        uShell->io.buffer [uShell->io.ind++] = ch;
+
+    } while (0);
+}
+
+/**
+ * \brief Delete char from the uShell
+ * \param[in] uShell - the uShell object
+ * \param[in] ch - char to be deleted
+ * \return none
+ */
+static void uShellIoDelChar(UShell_s* const uShell)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(uShell != NULL);
+
+    do
+    {
+        /* Check input parameters */
+        if (uShell == NULL)
+        {
+            break;
+        }
+
+        /* Check size of buffer */
+        if (uShell->io.ind == 0U)
+        {
+            break;
+        }
+
+        /* Delete char from the buffer */
+        uShell->io.buffer [--uShell->io.ind] = 0;
 
     } while (0);
 }

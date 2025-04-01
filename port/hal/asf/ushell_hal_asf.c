@@ -73,23 +73,23 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
 
 /**
  * \brief Open function.
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortOpen(void* const hal);
 
 /**
  * \brief Close function.
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortClose(void* const hal);
 
 /**
  * \brief Write function.
- * @param[in] hal Pointer to the HAL instance.
- * @param[in] data Pointer to the data to be written.
- * @param[in] size Size of the data to be written.
+ * \param[in] hal Pointer to the HAL instance.
+ * \param[in] data Pointer to the data to be written.
+ * \param[in] size Size of the data to be written.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortWrite(void* const hal,
@@ -98,10 +98,10 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
 
 /**
  * \brief Read function.
- * @param hal - Pointer to the HAL instance.
- * @param data - Pointer to the buffer to store the read data.
- * @param buffSize - Size of the buffer.
- * @param usedSize - Pointer to the variable to store the size of the data read.
+ * \param hal - Pointer to the HAL instance.
+ * \param data - Pointer to the buffer to store the read data.
+ * \param buffSize - Size of the buffer.
+ * \param usedSize - Pointer to the variable to store the size of the data read.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortRead(void* const hal,
@@ -111,7 +111,7 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
 
 /**
  * \brief Set Tx mode
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  *
  */
@@ -119,16 +119,16 @@ static UShellHalErr_e uShellHalPortSetTxMode(void* const hal);
 
 /**
  * \brief Set Rx mode
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortSetRxMode(void* const hal);
 
 /**
- * @brief Check if data is available for reading.
- * @param[in] hal - Pointer to the HAL instance.
- * @param[in] isAvailable - Pointer to a boolean indicating if data is available.
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \brief Check if data is available for reading.
+ * \param[in] hal - Pointer to the HAL instance.
+ * \param[in] isAvailable - Pointer to a boolean indicating if data is available.
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 static UShellHalErr_e uShellHalPortIsReadDataAvailable(void* const hal,
                                                        bool* const isAvailable);
@@ -436,7 +436,7 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
 
 /**
  * \brief Open function.
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortOpen(void* const hal)
@@ -499,7 +499,7 @@ static UShellHalErr_e uShellHalPortOpen(void* const hal)
 
 /**
  * \brief Close function.
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortClose(void* const hal)
@@ -559,9 +559,9 @@ static UShellHalErr_e uShellHalPortClose(void* const hal)
 
 /**
  * \brief Write function.
- * @param[in] hal Pointer to the HAL instance.
- * @param[in] data Pointer to the data to be written.
- * @param[in] size Size of the data to be written.
+ * \param[in] hal Pointer to the HAL instance.
+ * \param[in] data Pointer to the data to be written.
+ * \param[in] size Size of the data to be written.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortWrite(void* const hal,
@@ -606,9 +606,9 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
 
 /**
  * \brief Read function.
- * @param[in] hal Pointer to the HAL instance.
- * @param[out] data Pointer to the buffer to store the read data.
- * @param[in] size Size of the buffer.
+ * \param[in] hal Pointer to the HAL instance.
+ * \param[out] data Pointer to the buffer to store the read data.
+ * \param[in] size Size of the buffer.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortRead(void* const hal,
@@ -653,7 +653,7 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
 
 /**
  * \brief Set Tx mode
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  *
  */
@@ -694,7 +694,7 @@ static UShellHalErr_e uShellHalPortSetTxMode(void* const hal)
 
 /**
  * \brief Set Rx mode
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortSetRxMode(void* const hal)
@@ -733,10 +733,10 @@ static UShellHalErr_e uShellHalPortSetRxMode(void* const hal)
 }
 
 /**
- * @brief Check if data is available for reading.
- * @param[in] hal - Pointer to the HAL instance.
- * @param[in] isAvailable - Pointer to a boolean indicating if data is available.
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \brief Check if data is available for reading.
+ * \param[in] hal - Pointer to the HAL instance.
+ * \param[in] isAvailable - Pointer to a boolean indicating if data is available.
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 static UShellHalErr_e uShellHalPortIsReadDataAvailable(void* const hal,
                                                        bool* const isAvailable)

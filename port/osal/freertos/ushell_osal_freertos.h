@@ -88,9 +88,9 @@ typedef struct
 
 /**
  * \brief Initialize the UShell FreeRTOS osal instance
- * @param[in] osalFreertos - pointer to FreeRTOS osal instance
- * @param[in] name         - pointer to the name of the OSAL instance [optional]
- * @param[in] parent       - pointer to a parent object [optional]
+ * \param[in] osalFreertos - pointer to FreeRTOS osal instance
+ * \param[in] name         - pointer to the name of the OSAL instance [optional]
+ * \param[in] parent       - pointer to a parent object [optional]
  * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s* const osalFreertos,
@@ -99,7 +99,7 @@ UShellOsalErr_e UShellOsalFreertosInit(UShellOsalFreertos_s* const osalFreertos,
 
 /**
  * \brief Deinitialize UShell FreeRTOS OSAL instance
- * @param[in] osalFreertos - pointer to osal FreeRTOS instance
+ * \param[in] osalFreertos - pointer to osal FreeRTOS instance
  * \return UShellOsalErr_e error code.
  */
 UShellOsalErr_e UShellOsalFreertosDeinit(UShellOsalFreertos_s* const osalFreertos);

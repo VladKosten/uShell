@@ -242,9 +242,9 @@ static UShellVcpErr_e uShellVcpReadFromPort(UShellVcp_s* const vcp);
 static UShellVcpErr_e uShellVcpWriteToPort(UShellVcp_s* const vcp);
 
 /**
- * @brief Inspect the vcp object
- * @param vcp - vcp object to be inspected
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Inspect the vcp object
+ * \param vcp - vcp object to be inspected
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 static UShellVcpErr_e uShellVcpInspect(UShellVcp_s* const vcp);
 
@@ -268,14 +268,14 @@ static inline void uShellVcpStreamRxFlush(UShellVcp_s* const vcp);
 static inline void uShellVcpStreamTxFlush(UShellVcp_s* const vcp);
 
 /**
- * @brief Set tx direction of the vcp object
- * @param[in] vcp - vcp object to be set
+ * \brief Set tx direction of the vcp object
+ * \param[in] vcp - vcp object to be set
  */
 static inline void uShellVcpDirectTxSet(UShellVcp_s* const vcp);
 
 /**
- * @brief Set rx direction of the vcp  object
- * @param[in] vcp - vcp object to be set
+ * \brief Set rx direction of the vcp  object
+ * \param[in] vcp - vcp object to be set
  */
 static inline void uShellVcpDirectRxSet(UShellVcp_s* const vcp);
 
@@ -556,12 +556,12 @@ UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
 }
 
 /**
- * @brief Scan character from the uShell vcp object in non-blocking mode
- * @note: This function is non-blocking and will return immediately.
- * @note: This function will return USHELL_VCP_EMPTY_ERR if no character is available.
- * @param[in] vcp - uShell object to be scanned
- * @param[in] ch - character to be scanned
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Scan character from the uShell vcp object in non-blocking mode
+ * \note: This function is non-blocking and will return immediately.
+ * \note: This function will return USHELL_VCP_EMPTY_ERR if no character is available.
+ * \param[in] vcp - uShell object to be scanned
+ * \param[in] ch - character to be scanned
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanCharNonBlock(UShellVcp_s* const vcp,
                                          char* const ch)
@@ -716,10 +716,10 @@ UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
 }
 
 /**
- * @brief Check if the uShell vcp object is empty
- * @param vcp - uShell object to be checked
- * @param isEmpty - pointer to store the result indicating if the object is empty
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Check if the uShell vcp object is empty
+ * \param vcp - uShell object to be checked
+ * \param isEmpty - pointer to store the result indicating if the object is empty
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanIsEmpty(UShellVcp_s* const vcp,
                                     bool* const isEmpty)
@@ -2212,9 +2212,9 @@ static UShellVcpErr_e uShellVcpWriteToPort(UShellVcp_s* const vcp)
 }
 
 /**
- * @brief Inspect the vcp object
- * @param vcp - vcp object to be inspected
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Inspect the vcp object
+ * \param vcp - vcp object to be inspected
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 static UShellVcpErr_e uShellVcpInspect(UShellVcp_s* const vcp)
 {
@@ -2420,8 +2420,8 @@ static inline void uShellVcpStreamTxFlush(UShellVcp_s* const vcp)
 }
 
 /**
- * @brief Set tx direction of the vcp object
- * @param[in] vcp - vcp object to be set
+ * \brief Set tx direction of the vcp object
+ * \param[in] vcp - vcp object to be set
  */
 static inline void uShellVcpDirectTxSet(UShellVcp_s* const vcp)
 {
@@ -2453,8 +2453,8 @@ static inline void uShellVcpDirectTxSet(UShellVcp_s* const vcp)
 }
 
 /**
- * @brief Set rx direction of the vcp  object
- * @param[in] vcp - vcp object to be set
+ * \brief Set rx direction of the vcp  object
+ * \param[in] vcp - vcp object to be set
  */
 static inline void uShellVcpDirectRxSet(UShellVcp_s* const vcp)
 {

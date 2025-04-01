@@ -116,7 +116,7 @@ typedef enum
 
 /**
  * \brief Description of the uShell IO object
- * @note This object is used to store the buffer for input/output operations in the uShell
+ * \note This object is used to store the buffer for input/output operations in the uShell
  */
 typedef struct
 {
@@ -127,7 +127,7 @@ typedef struct
 
 /**
  * \brief Description of the uShell object
- * @note This object is used to store the uShell VCP object
+ * \note This object is used to store the uShell VCP object
  */
 typedef struct
 {
@@ -175,17 +175,17 @@ UShellVcpErr_e UShellVcpDeInit(UShellVcp_s* const vcp);
 
 /**
  * \brief Print string to the uShell vcp object
- * @param[in] vcp - uShell object to be printed
- * @param[in] str - string to be printed
- * @param[out] none
+ * \param[in] vcp - uShell object to be printed
+ * \param[in] str - string to be printed
+ * \param[out] none
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp, const char* const str);
 
 /**
  * \brief Print char to the uShell vcp object
- * @param vcp - uShell object to be printed
- * @param ch - char to be printed
+ * \param vcp - uShell object to be printed
+ * \param ch - char to be printed
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch);
@@ -193,20 +193,20 @@ UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch);
 /**
  * \brief Scan char from the uShell vcp object
  * \note: This function is blocking and will wait for the character to be received.
- * @param[in] vcp - uShell object to be scanned
- * @param[in] ch - char to be scanned
+ * \param[in] vcp - uShell object to be scanned
+ * \param[in] ch - char to be scanned
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
                                  char* const ch);
 
 /**
- * @brief Scan character from the uShell vcp object in non-blocking mode
- * @note: This function is non-blocking and will return immediately.
- * @note: This function will return USHELL_VCP_EMPTY_ERR if no character is available.
- * @param[in] vcp - uShell object to be scanned
- * @param[in] ch - character to be scanned
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Scan character from the uShell vcp object in non-blocking mode
+ * \note: This function is non-blocking and will return immediately.
+ * \note: This function will return USHELL_VCP_EMPTY_ERR if no character is available.
+ * \param[in] vcp - uShell object to be scanned
+ * \param[in] ch - character to be scanned
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanCharNonBlock(UShellVcp_s* const vcp,
                                          char* const ch);
@@ -214,9 +214,9 @@ UShellVcpErr_e UShellVcpScanCharNonBlock(UShellVcp_s* const vcp,
 /**
  * \brief Scan string from the uShell vcp object
  * \note: This function is blocking and will wait for the string to be received.
- * @param[in] vcp - uShell object to be scanned
- * @param[in] str - string to be scanned
- * @param[in] size - size of the string to be scanned
+ * \param[in] vcp - uShell object to be scanned
+ * \param[in] str - string to be scanned
+ * \param[in] size - size of the string to be scanned
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
@@ -224,10 +224,10 @@ UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
                                 const size_t maxSize);
 
 /**
- * @brief Check if the uShell vcp object is empty
- * @param vcp - uShell object to be checked
- * @param isEmpty - pointer to store the result indicating if the object is empty
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Check if the uShell vcp object is empty
+ * \param vcp - uShell object to be checked
+ * \param isEmpty - pointer to store the result indicating if the object is empty
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanIsEmpty(UShellVcp_s* const vcp,
                                     bool* const isEmpty);

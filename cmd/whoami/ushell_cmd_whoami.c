@@ -21,11 +21,11 @@
 UShellCmdWhoAmI_s uShellCmdWhoAmI = {0};    ///< UShellCmdWhoAmI object (base object)
 
 /**
- * @brief Execute the whoami command.
- * @param cmd - UShellCmd object
- * @param argc - number of arguments
- * @param argv - array of arguments
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Execute the whoami command.
+ * \param cmd - UShellCmd object
+ * \param argc - number of arguments
+ * \param argv - array of arguments
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdWhoAmIExec(void* const cmd,
                                           const int argc,
@@ -101,11 +101,11 @@ int UShellCmdWhoAmIDeinit()
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
 
 /**
- * @brief Execute the help command.
- * @param cmd - UShellCmd object
- * @param argc - number of arguments
- * @param argv - array of arguments
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Execute the help command.
+ * \param cmd - UShellCmd object
+ * \param argc - number of arguments
+ * \param argv - array of arguments
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdWhoAmIExec(void* const cmd,
                                           const int argc,
