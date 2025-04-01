@@ -317,7 +317,7 @@ UShellErr_e UShellInit(UShell_s* const uShell,
         /* Initialize the runtime environment */
         status = uShellRtEnvInit(uShell,
                                  (UShellOsal_s*) osal,
-                                 (UShellCfg_s*) &cfg,
+                                 (UShellCfg_s*) cfg,
                                  (UShellCmd_s*) cmdRoot);
         if (status != USHELL_NO_ERR)
         {
@@ -774,6 +774,9 @@ static void uShellWorker(void* const uShell)
                             /* Check we find cmd */
                             if (ushell->currCmd == NULL)
                             {
+                                /* Flush the io */
+                                uShellIoFlush(ushell);
+
                                 /* Print error msg */
                                 uShellPrintStr(ushell, USHELL_CMD_NOT_FOUND_MSG);
                                 break;
@@ -994,7 +997,7 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
         }
 
         /* Attach the configuration object */
-        uShell->cfg = *cfg;
+        memcpy(&uShell->cfg, cfg, sizeof(UShellCfg_s));
 
         /* Initialize the runtime environment history */
         if (uShell->cfg.historyIsEn == true)
