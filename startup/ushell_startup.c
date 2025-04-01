@@ -74,6 +74,27 @@ static UShellStartupHal_s uShellStartupVcpHalObj = {0};
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]=====================================================================
 
 /**
+ * \brief uShell OSAL initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellOsalInit(void);
+
+/**
+ * \brief uShell VCP OSAL initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellVcpOsalInit(void);
+
+/**
+ * \brief uShell HAL initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellVcpHalInit(void);
+
+/**
  * \brief uShell VCP initialization
  * \param void
  * \return int16_t - error code. non-zero = an error has occurred;
@@ -131,17 +152,13 @@ int16_t UShellStartup(void)
             break;
         }
 
-#ifdef USHELL_STARTUP_OSAL_PORT_FREERTOS
         /* Initialize the uShell OSAL */
-        UShellOsalErr_e osalErr = UShellOsalFreertosInit(&uShellStartupOsalObj,
-                                                         (void*) &uShellObj,
-                                                         USHELL_STARTUP_OSAL_PORT_NAME);
-        USHELL_STARTUP_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
-        if (osalErr != USHELL_OSAL_NO_ERR)
+        status = uShellOsalInit();
+        if (status != 0)
         {
-            return -1;
+            USHELL_STARTUP_ASSERT(0);
+            break;
         }
-#endif
 
         /* Initialize the uShell command */
         status = uShellCmdInit();
@@ -151,11 +168,13 @@ int16_t UShellStartup(void)
             break;
         }
 
-        /* Initialize the uShell */
+        /* Prepare the uShell cfg */
         UShellCfg_s ushellCfg = {
             .authIsEn = USHELL_STARTUP_AUTH_IS_EN,
             .historyIsEn = USHELL_STARTUP_HISTORY_IS_EN,
             .promptIsEn = USHELL_STARTUP_PROMPT_IS_EN};
+
+        /* Initialize the uShell */
         UShellErr_e ushellErr = UShellInit(&uShellObj,
                                            &uShellStartupOsalObj.base,
                                            &uShellVcpObj,
@@ -175,17 +194,44 @@ int16_t UShellStartup(void)
 }
 
 /**
- * \brief uShell VCP initialization
+ * \brief uShell OSAL initialization
  * \param void
  * \return int16_t - error code. non-zero = an error has occurred;
  */
-static int16_t uShellVcpInit(void)
+static int16_t uShellOsalInit(void)
 {
-    UShellHalPortErr_e halPortErr = USHELL_HAL_PORT_NO_ERR;
-    UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
-    UShellVcpErr_e vcpErr = USHELL_VCP_NO_ERR;
+    /* Local variable */
+    int16_t status = 0;
 
+    /* Initialize the uShell OSAL */
 #ifdef USHELL_STARTUP_OSAL_PORT_FREERTOS
+    /* Initialize the uShell OSAL */
+    UShellOsalErr_e osalErr = UShellOsalFreertosInit(&uShellStartupOsalObj,
+                                                     (void*) &uShellObj,
+                                                     USHELL_STARTUP_OSAL_PORT_NAME);
+    USHELL_STARTUP_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
+    if (osalErr != USHELL_OSAL_NO_ERR)
+    {
+        return -1;
+    }
+#endif
+
+    return status;
+}
+
+/**
+ * \brief uShell VCP OSAL initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellVcpOsalInit(void)
+{
+    /* Local variable */
+    int16_t status = 0;
+
+    /* Initialize the uShell OSAL */
+#ifdef USHELL_STARTUP_OSAL_PORT_FREERTOS
+    UShellOsalErr_e osalErr = USHELL_OSAL_NO_ERR;
     /* Initialize the uShell OSAL */
     osalErr = UShellOsalFreertosInit(&uShellStartupVcpOsalObj,
                                      (void*) &uShellVcpObj,
@@ -197,8 +243,22 @@ static int16_t uShellVcpInit(void)
     }
 #endif
 
-#ifdef USHELL_STARTUP_HAL_PORT_ATMEL
+    return status;
+}
 
+/**
+ * \brief uShell HAL initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellVcpHalInit(void)
+{
+    /* Local variable */
+    int16_t status = 0;
+
+    /* Initialize the uShell HAL */
+#ifdef USHELL_STARTUP_HAL_PORT_ATMEL
+    UShellHalPortErr_e halPortErr = USHELL_HAL_PORT_NO_ERR;
     /* Initialize the uShell HAL */
     UShellHalPortCfg_s halPortCfg = {
         .transceiverEnabled = USHELL_STARTUP_HAL_PORT_ASF_TRANSCEIVER_ENABLED,
@@ -219,6 +279,36 @@ static int16_t uShellVcpInit(void)
     }
 
 #endif
+
+    return status;
+}
+
+/**
+ * \brief uShell VCP initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellVcpInit(void)
+{
+    /* Local variable */
+    int16_t status = 0;
+    UShellVcpErr_e vcpErr = USHELL_VCP_NO_ERR;
+
+    /* Initialize the uShell HAL */
+    status = uShellVcpHalInit();
+    if (status != 0)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    /* Initialize the uShell VCP OSAL */
+    status = uShellVcpOsalInit();
+    if (status != 0)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
 
     /* Initialize the uShell VCP */
     vcpErr = UShellVcpInit(&uShellVcpObj,
