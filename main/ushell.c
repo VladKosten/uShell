@@ -341,6 +341,9 @@ UShellErr_e UShellInit(UShell_s* const uShell,
         /* Set init state */
         uShell->fsmState = USHELL_STATE_INIT;
 
+        /* Clear the screen */
+        uShellPrintStr(uShell, USHELL_CLEAR_SCREEN);
+
     } while (0);
 
     /* Return status */
@@ -604,6 +607,9 @@ static void uShellVcpWorker(void* const uShell)
     UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;
     UShellItem_t item = 0;
 
+    /* Delay to start the thread */
+    uShellDelayMs(ushell, USHELL_OSAL_START_DELAY_MS);
+
     /* Main loop */
     while (1)
     {
@@ -618,8 +624,8 @@ static void uShellVcpWorker(void* const uShell)
             {
                 do
                 {
-                    /* Clear screen */
-                    uShellPrintStr(ushell, USHELL_CLEAR_SCREEN);
+                    /* Clear line */
+                    uShellPrintStr(ushell, USHELL_CLEAR_LINE);
 
                     /* Print header */
                     uShellPrintStr(ushell, USHELL_HELLO_MSG);

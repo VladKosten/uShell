@@ -38,6 +38,13 @@ extern "C" {
 #endif
 
 /**
+ * \brief The delay time in milliseconds before starting the UShell.
+ */
+#ifndef USHELL_OSAL_START_DELAY_MS
+    #define USHELL_OSAL_START_DELAY_MS 1000U
+#endif
+
+/**
  * \brief The maximum size of the buffer in the UShell.
  */
 #ifndef USHELL_BUFFER_SIZE
