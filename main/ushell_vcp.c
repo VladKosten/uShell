@@ -428,6 +428,7 @@ UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp,
 
     /* Local variable */
     UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+    size_t strLen = strlen(str);
 
     do
     {
@@ -441,13 +442,20 @@ UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp,
             break;
         }
 
+        /* Check if the string is empty */
+        if (strLen == 0U)
+        {
+            /* Just return */
+            break;
+        }
+
         /* Lock the print lock */
         uShellVcpPrintLock(vcp);
 
         /* Print string to the vcp object */
         status = uShellVcpPrintBytes(vcp,
                                      str,
-                                     strlen(str));
+                                     strLen);
 
         /* Unlock the print lock */
         uShellVcpPrintUnlock(vcp);
@@ -1428,7 +1436,7 @@ static UShellVcpErr_e uShellVcpRtEnvOsalInit(UShellVcp_s* const vcp,
         UShellOsalTimerHandle_t timer = NULL;
         UShellOsalTimerCfg_s timerCfg =
             {
-                .name = USHELL_VCP_TIMER_NAME,
+                .name = USHELL_VCP_TIMER_INSPECT_NAME,
                 .timerParam = vcp,
                 .periodMs = USHELL_VCP_TIMER_INSPECT_PERIOD_MS,
                 .autoReloadState = true,
@@ -1459,7 +1467,7 @@ static UShellVcpErr_e uShellVcpRtEnvOsalInit(UShellVcp_s* const vcp,
         UShellOsalThreadCfg_s threadCfg =
             {
                 .name = USHELL_VCP_THREAD_NAME,
-                .stackSize = USHELL_VCP_THREAD_STACK_SIZE,
+                .stackSize = USHELL_VCP_THREAD_STACK_SIZE_BYTE,
                 .threadParam = vcp,
                 .threadPriority = USHELL_VCP_THREAD_PRIORITY,
                 .threadWorker = uShellVcpWorker};

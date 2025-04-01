@@ -608,7 +608,7 @@ static void uShellVcpWorker(void* const uShell)
     while (1)
     {
         /* Little delay */
-        uShellDelayMs(ushell, USHELL_UPD_TIME);
+        uShellDelayMs(ushell, USHELL_UPD_TIME_MS);
 
         /* Check the state */
         switch (ushell->fsmState)
@@ -660,7 +660,7 @@ static void uShellVcpWorker(void* const uShell)
                     uShellPrintStr(ushell, USHELL_CLEAR_LINE);
 
                     /* Print the password prompt */
-                    uShellPrintStr(ushell, USHELL_PASSWORD_PROMPT);
+                    uShellPrintStr(ushell, USHELL_AUTH_PROMPT);
 
                     /* Print the IO */
                     uShellPrintStr(ushell, ushell->io.buffer);
@@ -1143,7 +1143,7 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
         UShellOsalThreadCfg_s threadCfg =
             {
                 .name = USHELL_THREAD_NAME,
-                .stackSize = USHELL_THREAD_STACK_SIZE,
+                .stackSize = USHELL_THREAD_STACK_SIZE_BYTE,
                 .threadParam = uShell,
                 .threadPriority = USHELL_THREAD_PRIORITY,
                 .threadWorker = uShellVcpWorker};

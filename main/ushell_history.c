@@ -16,7 +16,7 @@
  */
 #ifndef USHELL_HISTORY_ASSERT
     #ifdef USHELL_ASSERT
-        #define USHELL_AUTH_ASSERT(cond) USHELL_HISTORY_ASSERT(cond)
+        #define USHELL_HISTORY_ASSERT(cond) USHELL_ASSERT(cond)
     #else
         #define USHELL_HISTORY_ASSERT(cond)
     #endif
