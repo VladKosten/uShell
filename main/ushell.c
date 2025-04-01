@@ -57,6 +57,7 @@ typedef enum
 #define USHELL_CLEAR_SCREEN "\033[2J\033[1;1H"    ///< Clear screen command
 #define USHELL_CLEAR_LINE   "\033[2K\r"           ///< Clear line command with carriage return
 #define USHELL_DEL_CHAR     "\b \b"               ///< Delete character command
+#define USHELL_NEW_LINE     "\n\r"                ///< New line command
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
 
@@ -89,11 +90,13 @@ static void uShellWorker(void* const uShell);
  * \param osal - osal object
  * \param hal - hal object
  * \param cfg - configuration object
+ * \param cmdRoot - root command
  * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellOsal_s* const osal,
-                                   UShellCfg_s* const cfg);
+                                   UShellCfg_s* const cfg,
+                                   UShellCmd_s* const cmdRoot);
 
 /**
  * \brief Deinitialize the runtime environment
@@ -119,6 +122,22 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
 static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell);
 
 /**
+ * \brief Initialize the runtime environment command
+ * \param uShell - uShell object
+ * \param cmdRoot - root command
+ * \return USHELL_NO_ERR if success, otherwise error code
+ */
+static UShellErr_e uShellRtEnvCmdRootInit(UShell_s* const uShell,
+                                          UShellCmd_s* const cmdRoot);
+
+/**
+ * @brief Deinitialize the runtime environment command
+ * @param[in] uShell - uShell object
+ * @return UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellRtEnvCmdRootDeInit(UShell_s* const uShell);
+
+/**
  * \brief Initialize the runtime environment history
  * \param uShell - uShell object
  * \return USHELL_NO_ERR if success, otherwise error code
@@ -140,18 +159,32 @@ static UShellErr_e uShellRtEnvFuncHistoryDeInit(UShell_s* const uShell);
 static UShellCmd_s* uShellCmdFind(UShell_s* const uShell);
 
 /**
- * \brief Lock the dio monitor
- * \param[in] dio - pointer to a UShell_s instance;
+ * \brief Lock the uShell monitor
+ * \param[in] uShell - pointer to a UShell_s instance;
  * \return no;
  */
-static void uShellLock(const UShell_s* const dio);
+static void uShellLock(const UShell_s* const uShell);
 
 /**
- * \brief Unlock the dio monitor
- * \param[in] dio - pointer to a UShell_s instance;
+ * \brief Unlock the uShell monitor
+ * \param[in] uShell - pointer to a UShell_s instance;
  * \return no;
  */
-static void uShellUnlock(const UShell_s* const dio);
+static void uShellUnlock(const UShell_s* const uShell);
+
+/**
+ * @brief Lock the cmd
+ * @param cmd - the cmd to be locked
+ * @return none
+ */
+static void uShellCmdLock(void* const cmd);
+
+/**
+ * @brief Unlock the cmd
+ * @param cmd - the cmd to be unlocked
+ * @return none
+ */
+static void uShellCmdUnlock(void* const cmd);
 
 /**
  * @brief Io flush function
@@ -220,6 +253,14 @@ static void uShellHistoryNextCmdGet(UShell_s* const uShell);
 static inline void uShellDelayMs(const UShell_s* const uShell,
                                  const uint32_t delayMs);
 
+/**
+ * @brief Hook table for the cmd
+ */
+static UShellCmdHookTable_s ushellCmdHookTable =
+    {
+        .lock = uShellCmdLock,
+        .unlock = uShellCmdUnlock};
+
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
@@ -229,20 +270,25 @@ static inline void uShellDelayMs(const UShell_s* const uShell,
  * \param[in] vcs - vcp object
  * \param[in] parent - parent object
  * \param[in] name - name of the object
+ * \param[in] cmdRoot - root command
  * \param[out] none
  * \return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
                        const UShellVcp_s* const vcp,
-                       const UShellCfg_s cfg,
+                       const UShellCfg_s* const cfg,
                        void* const parent,
-                       const char* const name)
+                       const char* const name,
+                       const UShellCmd_s* const cmdRoot)
 {
 
     /* Check input parameters */
     USHELL_ASSERT(uShell != NULL);
     USHELL_ASSERT(osal != NULL);
+    USHELL_ASSERT(vcp != NULL);
+    USHELL_ASSERT(name != NULL);
+    USHELL_ASSERT(cmdRoot != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
@@ -252,7 +298,9 @@ UShellErr_e UShellInit(UShell_s* const uShell,
         /* Initialize the runtime environment */
         if ((uShell == NULL) ||
             (osal == NULL) ||
-            (vcp == NULL))
+            (vcp == NULL) ||
+            (cmdRoot == NULL) ||
+            (cfg == NULL))
         {
             status = USHELL_INVALID_ARGS_ERR;
             break;
@@ -269,7 +317,8 @@ UShellErr_e UShellInit(UShell_s* const uShell,
         /* Initialize the runtime environment */
         status = uShellRtEnvInit(uShell,
                                  (UShellOsal_s*) osal,
-                                 (UShellCfg_s*) &cfg);
+                                 (UShellCfg_s*) &cfg,
+                                 (UShellCmd_s*) cmdRoot);
         if (status != USHELL_NO_ERR)
         {
             break;
@@ -427,14 +476,16 @@ UShellErr_e UShellStop(UShell_s* const uShell)
  * \param[out] none
  * \return USHELL_NO_ERR if success, otherwise error code
  */
-UShellErr_e UShellCmdAttach(UShell_s* const uShell, const UShellCmd_s* const cmd)
+UShellErr_e UShellCmdAttach(UShell_s* const uShell,
+                            const UShellCmd_s* const cmd)
 {
     /* Check input */
     USHELL_ASSERT(uShell != NULL);
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
-    uint8_t attachFlag = 0;
+    UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
+    UShellCmd_s* rootCmd = uShell->cmdRoot;
 
     do
     {
@@ -448,23 +499,13 @@ UShellErr_e UShellCmdAttach(UShell_s* const uShell, const UShellCmd_s* const cmd
         /* lock */
         uShellLock(uShell);
 
-        /* Attach command */
-
-        for (uint8_t i = 0; i < USHELL_MAX_CMD; i++)
-        {
-            if (uShell->cmdList [i] == NULL)
-            {
-                uShell->cmdList [i] = cmd;
-                attachFlag = 1;
-                break;
-            }
-        }
+        cmdStatus = UShellCmdListAdd(rootCmd, (UShellCmd_s*) cmd);
 
         /* unlock */
         uShellUnlock(uShell);
 
         /* Check if command is attached */
-        if (attachFlag == 0)
+        if (cmdStatus != USHELL_CMD_NO_ERR)
         {
             return USHELL_CMD_ERR;    ///< Exit: Command not attached
         }
@@ -488,7 +529,8 @@ UShellErr_e UShellCmdDetach(UShell_s* const uShell, const UShellCmd_s* const cmd
 
     /* Local variable */
     UShellErr_e status = USHELL_NO_ERR;
-    uint8_t detachFlag = 0;
+    UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
+    UShellCmd_s* rootCmd = uShell->cmdRoot;
 
     do
     {
@@ -502,25 +544,17 @@ UShellErr_e UShellCmdDetach(UShell_s* const uShell, const UShellCmd_s* const cmd
         /* LOCK */
         uShellLock(uShell);
 
-        /* Detach command */
-        for (uint8_t i = 0; i < USHELL_MAX_CMD; i++)
-        {
-            if (uShell->cmdList [i] == cmd)
-            {
-
-                uShell->cmdList [i] = NULL;
-                detachFlag = 1;
-                break;
-            }
-        }
+        /* Detach the command */
+        cmdStatus = UShellCmdListRemove(&rootCmd, (UShellCmd_s*) cmd);
 
         /* UNLOCK */
         uShellUnlock(uShell);
 
         /* Check if command is detached */
-        if (detachFlag == 0)
+        if (cmdStatus != USHELL_CMD_NO_ERR)
         {
-            return USHELL_CMD_ERR;    ///< Exit: Command not detached
+            status = USHELL_CMD_ERR;    ///< Exit: Command not detached
+            break;
         }
 
     } while (0);
@@ -745,6 +779,9 @@ static void uShellWorker(void* const uShell)
                                 break;
                             }
 
+                            /* Print new line */
+                            uShellPrintStr(ushell, USHELL_NEW_LINE);
+
                             /* Change state to proc cmd */
                             ushell->fsmState = USHELL_STATE_PROC_CMD;
 
@@ -930,11 +967,13 @@ static void uShellWorker(void* const uShell)
  * \param osal - osal object
  * \param hal - hal object
  * \param cfg - configuration object
+ * \param cmdRoot - root command
  * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellOsal_s* const osal,
-                                   UShellCfg_s* const cfg)
+                                   UShellCfg_s* const cfg,
+                                   UShellCmd_s* const cmdRoot)
 {
     /* Check input parameters */
     USHELL_ASSERT(uShell != NULL);
@@ -969,6 +1008,13 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
 
         /* Initialize the runtime environment OSAL */
         status = uShellRtEnvOsalInit(uShell, osal);
+        if (status != USHELL_NO_ERR)
+        {
+            break;
+        }
+
+        /* Initialize the cmdRoot */
+        status = uShellRtEnvCmdRootInit(uShell, cmdRoot);
         if (status != USHELL_NO_ERR)
         {
             break;
@@ -1014,6 +1060,9 @@ static UShellErr_e uShellRtEnvDeInit(UShell_s* const uShell)
         /* Deinitialize the runtime environment authentication */
         uShellRtEnvFuncHistoryDeInit(uShell);
 
+        /* Deinitialize the runtime environment cmd */
+        uShellRtEnvCmdRootDeInit(uShell);
+
     } while (0);
 
     return status;
@@ -1053,6 +1102,16 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
         osalStatus = UShellOsalLockObjCreate(thisOsal, &lockObj);
         USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
         USHELL_ASSERT(lockObj != NULL);
+        if (osalStatus != USHELL_OSAL_NO_ERR)
+        {
+            break;
+        }
+
+        /* : Create mutex for cmd */
+        UShellOsalLockObjHandle_t cmdLockObj = NULL;
+        osalStatus = UShellOsalLockObjCreate(thisOsal, &cmdLockObj);
+        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_ASSERT(cmdLockObj != NULL);
         if (osalStatus != USHELL_OSAL_NO_ERR)
         {
             break;
@@ -1121,20 +1180,38 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 
     } while (0);
 
-    /* : Delete the semaphore */
+    /* : Delete the lockObj */
     do
     {
-        /* : : Find the semaphore handle */
-        UShellOsalSemaphoreHandle_t semaphoreHandle = NULL;
-        osalStatus = UShellOsalSemaphoreHandleGet(thisOsal, 0U, &semaphoreHandle);
+        /* : : Find the lockObj handle */
+        UShellOsalLockObjHandle_t lockObj = NULL;
+        osalStatus = UShellOsalLockObjHandleGet(thisOsal, 0U, &lockObj);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
-            (semaphoreHandle == NULL))
+            (lockObj == NULL))
         {
             break;
         }
 
-        /* : : Delete the semaphore */
-        osalStatus = UShellOsalSemaphoreDelete(thisOsal, semaphoreHandle);
+        /* : : Delete the lockObj  */
+        osalStatus = UShellOsalLockObjDelete(thisOsal, lockObj);
+        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+
+    } while (0);
+
+    /* : Delete the lockObj for cmd  */
+    do
+    {
+        /* : : Find the lockObj handle */
+        UShellOsalLockObjHandle_t cmdLockObj = NULL;
+        osalStatus = UShellOsalLockObjHandleGet(thisOsal, 1U, &cmdLockObj);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (cmdLockObj == NULL))
+        {
+            break;
+        }
+
+        /* : : Delete the lockObj  */
+        osalStatus = UShellOsalLockObjDelete(thisOsal, cmdLockObj);
         USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
 
     } while (0);
@@ -1148,6 +1225,142 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
 
     /* Clear the object */
     return USHELL_NO_ERR;
+}
+
+/**
+ * \brief Initialize the runtime environment command
+ * \param uShell - uShell object
+ * \param cmdRoot - root command
+ * \return USHELL_NO_ERR if success, otherwise error code
+ */
+static UShellErr_e uShellRtEnvCmdRootInit(UShell_s* const uShell,
+                                          UShellCmd_s* const cmdRoot)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(uShell != NULL);
+    USHELL_ASSERT(cmdRoot != NULL);
+
+    /* Local variables */
+    UShellErr_e status = USHELL_NO_ERR;
+    UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
+    UShellCmd_s* currCmd = cmdRoot;
+
+    do
+    {
+        /* Check input parameters */
+        if ((uShell == NULL) ||
+            (cmdRoot == NULL))
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Attach the command root */
+        uShell->cmdRoot = cmdRoot;
+
+        /* Initialize the command list */
+        while (currCmd != NULL)
+        {
+
+            /* Set the parent */
+            cmdStatus = UShellCmdParentSet(currCmd, uShell);
+            if (cmdStatus != USHELL_CMD_NO_ERR)
+            {
+                status = USHELL_CMD_ERR;
+                break;
+            }
+
+            /* Set hooks table */
+            cmdStatus = UShellCmdHookTableSet(currCmd, &ushellCmdHookTable);
+            if (cmdStatus != USHELL_CMD_NO_ERR)
+            {
+                status = USHELL_CMD_ERR;
+                break;
+            }
+
+            /* Set the parent */
+            currCmd->parent = uShell;
+
+            /* Move to the next command */
+            cmdStatus = UShellCmdListNextGet(currCmd, &currCmd);
+            if (cmdStatus != USHELL_CMD_NO_ERR)
+            {
+                status = USHELL_CMD_ERR;
+                break;
+            }
+        }
+
+    } while (0);
+
+    /* Check status */
+
+    if (status != USHELL_NO_ERR)
+    {
+        /* Deinitialize the runtime environment */
+        uShellRtEnvCmdRootDeInit(uShell);
+    }
+
+    return status;
+}
+
+/**
+ * @brief Deinitialize the runtime environment command
+ * @param[in] uShell - uShell object
+ * @return UShellErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellErr_e uShellRtEnvCmdRootDeInit(UShell_s* const uShell)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(uShell != NULL);
+
+    /* Local variables */
+    UShellErr_e status = USHELL_NO_ERR;
+    UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
+    UShellCmd_s* currCmd = uShell->cmdRoot;
+
+    do
+    {
+        /* Check input parameters */
+        if (uShell == NULL)
+        {
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Deinitialize the command list */
+        while (currCmd != NULL)
+        {
+            /* Set the parent */
+            cmdStatus = UShellCmdParentSet(currCmd, NULL);
+            if (cmdStatus != USHELL_CMD_NO_ERR)
+            {
+                status = USHELL_CMD_ERR;
+                break;
+            }
+
+            /* Set hooks table */
+            cmdStatus = UShellCmdHookTableSet(currCmd, NULL);
+            if (cmdStatus != USHELL_CMD_NO_ERR)
+            {
+                status = USHELL_CMD_ERR;
+                break;
+            }
+
+            /* Move to the next command */
+            cmdStatus = UShellCmdListNextGet(currCmd, &currCmd);
+            if (cmdStatus != USHELL_CMD_NO_ERR)
+            {
+                status = USHELL_CMD_ERR;
+                break;
+            }
+        }
+
+        /* Delete the command root */
+        uShell->cmdRoot = NULL;
+
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -1228,7 +1441,7 @@ static UShellCmd_s* uShellCmdFind(UShell_s* const uShell)
 {
     /* Local cmd */
     UShellCmd_s* cmd = NULL;
-    UShellCmd_s* currCmd = (UShellCmd_s*) uShell->cmdList;
+    UShellCmd_s* currCmd = (UShellCmd_s*) uShell->cmdRoot;
     UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
     char* cmdName = NULL;
     size_t cmdNameLen = 0;
@@ -1239,7 +1452,7 @@ static UShellCmd_s* uShellCmdFind(UShell_s* const uShell)
     {
         /* Check inp  */
         if ((uShell == NULL) ||
-            (uShell->cmdList == NULL))
+            (uShell->cmdRoot == NULL))
         {
             cmd = NULL;
             break;
@@ -1285,26 +1498,26 @@ static UShellCmd_s* uShellCmdFind(UShell_s* const uShell)
 }
 
 /**
- * \brief Lock the dio monitor
- * \param[in] dio - pointer to a UShell_s instance;
+ * \brief Lock the uShell monitor
+ * \param[in] uShell - pointer to a UShell_s instance;
  * \return no;
  */
-static void uShellLock(const UShell_s* const dio)
+static void uShellLock(const UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_ASSERT(uShell != NULL);
 
     do
     {
         /* Check input parameters */
-        if ((dio == NULL) ||
-            (dio->osal == NULL))
+        if ((uShell == NULL) ||
+            (uShell->osal == NULL))
         {
             break;
         }
 
         /* Cast */
-        UShellOsal_s* osal = (UShellOsal_s*) dio->osal;
+        UShellOsal_s* osal = (UShellOsal_s*) uShell->osal;
 
         /* Get the lock object */
         UShellOsalLockObjHandle_t lockObj = NULL;
@@ -1327,31 +1540,119 @@ static void uShellLock(const UShell_s* const dio)
 }
 
 /**
- * \brief Unlock the dio monitor
- * \param[in] dio - pointer to a UShell_s instance;
+ * \brief Unlock the uShell monitor
+ * \param[in] uShell - pointer to a UShell_s instance;
  * \return no;
  */
-static void uShellUnlock(const UShell_s* const dio)
+static void uShellUnlock(const UShell_s* const uShell)
 {
     /* Check input parameters */
-    USHELL_ASSERT(dio != NULL);
+    USHELL_ASSERT(uShell != NULL);
 
     do
     {
         /* Check input parameters */
-        if ((dio == NULL) ||
-            (dio->osal == NULL))
+        if ((uShell == NULL) ||
+            (uShell->osal == NULL))
         {
             break;
         }
 
         /* Cast */
-        UShellOsal_s* osal = (UShellOsal_s*) dio->osal;
+        UShellOsal_s* osal = (UShellOsal_s*) uShell->osal;
 
         /* Get the lock object */
         UShellOsalLockObjHandle_t lockObj = NULL;
         UShellOsalErr_e osalStatus = UShellOsalLockObjHandleGet(osal,
                                                                 0U,
+                                                                &lockObj);
+        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_ASSERT(lockObj != NULL);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (lockObj == NULL))
+        {
+            break;
+        }
+
+        /* Unlock */
+        osalStatus = UShellOsalUnlock(osal, lockObj);
+        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+
+    } while (0);
+}
+
+/**
+ * @brief Lock the cmd
+ * @param cmd - the cmd to be locked
+ * @return none
+ */
+static void uShellCmdLock(void* const cmd)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(cmd != NULL);
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellCmd_s* uShellCmd = (UShellCmd_s*) cmd;
+    UShell_s* uShell = (UShell_s*) uShellCmd->parent;
+    UShellOsal_s* osal = (UShellOsal_s*) uShell->osal;
+    UShellOsalLockObjHandle_t lockObj = NULL;
+
+    do
+    {
+        /* Check input parameters */
+        if ((uShellCmd == NULL) ||
+            (uShell == NULL) ||
+            (uShell->osal == NULL))
+        {
+            break;
+        }
+
+        /* Get the lock object */
+        osalStatus = UShellOsalLockObjHandleGet(osal,
+                                                1U,
+                                                &lockObj);
+        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+        USHELL_ASSERT(lockObj != NULL);
+        if ((osalStatus != USHELL_OSAL_NO_ERR) ||
+            (lockObj == NULL))
+        {
+            break;
+        }
+
+        /* Unlock */
+        osalStatus = UShellOsalLock(osal, lockObj);
+        USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
+
+    } while (0);
+}
+
+/**
+ * @brief Unlock the cmd
+ * @param cmd - the cmd to be unlocked
+ * @return none
+ */
+static void uShellCmdUnlock(void* const cmd)
+{
+    /* Check input parameters */
+    USHELL_ASSERT(cmd != NULL);
+    UShellOsalErr_e osalStatus = USHELL_OSAL_NO_ERR;
+    UShellCmd_s* uShellCmd = (UShellCmd_s*) cmd;
+    UShell_s* uShell = (UShell_s*) uShellCmd->parent;
+    UShellOsal_s* osal = (UShellOsal_s*) uShell->osal;
+    UShellOsalLockObjHandle_t lockObj = NULL;
+
+    do
+    {
+        /* Check input parameters */
+        if ((uShellCmd == NULL) ||
+            (uShell == NULL) ||
+            (uShell->osal == NULL))
+        {
+            break;
+        }
+
+        /* Get the lock object */
+        UShellOsalErr_e osalStatus = UShellOsalLockObjHandleGet(osal,
+                                                                1U,
                                                                 &lockObj);
         USHELL_ASSERT(osalStatus == USHELL_OSAL_NO_ERR);
         USHELL_ASSERT(lockObj != NULL);
@@ -1445,7 +1746,7 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
     UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
     UShellCmd_s* matches [USHELL_MAX_CMD] = {0};
     uint8_t matchCount = 0;
-    UShellCmd_s* currCmd = (UShellCmd_s*) uShell->cmdList;
+    UShellCmd_s* currCmd = (UShellCmd_s*) uShell->cmdRoot;
     char* cmdName = NULL;
     size_t inputLen = strlen(uShell->io.buffer);
 
@@ -1453,7 +1754,7 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
     {
         /* Check input parameters */
         if ((uShell == NULL) ||
-            (uShell->cmdList == NULL) ||
+            (uShell->cmdRoot == NULL) ||
             (inputLen == 0))
         {
             break;

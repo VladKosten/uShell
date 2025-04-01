@@ -148,6 +148,35 @@ UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
 }
 
 /**
+ * @brief Set the hook table
+ * @param[in] cmd -  the cmd to be set
+ * @param[in] hook -  the hook table to be set
+ * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
+UShellCmdErr_e UShellCmdHookTableSet(UShellCmd_s* const cmd,
+                                     UShellCmdHookTable_s* const hook)
+{
+    /* Local variable */
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+
+    do
+    {
+        /* Check input parameter */
+        if ((NULL == cmd))
+        {
+            status = USHELL_CMD_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Set the hook table */
+        cmd->hook = hook;
+
+    } while (0);
+
+    return status;
+}
+
+/**
  * @brief Execute the cmd
  * @param[in] cmd - UShellCmd obj to be executed
  * @param[in] argc - number of arguments
@@ -262,49 +291,51 @@ UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd, UShellCmdHelp_t** const 
 UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
                                 UShellCmd_s* const cmd)
 {
-    /* Local variable */
     UShellCmdErr_e status = USHELL_CMD_NO_ERR;
     UShellCmd_s* currCmd = cmdRoot;
 
     do
     {
-        /* Check input parameter */
-        if ((NULL == cmdRoot) ||
-            (NULL == cmd))
+        if ((NULL == cmdRoot) || (NULL == cmd))
         {
             status = USHELL_CMD_INVALID_ARGS_ERR;
             break;
         }
 
-        /* Ensure the list termination  */
+        /* For safety */
         cmd->next = NULL;
 
-        /* Lock */
+        /* Lock the command list */
         uShellCmdLock(cmdRoot);
 
         /* Thread safe */
-        do
+        while (currCmd != NULL)
         {
-
-            /* Find the last cmd in the list */
-            while (currCmd->next != NULL)
+            /* Check if the cmd is already in the list */
+            if (currCmd == cmd)
             {
-                /* Check if the cmd is already in the list */
-                if (currCmd == cmd)
-                {
-                    break;
-                }
-
-                /* Move to the next cmd */
-                currCmd = currCmd->next;
+                USHELL_CMD_ASSERT(0);
+                status = USHELL_CMD_ALREADY_EXISTS_ERR;
+                break;
             }
 
-            /* Add the cmd to the list */
+            /* Find the last cmd in the list */
+            if (currCmd->next == NULL)
+            {
+                break;
+            }
+
+            /* Move to the next cmd */
+            currCmd = currCmd->next;
+        }
+
+        /* Check if the cmd is already in the list */
+        if (USHELL_CMD_NO_ERR == status)
+        {
             currCmd->next = cmd;
+        }
 
-        } while (0);
-
-        /* Unlock */
+        /* Unlock the command list */
         uShellCmdUnlock(cmdRoot);
 
     } while (0);
@@ -312,18 +343,6 @@ UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
     return status;
 }
 
-/**
- * @brief Remove a command from the list.
- *
- * This function removes the specified command from the linked list.
- * The command list is assumed to be singly linked.
- *
- * @param[in,out] cmdRoot Pointer to the pointer to the root of the list.
- *                        This parameter is updated if the head command is removed.
- * @param[in]     cmd     Pointer to the command to be removed.
- * @return UShellCmdErr_e Error code; USHELL_CMD_NO_ERR if successful,
- *         or an error code (e.g. USHELL_CMD_INVALID_ARGS_ERR or USHELL_CMD_NOT_FOUND_ERR).
- */
 /**
  * @brief Remove a command from the list.
  *

@@ -216,12 +216,12 @@ typedef struct
     const UShellVcp_s* vcp;      ///< VCP object
 
     /* Optional fields */
-    UShellFsmState_e fsmState;                      ///< Finite state machine state
-    UShellCfg_s cfg;                                ///< Configuration object
-    const UShellCmd_s* cmdList [USHELL_MAX_CMD];    ///< Commands array
-    UShellHistory_s history;                        ///< History object
-    UShellCmd_s* currCmd;                           ///< Current command
-    UShellIo_s io;                                  ///< IO object
+    UShellFsmState_e fsmState;    ///< Finite state machine state
+    UShellCfg_s cfg;              ///< Configuration object
+    UShellCmd_s* cmdRoot;         ///< Commands array
+    UShellHistory_s history;      ///< History object
+    UShellCmd_s* currCmd;         ///< Current command
+    UShellIo_s io;                ///< IO object
 
 } UShell_s;
 
@@ -234,15 +234,17 @@ typedef struct
  * \param[in] vcs - vcp object
  * \param[in] parent - parent object
  * \param[in] name - name of the object
+ * \param[in] cmdRoot - root command
  * \param[out] none
  * \return USHELL_NO_ERR if success, otherwise error code
  */
 UShellErr_e UShellInit(UShell_s* const uShell,
                        const UShellOsal_s* const osal,
                        const UShellVcp_s* const vcp,
-                       const UShellCfg_s cfg,
+                       const UShellCfg_s* const cfg,
                        void* const parent,
-                       const char* const name);
+                       const char* const name,
+                       const UShellCmd_s* const cmdRoot);
 
 /**
  * \brief DeInit uShell object

@@ -17,6 +17,7 @@
 #include "ushell_startup.h"
 #include "ushell.h"
 #include "ushell_vcp.h"
+#include "ushell_cmd_help.h"
 
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
@@ -77,6 +78,20 @@ static UShellStartupHal_s uShellStartupVcpHalObj = {0};
  */
 static int16_t uShellVcpInit(void);
 
+/**
+ * \brief uShell command help initialization
+ * \param rootCmd - The first cmd in the list of commands to be initialized
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellCmdHelpInit(void);
+
+/**
+ * \brief uShell command initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellCmdInit(void);
+
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
 
 /**
@@ -103,7 +118,7 @@ int16_t UShellStartup(void)
 #ifdef USHELL_STARTUP_OSAL_PORT_FREERTOS
         /* Initialize the uShell OSAL */
         UShellOsalErr_e osalErr = UShellOsalFreertosInit(&uShellStartupOsalObj,
-                                                         &uShellObj,
+                                                         (void*) &uShellObj,
                                                          USHELL_STARTUP_OSAL_PORT_NAME);
         USHELL_STARTUP_ASSERT(osalErr == USHELL_OSAL_NO_ERR);
         if (osalErr != USHELL_OSAL_NO_ERR)
@@ -111,6 +126,14 @@ int16_t UShellStartup(void)
             return -1;
         }
 #endif
+
+        /* Initialize the uShell command */
+        status = uShellCmdInit();
+        if (status != 0)
+        {
+            USHELL_STARTUP_ASSERT(0);
+            break;
+        }
 
         /* Initialize the uShell */
         UShellCfg_s ushellCfg = {
@@ -120,9 +143,10 @@ int16_t UShellStartup(void)
         UShellErr_e ushellErr = UShellInit(&uShellObj,
                                            &uShellStartupOsalObj.base,
                                            &uShellVcpObj,
-                                           ushellCfg,
+                                           &ushellCfg,
                                            NULL,
-                                           USHELL_STARTUP_NAME);
+                                           USHELL_STARTUP_NAME,
+                                           &uShellCmdHelp.cmd);
         USHELL_STARTUP_ASSERT(ushellErr == USHELL_NO_ERR);
         if (ushellErr != USHELL_NO_ERR)
         {
@@ -194,6 +218,49 @@ static int16_t uShellVcpInit(void)
     }
 
     return 0;
+}
+
+/**
+ * \brief uShell command help initialization
+ * \param rootCmd - The first cmd in the list of commands to be initialized
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellCmdHelpInit(void)
+{
+    /* Local variable */
+    int16_t status = 0;
+
+    /* Initialize the UShell command help */
+    status = UShellCmdHelpInit(&uShellCmdHelp.cmd);
+    if (status != 0)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    return status;
+}
+
+/**
+ * \brief uShell command initialization
+ * \param void
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellCmdInit(void)
+{
+    /* Local variable */
+    int16_t status = 0;
+
+    /* Initialize the UShell command */
+
+    status = uShellCmdHelpInit();
+    if (status != 0)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    return status;
 }
 
 //============================================================================[PRIVATE FUNCTIONS]===================================================================================

@@ -36,6 +36,7 @@ typedef enum
     USHELL_CMD_NOT_INIT_ERR,             ///< Exit: error - not initialized
     USHELL_CMD_PORT_ERR,                 ///< Exit: error - port error (e.g. port layer error)
     USHELL_CMD_EXECUTE_NUMB_ARGS_ERR,    ///< Exit: error - number of arguments error
+    USHELL_CMD_ALREADY_EXISTS_ERR,       ///< Exit: error - command already exists
 
 } UShellCmdErr_e;
 
@@ -113,6 +114,15 @@ UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd);
  */
 UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
                                   const void* const parent);
+
+/**
+ * @brief Set the hook table
+ * @param[in] cmd -  the cmd to be set
+ * @param[in] hook -  the hook table to be set
+ * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
+UShellCmdErr_e UShellCmdHookTableSet(UShellCmd_s* const cmd,
+                                     UShellCmdHookTable_s* const hook);
 
 /**
  * @brief Execute the cmd

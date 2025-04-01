@@ -24,3 +24,4 @@ endif()
 # Add subdirectories
 add_subdirectory(main)
 add_subdirectory(port)
+add_subdirectory(cmd)
