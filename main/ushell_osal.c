@@ -56,9 +56,6 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
                                void* const parent,
                                const UShellOsalPortable_s* portable)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -68,6 +65,8 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
         /* Check input parameter */
         if (osal == NULL)
         {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
             status = USHELL_OSAL_INVALID_ARGS;
             break;
         }
@@ -86,6 +85,7 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -97,9 +97,6 @@ UShellOsalErr_e UShellOsalInit(UShellOsal_s* osal,
  */
 UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -109,6 +106,8 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal)
         /* Check input parameter */
         if (osal == NULL)
         {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
             status = USHELL_OSAL_INVALID_ARGS;
             break;
         }
@@ -118,6 +117,7 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal)
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -129,10 +129,6 @@ UShellOsalErr_e UShellOsalDeinit(UShellOsal_s* osal)
  */
 UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const parent)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(parent != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -143,6 +139,8 @@ UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const paren
         if ((osal == NULL) ||
             (parent == NULL))
         {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
             status = USHELL_OSAL_INVALID_ARGS;
             break;
         }
@@ -152,6 +150,7 @@ UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const paren
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -161,11 +160,9 @@ UShellOsalErr_e UShellOsalParentGet(UShellOsal_s* const osal, void** const paren
  * \param[in] parent    - pointer to parent object being set
  * \return UShellOsalErr_e error code
  */
-UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent)
+UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal,
+                                    void* const parent)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -176,6 +173,8 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent
         if ((osal == NULL) ||
             (parent == NULL))
         {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
             status = USHELL_OSAL_INVALID_ARGS;
             break;
         }
@@ -196,10 +195,6 @@ UShellOsalErr_e UShellOsalParentSet(UShellOsal_s* const osal, void* const parent
  */
 UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const name)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(name != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -210,6 +205,8 @@ UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const n
         if ((osal == NULL) ||
             (name == NULL))
         {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
             status = USHELL_OSAL_INVALID_ARGS;
             break;
         }
@@ -219,6 +216,7 @@ UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const n
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -230,9 +228,6 @@ UShellOsalErr_e UShellOsalNameGet(UShellOsal_s* const osal, const char** const n
  */
 UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, char* const name)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -243,6 +238,8 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, char* const name)
         if ((osal == NULL) ||
             (name == NULL))
         {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
             status = USHELL_OSAL_INVALID_ARGS;
             break;
         }
@@ -252,6 +249,7 @@ UShellOsalErr_e UShellOsalNameSet(UShellOsal_s* const osal, char* const name)
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -268,12 +266,6 @@ UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s* const osal,
                                       const size_t queueDepth,
                                       UShellOsalQueueHandle_t* const queueHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(queueHandle != NULL);
-    USHELL_OSAL_ASSERT(queueItemSize > 0);
-    USHELL_OSAL_ASSERT(queueDepth > 0);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -286,23 +278,31 @@ UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s* const osal,
             (queueItemSize == 0) ||
             (queueDepth == 0))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->queueCreate))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Call the port specific function */
-        status = osal->portable->queueCreate(osal, queueItemSize, queueDepth, queueHandle);
+        status = osal->portable->queueCreate(osal,
+                                             queueItemSize,
+                                             queueDepth,
+                                             queueHandle);
 
     } while (0);
 
-    return status;
-
+    /* Return the status */
     return status;
 }
 
@@ -315,10 +315,6 @@ UShellOsalErr_e UShellOsalQueueCreate(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s* const osal,
                                       const UShellOsalQueueHandle_t queueHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(queueHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -329,14 +325,20 @@ UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s* const osal,
         if ((NULL == osal) ||
             (NULL == queueHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->queueDelete))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Call the port specific function */
@@ -344,6 +346,7 @@ UShellOsalErr_e UShellOsalQueueDelete(UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -358,10 +361,6 @@ UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s* const osal,
                                        const UShellOsalQueueHandle_t queueHandle,
                                        const void* const queueItemPtr)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(queueHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -373,14 +372,20 @@ UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s* const osal,
             (NULL == queueHandle) ||
             (NULL == queueItemPtr))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->queueItemPut))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Put item to the queue */
@@ -388,6 +393,7 @@ UShellOsalErr_e UShellOsalQueueItemPut(UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -405,11 +411,6 @@ UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s* const osal,
                                         void* const queueItemPtr,
                                         const UShellOsalTimeMs_t timeoutMs)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(queueHandle != NULL);
-    USHELL_OSAL_ASSERT(queueItemPtr != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -421,21 +422,31 @@ UShellOsalErr_e ushellOsalQueueItemPost(UShellOsal_s* const osal,
             (NULL == queueHandle) ||
             (NULL == queueItemPtr))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->queueItemPost))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Put item to the queue */
-        status = osal->portable->queueItemPost(osal, queueHandle, queueItemPtr, timeoutMs);
+        status = osal->portable->queueItemPost(osal,
+                                               queueHandle,
+                                               queueItemPtr,
+                                               timeoutMs);
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -451,11 +462,6 @@ UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s* const osal,
                                        const UShellOsalQueueHandle_t queueHandle,
                                        void* const queueItemPtr)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(queueHandle != NULL);
-    USHELL_OSAL_ASSERT(queueItemPtr != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -467,14 +473,20 @@ UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s* const osal,
             (NULL == queueHandle) ||
             (NULL == queueItemPtr))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->queueItemGet))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Get item from the queue */
@@ -482,6 +494,7 @@ UShellOsalErr_e UShellOsalQueueItemGet(UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -497,11 +510,6 @@ UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s* const osal,
                                         const UShellOsalQueueHandle_t queueHandle,
                                         void* const queueItemPtr)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(queueHandle != NULL);
-    USHELL_OSAL_ASSERT(queueItemPtr != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -513,21 +521,30 @@ UShellOsalErr_e UShellOsalQueueItemWait(UShellOsal_s* const osal,
             (NULL == queueHandle) ||
             (NULL == queueItemPtr))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->queueItemWait))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Get item from the queue */
-        status = osal->portable->queueItemWait(osal, queueHandle, queueItemPtr);
+        status = osal->portable->queueItemWait(osal,
+                                               queueHandle,
+                                               queueItemPtr);
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -545,11 +562,6 @@ UShellOsalErr_e ushellOsalQueueItemPend(UShellOsal_s* const osal,
                                         void* const queueItemPtr,
                                         const UShellOsalTimeMs_t timeoutMs)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(queueHandle != NULL);
-    USHELL_OSAL_ASSERT(queueItemPtr != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -561,21 +573,31 @@ UShellOsalErr_e ushellOsalQueueItemPend(UShellOsal_s* const osal,
             (NULL == queueHandle) ||
             (NULL == queueItemPtr))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->queueItemPend))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Get item from the queue */
-        status = osal->portable->queueItemPend(osal, queueHandle, queueItemPtr, timeoutMs);
+        status = osal->portable->queueItemPend(osal,
+                                               queueHandle,
+                                               queueItemPtr,
+                                               timeoutMs);
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -588,10 +610,6 @@ UShellOsalErr_e ushellOsalQueueItemPend(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s* const osal,
                                      const UShellOsalQueueHandle_t queueHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(queueHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -602,14 +620,20 @@ UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s* const osal,
         if ((NULL == osal) ||
             (NULL == queueHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->queueReset))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Reset queue */
@@ -617,6 +641,7 @@ UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -629,10 +654,6 @@ UShellOsalErr_e UShellOsalQueueReset(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s* const osal,
                                         UShellOsalLockObjHandle_t* const lockObjHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(lockObjHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -643,14 +664,20 @@ UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s* const osal,
         if ((NULL == osal) ||
             (NULL == lockObjHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->lockObjCreate))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Create the lock object */
@@ -658,6 +685,7 @@ UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -669,10 +697,6 @@ UShellOsalErr_e UShellOsalLockObjCreate(UShellOsal_s* const osal,
  */
 UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s* const osal, const UShellOsalLockObjHandle_t lockObjHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(lockObjHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -683,14 +707,20 @@ UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s* const osal, const UShellOs
         if ((NULL == osal) ||
             (NULL == lockObjHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->lockObjDelete))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Delete the lock object */
@@ -698,6 +728,7 @@ UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s* const osal, const UShellOs
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -709,10 +740,6 @@ UShellOsalErr_e UShellOsalLockObjDelete(UShellOsal_s* const osal, const UShellOs
  */
 UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal, const UShellOsalLockObjHandle_t lockObjHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(lockObjHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -723,14 +750,20 @@ UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal, const UShellOsalLockObj
         if ((NULL == osal) ||
             (NULL == lockObjHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->lock))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Lock access to the resource */
@@ -738,6 +771,7 @@ UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal, const UShellOsalLockObj
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -750,10 +784,6 @@ UShellOsalErr_e UShellOsalLock(UShellOsal_s* const osal, const UShellOsalLockObj
 UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal,
                                  const UShellOsalLockObjHandle_t lockObjHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(lockObjHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -764,14 +794,20 @@ UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal,
         if ((NULL == osal) ||
             (NULL == lockObjHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->unlock))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Unlock access to the resource */
@@ -779,6 +815,7 @@ UShellOsalErr_e UShellOsalUnlock(UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -793,10 +830,6 @@ UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s* const osal,
                                        UShellOsalThreadHandle_t* const threadHandle,
                                        UShellOsalThreadCfg_s threadCfg)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(threadHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -807,21 +840,30 @@ UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s* const osal,
         if ((NULL == osal) ||
             (NULL == threadHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->threadCreate))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Create the thread */
-        status = osal->portable->threadCreate(osal, threadHandle, threadCfg);
+        status = osal->portable->threadCreate(osal,
+                                              threadHandle,
+                                              threadCfg);
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -836,10 +878,6 @@ UShellOsalErr_e UShellOsalThreadCreate(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s* const osal,
                                        const UShellOsalThreadHandle_t threadHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(threadHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -850,21 +888,29 @@ UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s* const osal,
         if ((NULL == osal) ||
             (NULL == threadHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->threadDelete))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Delete the thread */
-        status = osal->portable->threadDelete(osal, threadHandle);
+        status = osal->portable->threadDelete(osal,
+                                              threadHandle);
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -877,10 +923,6 @@ UShellOsalErr_e UShellOsalThreadDelete(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s* const osal,
                                         const UShellOsalThreadHandle_t threadHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(threadHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -891,14 +933,20 @@ UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s* const osal,
         if ((NULL == osal) ||
             (NULL == threadHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->threadSuspend))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Suspend the thread */
@@ -906,6 +954,7 @@ UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -919,9 +968,6 @@ UShellOsalErr_e UShellOsalThreadSuspend(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
                                       const UShellOsalTimeMs_t msDelay)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -931,14 +977,20 @@ UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
         /* Checking of params */
         if (NULL == osal)
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->threadDelay))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Perform some delay */
@@ -946,6 +998,7 @@ UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
 }
 
@@ -958,10 +1011,6 @@ UShellOsalErr_e UShellOsalThreadDelay(const UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
                                        const UShellOsalThreadHandle_t threadHandle)
 {
-    /* Checking of params */
-    USHELL_OSAL_ASSERT(osal != NULL);
-    USHELL_OSAL_ASSERT(threadHandle != NULL);
-
     /* Local variables */
     UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
@@ -972,14 +1021,20 @@ UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
         if ((NULL == osal) ||
             (NULL == threadHandle))
         {
-            return USHELL_OSAL_INVALID_ARGS;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
         }
 
         /* Checking is init obj */
         if ((NULL == osal->portable) ||
             (NULL == osal->portable->threadResume))
         {
-            return USHELL_OSAL_PORT_SPECIFIC_ERR;
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
         }
 
         /* Resume the thread */
@@ -987,178 +1042,8 @@ UShellOsalErr_e UShellOsalThreadResume(UShellOsal_s* const osal,
 
     } while (0);
 
+    /* Return the status */
     return status;
-}
-
-/**
- * \brief Create the semaphore object
- * \param osal               - pointer to OSAL instance
- * \param semaphoreCountMax  - the maximum count of the semaphore
- * \param semaphoreInitValue - the initial value of the semaphore
- * \param semaphoreHandle    - semaphore object handle that was created
- * \return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreCreate(UShellOsal_s* const osal,
-                                          const UShellOsalSemaphoreCount_t semaphoreCountMax,
-                                          const UShellOsalSemaphoreCount_t semaphoreInitValue,
-                                          UShellOsalSemaphoreHandle_t* const semaphoreHandle)
-{
-    if ((NULL == osal) ||
-        (NULL == semaphoreHandle) ||
-        (0 == semaphoreCountMax) ||
-        (semaphoreInitValue > semaphoreCountMax))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if ((NULL == osal->portable->semaphoreCreate))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    if (UINT32_MAX < semaphoreCountMax)
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    UShellOsalErr_e retStatus = osal->portable->semaphoreCreate(osal,
-                                                                semaphoreCountMax,
-                                                                semaphoreInitValue,
-                                                                semaphoreHandle);
-
-    return retStatus;
-}
-
-/**
- * \brief Delete the semaphore object
- * \param osal              - pointer to OSAL instance
- * \param semaphoreHandle   - semaphore object handle to delete
- * \return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreDelete(UShellOsal_s* const osal,
-                                          const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    if ((NULL == osal) ||
-        (NULL == semaphoreHandle))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if ((NULL == osal->portable->semaphoreDelete))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    UShellOsalErr_e retStatus = osal->portable->semaphoreDelete(osal, semaphoreHandle);
-
-    return retStatus;
-}
-
-/**
- * \brief Acquire the semaphore
- * \param osal              - pointer to OSAL instance
- * \param semaphoreHandle   - semaphore object handle to acquire
- * \return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreAcquire(UShellOsal_s* const osal,
-                                           const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    if ((NULL == osal) ||
-        (NULL == semaphoreHandle))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if ((NULL == osal->portable->semaphoreAcquire))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    UShellOsalErr_e retStatus = osal->portable->semaphoreAcquire(osal, semaphoreHandle);
-
-    return retStatus;
-}
-
-/**
- * \brief Acquire the semaphore
- * \param osal             - pointer to OSAL instance
- * \param semaphoreHandle   - semaphore object handle to acquire
- * \param timeoutMs       - timeout in milliseconds to wait for the semaphore
- * \return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreAcquirePend(UShellOsal_s* const osal,
-                                               const UShellOsalSemaphoreHandle_t semaphoreHandle,
-                                               const UShellOsalTimeMs_t timeoutMs)
-{
-    if ((NULL == osal) ||
-        (NULL == semaphoreHandle))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if ((NULL == osal->portable->semaphoreAcquirePend))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    UShellOsalErr_e retStatus = osal->portable->semaphoreAcquirePend(osal, semaphoreHandle, timeoutMs);
-
-    return retStatus;
-}
-
-/**
- * \brief Release the semaphore
- * \param osal              - pointer to OSAL instance
- * \param semaphoreHandle   - semaphore object handle to release
- * \return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreRelease(UShellOsal_s* const osal,
-                                           const UShellOsalSemaphoreHandle_t semaphoreHandle)
-{
-    if ((NULL == osal) ||
-        (NULL == semaphoreHandle))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if ((NULL == osal->portable->semaphoreRelease))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    UShellOsalErr_e retStatus = osal->portable->semaphoreRelease(osal, semaphoreHandle);
-
-    return retStatus;
-}
-
-/**
- * \brief Get the current count of the semaphore
- * \param osal              - pointer to OSAL instance
- * \param semaphoreHandle   - semaphore object handle
- * \param semaphoreCount    - the current count of the semaphore
- * \return UShellOsalErr_e error code.
- */
-UShellOsalErr_e UShellOsalSemaphoreCountGet(UShellOsal_s* const osal,
-                                            const UShellOsalSemaphoreHandle_t semaphoreHandle,
-                                            UShellOsalSemaphoreCount_t* const semaphoreCount)
-{
-    if ((NULL == osal) ||
-        (NULL == semaphoreHandle) ||
-        (NULL == semaphoreCount))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    if ((NULL == osal->portable->semaphoreCountGet))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
-
-    UShellOsalErr_e retStatus = osal->portable->semaphoreCountGet(osal,
-                                                                  semaphoreHandle,
-                                                                  semaphoreCount);
-
-    return retStatus;
 }
 
 /**
@@ -1174,26 +1059,45 @@ UShellOsalErr_e UShellOsalStreamBuffCreate(UShellOsal_s* const osal,
                                            const size_t triggerLevelBytes,
                                            UShellOsalStreamBuffHandle_t* const streamBuffHandle)
 {
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle) ||
-        (0 == buffSizeBytes) ||
-        (0 == triggerLevelBytes) ||
-        (triggerLevelBytes > buffSizeBytes))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Create the stream buffer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle) ||
+            (0 == buffSizeBytes) ||
+            (0 == triggerLevelBytes) ||
+            (triggerLevelBytes > buffSizeBytes))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    if ((NULL == osal->portable->streamBuffCreate))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->streamBuffCreate))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e retStatus = osal->portable->streamBuffCreate(osal,
-                                                                 buffSizeBytes,
-                                                                 triggerLevelBytes,
-                                                                 streamBuffHandle);
+        /* Create the stream buffer */
+        status = osal->portable->streamBuffCreate(osal,
+                                                  buffSizeBytes,
+                                                  triggerLevelBytes,
+                                                  streamBuffHandle);
 
-    return retStatus;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1205,20 +1109,39 @@ UShellOsalErr_e UShellOsalStreamBuffCreate(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalStreamBuffDelete(UShellOsal_s* const osal,
                                            const UShellOsalStreamBuffHandle_t streamBuffHandle)
 {
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Delete the stream buffer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    if ((NULL == osal->portable->streamBuffDelete))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->streamBuffDelete))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e retStatus = osal->portable->streamBuffDelete(osal, streamBuffHandle);
+        /* Delete the stream buffer */
+        status = osal->portable->streamBuffDelete(osal, streamBuffHandle);
 
-    return retStatus;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1236,25 +1159,44 @@ size_t UShellOsalStreamBuffSend(UShellOsal_s* const osal,
                                 const size_t dataLengthBytes,
                                 const uint32_t msToWait)
 {
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle) ||
-        (NULL == txData) ||
-        (0 == dataLengthBytes))
+    /* Local variables */
+    size_t bytesWritten = 0;
+
+    /* Send data to the stream buffer */
+    do
     {
-        return 0;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle) ||
+            (NULL == txData) ||
+            (0 == dataLengthBytes))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            bytesWritten = 0;
+            break;
+        }
 
-    if ((NULL == osal->portable->streamBuffSend))
-    {
-        return 0;
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->streamBuffSend))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            bytesWritten = 0;
+            break;
+        }
 
-    size_t bytesWritten = osal->portable->streamBuffSend(osal,
-                                                         streamBuffHandle,
-                                                         txData,
-                                                         dataLengthBytes,
-                                                         msToWait);
+        /* Send data to the stream buffer */
+        bytesWritten = osal->portable->streamBuffSend(osal,
+                                                      streamBuffHandle,
+                                                      txData,
+                                                      dataLengthBytes,
+                                                      msToWait);
 
+    } while (0);
+
+    /* Return the number of bytes written */
     return bytesWritten;
 }
 
@@ -1275,24 +1217,43 @@ size_t UShellOsalStreamBuffSendBlocking(UShellOsal_s* const osal,
                                         const void* txData,
                                         const size_t dataLengthBytes)
 {
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle) ||
-        (NULL == txData) ||
-        (0 == dataLengthBytes))
+    /* Local variables */
+    size_t bytesWritten = 0;
+
+    /* Send data to the stream buffer */
+    do
     {
-        return 0;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle) ||
+            (NULL == txData) ||
+            (0 == dataLengthBytes))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            bytesWritten = 0;
+            break;
+        }
 
-    if ((NULL == osal->portable->streamBuffSendBlocking))
-    {
-        return 0;
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->streamBuffSendBlocking))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            bytesWritten = 0;
+            break;
+        }
 
-    size_t bytesWritten = osal->portable->streamBuffSendBlocking(osal,
-                                                                 streamBuffHandle,
-                                                                 txData,
-                                                                 dataLengthBytes);
+        /* Send data to the stream buffer */
+        bytesWritten = osal->portable->streamBuffSendBlocking(osal,
+                                                              streamBuffHandle,
+                                                              txData,
+                                                              dataLengthBytes);
 
+    } while (0);
+
+    /* Return the number of bytes written */
     return bytesWritten;
 }
 
@@ -1313,25 +1274,44 @@ size_t UShellOsalStreamBuffReceive(UShellOsal_s* const osal,
                                    const uint32_t msToWait)
 {
 
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle) ||
-        (NULL == rxData) ||
-        (0 == dataLengthBytes))
+    /* Local variables */
+    size_t bytesRead = 0;
+
+    /* Receive data from the stream buffer */
+    do
     {
-        return 0;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle) ||
+            (NULL == rxData) ||
+            (0 == dataLengthBytes))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            bytesRead = 0;
+            break;
+        }
 
-    if ((NULL == osal->portable->streamBuffReceive))
-    {
-        return 0;
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->streamBuffReceive))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            bytesRead = 0;
+            break;
+        }
 
-    size_t bytesRead = osal->portable->streamBuffReceive(osal,
-                                                         streamBuffHandle,
-                                                         rxData,
-                                                         dataLengthBytes,
-                                                         msToWait);
+        /* Receive data from the stream buffer */
+        bytesRead = osal->portable->streamBuffReceive(osal,
+                                                      streamBuffHandle,
+                                                      rxData,
+                                                      dataLengthBytes,
+                                                      msToWait);
 
+    } while (0);
+
+    /* Return the number of bytes read */
     return bytesRead;
 }
 
@@ -1351,25 +1331,43 @@ size_t UShellOsalStreamBuffReceiveBlocking(UShellOsal_s* const osal,
                                            void* const rxData,
                                            const size_t dataLengthBytes)
 {
+    /* Local variables */
+    size_t bytesRead = 0;
 
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle) ||
-        (NULL == rxData) ||
-        (0 == dataLengthBytes))
+    /* Receive data from the stream buffer */
+    do
     {
-        return 0;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle) ||
+            (NULL == rxData) ||
+            (0 == dataLengthBytes))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            bytesRead = 0;
+            break;
+        }
 
-    if ((NULL == osal->portable->streamBuffReceiveBlocking))
-    {
-        return 0;
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->streamBuffReceiveBlocking))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            bytesRead = 0;
+            break;
+        }
 
-    size_t bytesRead = osal->portable->streamBuffReceiveBlocking(osal,
-                                                                 streamBuffHandle,
-                                                                 rxData,
-                                                                 dataLengthBytes);
+        /* Receive data from the stream buffer */
+        bytesRead = osal->portable->streamBuffReceiveBlocking(osal,
+                                                              streamBuffHandle,
+                                                              rxData,
+                                                              dataLengthBytes);
 
+    } while (0);
+
+    /* Return the number of bytes read */
     return bytesRead;
 }
 
@@ -1382,21 +1380,39 @@ size_t UShellOsalStreamBuffReceiveBlocking(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalStreamBuffReset(UShellOsal_s* const osal,
                                           const UShellOsalStreamBuffHandle_t streamBuffHandle)
 {
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle))
+    /* Reset the stream buffer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    if ((NULL == osal->portable->streamBuffReset))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->streamBuffReset))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e retStatus = osal->portable->streamBuffReset(osal, streamBuffHandle);
+        /* Reset the stream buffer */
+        status = osal->portable->streamBuffReset(osal, streamBuffHandle);
 
-    return retStatus;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1411,22 +1427,41 @@ UShellOsalErr_e UShellOsalStreamBuffIsEmpty(UShellOsal_s* const osal,
                                             const UShellOsalStreamBuffHandle_t streamBuffHandle,
                                             bool* const isEmpty)
 {
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Check if the stream buffer is empty */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle) ||
+            (NULL == isEmpty))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    if ((NULL == osal->portable->streamBuffIsEmpty))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->streamBuffIsEmpty))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e retStatus = osal->portable->streamBuffIsEmpty(osal,
-                                                                  streamBuffHandle,
-                                                                  isEmpty);
+        /* Check if the stream buffer is empty */
+        status = osal->portable->streamBuffIsEmpty(osal,
+                                                   streamBuffHandle,
+                                                   isEmpty);
+    } while (0);
 
-    return retStatus;
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1441,24 +1476,42 @@ UShellOsalErr_e UShellOsalTimerCreate(UShellOsal_s* const osal,
                                       UShellOsalTimerHandle_t* const timerHandle,
                                       UShellOsalTimerCfg_s timerCfg)
 {
-    /* Checking of params */
-    if ((NULL == osal) ||
-        (NULL == timerHandle) ||
-        (timerCfg.timerExpiredCb == NULL))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Create the timer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == timerHandle) ||
+            (timerCfg.timerExpiredCb == NULL))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    /* Checking is init obj */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->timerCreate))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->timerCreate))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e osalStatus = osal->portable->timerCreate(osal, timerHandle, timerCfg);
+        /* Create the timer */
+        status = osal->portable->timerCreate(osal,
+                                             timerHandle,
+                                             timerCfg);
 
-    return osalStatus;    // Exit: no errors
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1471,23 +1524,39 @@ UShellOsalErr_e UShellOsalTimerCreate(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalTimerDelete(UShellOsal_s* const osal,
                                       const UShellOsalTimerHandle_t timerHandle)
 {
-    /* Checking of params */
-    if ((NULL == osal) ||
-        (NULL == timerHandle))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Delete the timer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == timerHandle))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    /* Checking is init obj */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->timerDelete))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->timerDelete))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e osalStatus = osal->portable->timerDelete(osal, timerHandle);
+        /* Delete the timer */
+        status = osal->portable->timerDelete(osal, timerHandle);
 
-    return osalStatus;    // Exit: no errors
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1500,23 +1569,39 @@ UShellOsalErr_e UShellOsalTimerDelete(UShellOsal_s* const osal,
 UShellOsalErr_e UShellOsalTimerStart(UShellOsal_s* const osal,
                                      const UShellOsalTimerHandle_t timerHandle)
 {
-    /* Checking of params */
-    if ((NULL == osal) ||
-        (NULL == timerHandle))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Start the timer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == timerHandle))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    /* Checking is init obj */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->timerStart))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->timerStart))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e osalStatus = osal->portable->timerStart(osal, timerHandle);
+        /* Start the timer */
+        status = osal->portable->timerStart(osal, timerHandle);
 
-    return osalStatus;    // Exit: no errors
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1528,23 +1613,39 @@ UShellOsalErr_e UShellOsalTimerStart(UShellOsal_s* const osal,
  */
 UShellOsalErr_e UShellOsalTimerStop(UShellOsal_s* const osal, const UShellOsalTimerHandle_t timerHandle)
 {
-    /* Checking of params */
-    if ((NULL == osal) ||
-        (NULL == timerHandle))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Stop the timer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == timerHandle))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    /* Checking is init obj */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->timerStop))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->timerStop))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e osalStatus = osal->portable->timerStop(osal, timerHandle);
+        /* Stop the timer */
+        status = osal->portable->timerStop(osal, timerHandle);
 
-    return osalStatus;    // Exit: no errors
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1556,23 +1657,39 @@ UShellOsalErr_e UShellOsalTimerStop(UShellOsal_s* const osal, const UShellOsalTi
  */
 UShellOsalErr_e UShellOsalTimerReset(UShellOsal_s* const osal, const UShellOsalTimerHandle_t timerHandle)
 {
-    /* Checking of params */
-    if ((NULL == osal) ||
-        (NULL == timerHandle))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Reset the timer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == timerHandle))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    /* Checking is init obj */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->timerReset))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->timerReset))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e osalStatus = osal->portable->timerReset(osal, timerHandle);
+        /* Reset the timer */
+        status = osal->portable->timerReset(osal, timerHandle);
 
-    return osalStatus;    // Exit: no errors
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1586,16 +1703,30 @@ UShellOsalErr_e UShellOsalTimerHandleGet(UShellOsal_s* const osal,
                                          const size_t timerSlotInd,
                                          UShellOsalTimerHandle_t* const timerHandle)
 {
-    if ((NULL == osal) ||
-        (NULL == timerHandle) ||
-        (USHELL_OSAL_TIMER_NUM <= timerSlotInd))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Get the timer handle */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == timerHandle) ||
+            (USHELL_OSAL_TIMER_NUM <= timerSlotInd))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    *timerHandle = osal->timerObj [timerSlotInd].timerHandle;
+        /* Get the timer handle */
+        *timerHandle = osal->timerObj [timerSlotInd].timerHandle;
 
-    return USHELL_OSAL_NO_ERR;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1610,23 +1741,40 @@ UShellOsalErr_e UShellOsalTimerPeriodChange(UShellOsal_s* const osal,
                                             const UShellOsalTimerHandle_t timerHandle,
                                             const UShellOsalTimeMs_t periodMs)
 {
-    /* Checking of params */
-    if ((NULL == osal) ||
-        (NULL == timerHandle))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Change the period of the timer */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;    // Exit: Error: Invalid args
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == timerHandle) ||
+            (0 == periodMs))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    /* Checking is init obj */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->timerPeriodChange))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;    // Exit: Error: init obj
-    }
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->timerPeriodChange))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    UShellOsalErr_e osalStatus = osal->portable->timerPeriodChange(osal, timerHandle, periodMs);
+        /* Change the period of the timer */
+        status = osal->portable->timerPeriodChange(osal, timerHandle, periodMs);
 
-    return osalStatus;    // Exit: no errors
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1638,24 +1786,39 @@ UShellOsalErr_e UShellOsalTimerPeriodChange(UShellOsal_s* const osal,
 UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
                                        UShellOsalEventGroupHandle_t* const eventGroupHandle)
 {
-    /* Check input parameter */
-    if ((NULL == osal) ||
-        (NULL == eventGroupHandle))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    /* Check if the OSAL object is initialized */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->eventGroupCreate))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
     /* Create the event group */
-    UShellOsalErr_e retStatus = osal->portable->eventGroupCreate(osal, eventGroupHandle);
+    do
+    {
+        /* Check input parameter */
+        if ((NULL == osal) ||
+            (NULL == eventGroupHandle))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    return retStatus;
+        /* Check if the OSAL object is initialized */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->eventGroupCreate))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
+
+        /* Create the event group */
+        status = osal->portable->eventGroupCreate(osal, eventGroupHandle);
+
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1668,24 +1831,38 @@ UShellOsalErr_e UShellEventGroupCreate(UShellOsal_s* const osal,
 UShellOsalErr_e UShellEventGroupDelete(UShellOsal_s* const osal,
                                        const UShellOsalEventGroupHandle_t eventGroupHandle)
 {
-    /* Check input parameter */
-    if ((NULL == osal) ||
-        (NULL == eventGroupHandle))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    /* Check if the OSAL object is initialized */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->eventGroupDelete))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
     /* Delete the event group */
-    UShellOsalErr_e retStatus = osal->portable->eventGroupDelete(osal, eventGroupHandle);
+    do
+    {
+        /* Check input parameter */
+        if (NULL == osal)
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    return retStatus;
+        /* Check if the OSAL object is initialized */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->eventGroupDelete))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
+
+        /* Delete the event group */
+        status = osal->portable->eventGroupDelete(osal, eventGroupHandle);
+
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1699,24 +1876,39 @@ UShellOsalErr_e UShellEventGroupSetBits(UShellOsal_s* const osal,
                                         const UShellOsalEventGroupHandle_t eventGroupHandle,
                                         const UShellOsalEventGroupBits_e bitsToSet)
 {
-    /* Check input parameter */
-    if ((NULL == osal) ||
-        (NULL == eventGroupHandle))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    /* Check if the OSAL object is initialized */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->eventGroupSetBits))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
 
     /* Set the bits in the event group */
-    UShellOsalErr_e retStatus = osal->portable->eventGroupSetBits(osal, eventGroupHandle, bitsToSet);
+    do
+    {
+        /* Check input parameter */
+        if ((NULL == osal) ||
+            (NULL == eventGroupHandle))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    return retStatus;
+        /* Check if the OSAL object is initialized */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->eventGroupSetBits))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
+
+        /* Set the bits in the event group */
+        status = osal->portable->eventGroupSetBits(osal, eventGroupHandle, bitsToSet);
+
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1736,30 +1928,45 @@ UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
                                          const bool clearOnExit,
                                          const bool waitAllBits)
 {
-    /* Check input parameter */
-    if ((NULL == osal) ||
-        (NULL == eventGroupHandle) ||
-        (NULL == bitsReceived))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Wait for bits in the event group */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Check input parameter */
+        if ((NULL == osal) ||
+            (NULL == eventGroupHandle) ||
+            (NULL == bitsReceived))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    /* Check if the OSAL object is initialized */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->eventGroupClearBits))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+        /* Check if the OSAL object is initialized */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->eventGroupBitsWait))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    /* Clear the bits in the event group */
-    UShellOsalErr_e retStatus = osal->portable->eventGroupBitsWait(osal,
-                                                                   eventGroupHandle,
-                                                                   bitsToWait,
-                                                                   bitsReceived,
-                                                                   clearOnExit,
-                                                                   waitAllBits);
+        /* Wait for bits in the event group */
+        status = osal->portable->eventGroupBitsWait(osal,
+                                                    eventGroupHandle,
+                                                    bitsToWait,
+                                                    bitsReceived,
+                                                    clearOnExit,
+                                                    waitAllBits);
 
-    return retStatus;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1773,25 +1980,40 @@ UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
                                               const UShellOsalEventGroupHandle_t eventGroupHandle,
                                               UShellOsalEventGroupBits_e* const bitsActive)
 {
-    /* Check input parameter */
-    if ((NULL == osal) ||
-        (NULL == eventGroupHandle) ||
-        (NULL == bitsActive))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Get the active bits in the event group */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Check input parameter */
+        if ((NULL == osal) ||
+            (NULL == eventGroupHandle) ||
+            (NULL == bitsActive))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    /* Check if the OSAL object is initialized */
-    if ((NULL == osal->portable) ||
-        (NULL == osal->portable->eventGroupClearBits))
-    {
-        return USHELL_OSAL_PORT_SPECIFIC_ERR;
-    }
+        /* Check if the OSAL object is initialized */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->eventGroupBitsActiveGet))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
 
-    /* Clear the bits in the event group */
-    UShellOsalErr_e retStatus = osal->portable->eventGroupBitsActiveGet(osal, eventGroupHandle, bitsActive);
+        /* Get the active bits in the event group */
+        status = osal->portable->eventGroupBitsActiveGet(osal, eventGroupHandle, bitsActive);
 
-    return retStatus;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1805,16 +2027,29 @@ UShellOsalErr_e UShellOsalEventGroupHandleGet(UShellOsal_s* const osal,
                                               const size_t eventGroupSlotInd,
                                               UShellOsalEventGroupHandle_t* const eventGroupHandle)
 {
-    if ((NULL == osal) ||
-        (NULL == eventGroupHandle) ||
-        (USHELL_OSAL_EVENT_GROUPS_NUM <= eventGroupSlotInd))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Get the event group handle */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == eventGroupHandle) ||
+            (USHELL_OSAL_EVENT_GROUPS_NUM <= eventGroupSlotInd))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    *eventGroupHandle = osal->eventGroupHandle [eventGroupSlotInd];
+        /* Get the event group handle */
+        *eventGroupHandle = osal->eventGroupHandle [eventGroupSlotInd];
 
-    return USHELL_OSAL_NO_ERR;
+    } while (0);
+
+    return status;
 }
 
 /**
@@ -1828,16 +2063,30 @@ UShellOsalErr_e UShellOsalQueueHandleGet(UShellOsal_s* const osal,
                                          const size_t queueSlotInd,
                                          UShellOsalQueueHandle_t* const queueHandle)
 {
-    if ((NULL == osal) ||
-        (NULL == queueHandle) ||
-        (USHELL_OSAL_QUEUE_SLOTS_NUM <= queueSlotInd))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Get the queue handle */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == queueHandle) ||
+            (USHELL_OSAL_QUEUE_SLOTS_NUM <= queueSlotInd))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    *queueHandle = osal->queueHandle [queueSlotInd];
+        /* Get the queue handle */
+        *queueHandle = osal->queueHandle [queueSlotInd];
 
-    return USHELL_OSAL_NO_ERR;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1851,17 +2100,30 @@ UShellOsalErr_e UShellOsalLockObjHandleGet(UShellOsal_s* const osal,
                                            const size_t lockObjSlotInd,
                                            UShellOsalLockObjHandle_t* const lockObjHandle)
 {
-    if ((NULL == osal) ||
-        (NULL == lockObjHandle) ||
-        (USHELL_OSAL_LOCK_OBJS_NUM <= lockObjSlotInd) ||
-        (NULL == osal->lockObjHandle [lockObjSlotInd]))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Get the lock object handle */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == lockObjHandle) ||
+            (USHELL_OSAL_LOCK_OBJS_NUM <= lockObjSlotInd))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    *lockObjHandle = osal->lockObjHandle [lockObjSlotInd];
+        /* Get the lock object handle */
+        *lockObjHandle = osal->lockObjHandle [lockObjSlotInd];
 
-    return USHELL_OSAL_NO_ERR;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1875,39 +2137,30 @@ UShellOsalErr_e UShellOsalThreadHandleGet(UShellOsal_s* const osal,
                                           const size_t threadSlotInd,
                                           UShellOsalThreadHandle_t* const threadHandle)
 {
-    if ((NULL == osal) ||
-        (NULL == threadHandle) ||
-        (USHELL_OSAL_THREADS_NUM <= threadSlotInd))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Get the thread handle */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == threadHandle) ||
+            (USHELL_OSAL_THREADS_NUM <= threadSlotInd))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    *threadHandle = osal->threadObj [threadSlotInd].threadHandle;
+        /* Get the thread handle */
+        *threadHandle = osal->threadObj [threadSlotInd].threadHandle;
 
-    return USHELL_OSAL_NO_ERR;
-}
+    } while (0);
 
-/**
- * \brief Get a semaphore handle of the given OSAL object
- * \param[in]   osal                - pointer to OSAL instance
- * \param[in]   semaphoreSlotInd    - index of semaphore slots
- * \param[out]  semaphoreHandle	    - pointer to an object into which the semaphore handle handle will be copied
- * \return UShellOsalErr_e error code
- */
-UShellOsalErr_e UShellOsalSemaphoreHandleGet(UShellOsal_s* const osal,
-                                             const size_t semaphoreSlotInd,
-                                             UShellOsalSemaphoreHandle_t* const semaphoreHandle)
-{
-    if ((NULL == osal) ||
-        (NULL == semaphoreHandle) ||
-        (USHELL_OSAL_SEMAPHORE_OBJS_NUM <= semaphoreSlotInd))
-    {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
-
-    *semaphoreHandle = osal->semaphoreHandle [semaphoreSlotInd];
-
-    return USHELL_OSAL_NO_ERR;
+    /* Return the status */
+    return status;
 }
 
 /**
@@ -1921,16 +2174,30 @@ UShellOsalErr_e UShellOsalStreamBuffHandleGet(UShellOsal_s* const osal,
                                               const size_t streamBuffSlotInd,
                                               UShellOsalStreamBuffHandle_t* const streamBuffHandle)
 {
-    if ((NULL == osal) ||
-        (NULL == streamBuffHandle) ||
-        (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM <= streamBuffSlotInd))
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Get the stream buffer handle */
+    do
     {
-        return USHELL_OSAL_INVALID_ARGS;
-    }
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == streamBuffHandle) ||
+            (USHELL_OSAL_STREAM_BUFF_SLOTS_NUM <= streamBuffSlotInd))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
 
-    *streamBuffHandle = osal->streamBuffHandle [streamBuffSlotInd];
+        /* Get the stream buffer handle */
+        *streamBuffHandle = osal->streamBuffHandle [streamBuffSlotInd];
 
-    return USHELL_OSAL_NO_ERR;
+    } while (0);
+
+    /* Return the status */
+    return status;
 }
 
 //============================================================================[PRIVATE FUNCTIONS]==================================================================================
