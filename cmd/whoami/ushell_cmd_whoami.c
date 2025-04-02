@@ -65,7 +65,7 @@ int UShellCmdWhoAmIInit(void)
 
     } while (0);
 
-    return 0;    // Return success code
+    return status;    // Return success code
 }
 
 /**

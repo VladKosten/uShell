@@ -54,9 +54,9 @@ static void uShellCmdUnlock(UShellCmd_s* const cmd);
  * \return UShellOsalErr_e - error code
  */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
-                             const char* const name,
-                             const UShellCmdHelp_t* const help,
-                             const UShellCmdExec_f* const execFunc)
+                             char* const name,
+                             UShellCmdHelp_t* const help,
+                             UShellCmdExec_f* const execFunc)
 {
 
     /* Local variable */

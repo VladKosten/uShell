@@ -150,7 +150,7 @@ static UShellCmdErr_e uShellCmdHelpExec(void* const cmd,
         while (currCmd != NULL)
         {
             /* Print command name and help */
-            printf("%s: %s\r\n", currCmd->name, currCmd->help);    // Print command name and help message
+            printf("    %s: %s\r\n", currCmd->name, currCmd->help);    // Print command name and help message
 
             /* Move to the next command */
             currCmd = currCmd->next;    // Set current command to next command

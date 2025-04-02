@@ -218,14 +218,6 @@ static void uShellPrintStr(UShell_s* const uShell,
                            const char* const str);
 
 /**
- * \brief Print the char
- * \param[in] uShell - the uShell object
- * \param[in] ch - char to be printed
- * \return none
- */
-static void uShellPrintChar(UShell_s* const uShell,
-                            const char ch);
-/**
  * \brief Add cmd to history
  * \param[in] uShell - the uShell object
  * \return none
@@ -1890,7 +1882,7 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
         else if (matchCount > 1)
         {
             /* Multiple matches — print them */
-            uShellPrintChar(uShell, '\n');    // Terrible, but i don't give a f*ck
+            uShellPrintStr(uShell, "\r\n");
             for (uint8_t i = 0; i < matchCount; i++)
             {
                 /* Get name of current command */
@@ -1905,7 +1897,7 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
 
                 /* Print the command */
                 uShellPrintStr(uShell, cmdName);
-                uShellPrintChar(uShell, '\n');
+                uShellPrintStr(uShell, "\r\n");
             }
         }
 
@@ -1939,43 +1931,6 @@ static void uShellPrintStr(UShell_s* const uShell,
 
         /* Print */
         vcpStatus = UShellVcpPrintStr(vcp, str);
-        if (vcpStatus != USHELL_VCP_NO_ERR)
-        {
-            /* Print error */
-            USHELL_ASSERT(0);
-            break;
-        }
-
-    } while (0);
-}
-
-/**
- * \brief Print the char
- * \param[in] uShell - the uShell object
- * \param[in] ch - char to be printed
- * \return none
- */
-static void uShellPrintChar(UShell_s* const uShell,
-                            const char ch)
-{
-    /* Local variable */
-    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;
-    UShellVcp_s* vcp = (UShellVcp_s*) uShell->vcp;
-
-    /* Print */
-    do
-    {
-        /* Check input parameter */
-        if ((uShell == NULL) ||
-            (vcp == NULL))
-        {
-            /* Invalid arguments */
-            USHELL_ASSERT(0);
-            break;
-        }
-
-        /* Print */
-        vcpStatus = UShellVcpPrintChar(vcp, ch);
         if (vcpStatus != USHELL_VCP_NO_ERR)
         {
             /* Print error */

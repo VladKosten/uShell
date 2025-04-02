@@ -69,7 +69,7 @@ extern "C" {
  * \brief The stack size of the UShell thread in bytes.
  */
 #ifndef USHELL_THREAD_STACK_SIZE_BYTE
-    #define USHELL_THREAD_STACK_SIZE_BYTE 2048U
+    #define USHELL_THREAD_STACK_SIZE_BYTE 4096U
 #endif
 
 /**

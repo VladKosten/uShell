@@ -20,6 +20,8 @@
 #include "ushell_cmd_help.h"
 #include "ushell_cmd_clear.h"
 #include "ushell_cmd_whoami.h"
+#include "ushell_cmd_fs.h"
+#include "msp.h"
 
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
@@ -121,6 +123,13 @@ static int16_t uShellCmdClearInit(void);
  * \return int16_t - error code. non-zero = an error has occurred;
  */
 static int16_t uShellCmdWhoAmiInit(void);
+
+/**
+ * \brief uShell Fs  command fs initialization
+ * \param none
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellCmdFsInit(void);
 
 /**
  * \brief uShell command initialization
@@ -408,6 +417,73 @@ static int16_t uShellCmdWhoAmiInit(void)
 }
 
 /**
+ * \brief uShell Fs  command fs initialization
+ * \param none
+ * \return int16_t - error code. non-zero = an error has occurred;
+ */
+static int16_t uShellCmdFsInit(void)
+{
+    /* Local variable */
+    int16_t status = 0;
+
+    /* Initialize the UShell command fs */
+    lfs_t* lfs = MspSearch(22);
+    status = UShellCmdFsInit(lfs);
+    if (status != 0)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    /* Add the command to the list of commands */
+    UShellCmdErr_e cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
+                                                &uShellCmdFs.cmdLs.cmd);
+    if (cmdStatus != USHELL_CMD_NO_ERR)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    /* Add the command to the list of commands */
+    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
+                                 &uShellCmdFs.cmdCd.cmd);
+    if (cmdStatus != USHELL_CMD_NO_ERR)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    /* Add the command to the list of commands */
+    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
+                                 &uShellCmdFs.cmdRm.cmd);
+    if (cmdStatus != USHELL_CMD_NO_ERR)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    /* Add the command to the list of commands */
+    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
+                                 &uShellCmdFs.cmdMkdir.cmd);
+    if (cmdStatus != USHELL_CMD_NO_ERR)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    /* Add the command to the list of commands */
+    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
+                                 &uShellCmdFs.cmdCat.cmd);
+    if (cmdStatus != USHELL_CMD_NO_ERR)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    return status;
+}
+
+/**
  * \brief uShell command initialization
  * \param void
  * \return int16_t - error code. non-zero = an error has occurred;
@@ -434,6 +510,13 @@ static int16_t uShellCmdInit(void)
     }
 
     status = uShellCmdWhoAmiInit();
+    if (status != 0)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    status = uShellCmdFsInit();
     if (status != 0)
     {
         USHELL_STARTUP_ASSERT(0);

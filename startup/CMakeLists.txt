@@ -6,4 +6,6 @@ target_link_libraries(UShellStartup PUBLIC UShellStartupConfig
                                     PUBLIC UShell
                                     PUBLIC UShellCmdHelp
                                     PUBLIC UShellCmdClear
-                                    PUBLIC UShellCmdWhoAmI)
+                                    PUBLIC UShellCmdWhoAmI
+                                    PUBLIC UShellCmdFs
+                                    PUBLIC Msp)
