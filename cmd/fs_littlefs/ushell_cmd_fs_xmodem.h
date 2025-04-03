@@ -55,112 +55,95 @@ typedef enum
     XMODEM_SERVER_BLOCK_ERR = -5,         ///< Block error
     XMODEM_SERVER_UNEXPECTED_ERR = -6,    ///< Unexpected error
 
-} XmodemServerErr_e;
+} XModemServerErr_e;
 
 /**
- * @brief The XModem server state machine
+ * @brief States for the XModem server state machine.
+ * @note The XMODEM_STATE_COUNT value represents the total number of states.
  */
 typedef enum
 {
-    XMODEM_SERVER_STATE_START,
-    XMODEM_SERVER_STATE_SOH,
-    XMODEM_SERVER_STATE_BLOCK_NUM,
-    XMODEM_SERVER_STATE_BLOCK_NEG,
-    XMODEM_SERVER_STATE_DATA,
-    XMODEM_SERVER_STATE_CRC0,
-    XMODEM_SERVER_STATE_CRC1,
-    XMODEM_SERVER_STATE_PROCESS_PACKET,
-    XMODEM_SERVER_STATE_SUCCESSFUL,
-    XMODEM_SERVER_STATE_FAILURE,
+    XMODEM_SERVER_STATE_START,          /**< Initial state, waiting to begin packet reception. */
+    XMODEM_SERVER_STATE_SOH,            /**< Detected Start Of Header (SOH) byte, beginning of packet. */
+    XMODEM_SERVER_STATE_BLOCK_NUM,      /**< Receiving the block number of the current packet. */
+    XMODEM_SERVER_STATE_BLOCK_NEG,      /**< Receiving the complement (negative) of the block number. */
+    XMODEM_SERVER_STATE_DATA,           /**< Receiving the packet data bytes. */
+    XMODEM_SERVER_STATE_CRC0,           /**< Receiving the first byte of the CRC checksum. */
+    XMODEM_SERVER_STATE_CRC1,           /**< Receiving the second byte of the CRC checksum. */
+    XMODEM_SERVER_STATE_PROCESS_PACKET, /**< Processing the complete packet after reception. */
+    XMODEM_SERVER_STATE_PACKET_SUC,     /**< Packet processed successfully. */
+    XMODEM_SERVER_STATE_SUCCESS,        /**< Successful packet reception and processing. */
+    XMODEM_SERVER_STATE_FAILURE,        /**< An error occurred during packet processing. */
 
-    XMODEM_STATE_COUNT,
+    XMODEM_STATE_COUNT, /**< Total number of states. */
 
-} XmodemServerState_e;
-
-/**
- * @brief Callback function to transmit a byte to the xmodem client
- */
-typedef void (*XmodemTxByte_f)(void* xmodem,
-                               uint8_t byte,
-                               void* parent);
+} XModemServerState_e;
 
 /**
- * This contains the state for the xmodem server.
- * None of its contents should be accessed directly, this structure
- * should be considered opaque
+ * @brief Port table for the xmodem server
  */
 typedef struct
 {
-    void* parent;
-    XmodemServerState_e state;                       // What state are we in?
-    uint8_t packet_data [XMODEM_MAX_PACKET_SIZE];    // Incoming packet data
-    int packetPos;                                   // Where are we up to in this packet
-    uint16_t crc;                                    // Whatis the expected CRC of the incoming packet
-    uint16_t packetSize;                             // Are we receiving 128B or 1K packets?
-    bool repeating;                                  // Are we receiving a packet that we've already processed?
-    int64_t lastEventTime;                           // When did we last do something interesting?
-    uint32_t blockNum;                               // What block are we up to?
-    uint32_t errorCount;                             // How many errors have we seen?
-    XmodemTxByte_f txByte;
+    XModemServerErr_e (*isRxByte)(void* xmodem, bool* isRx, void* parent);     ///< Callback function to check if a byte is available from the xmodem client
+    XModemServerErr_e (*txByte)(void* xmodem, uint8_t byte, void* parent);     ///< Callback function to transmit a byte to the xmodem client
+    XModemServerErr_e (*rxByte)(void* xmodem, uint8_t* byte, void* parent);    ///< Callback function to receive a byte from the xmodem client
+    XModemServerErr_e (*delayMs)(void* xmodem, int ms);                        ///< Callback function to delay for a specified time
+    XModemServerErr_e (*write)(void* xmodem, uint8_t* data, int size);         ///< Callback function to write data from the xmodem client
 
-} XmodemServer_s;
+} XModemServerPort_s;
+
+/**
+ * * @brief XModem server object
+ */
+typedef struct
+{
+    void* parent;                                    ///< Pointer to the parent object (optional)
+    XModemServerState_e state;                       ///< Current state of the xmodem server
+    uint8_t packet_data [XMODEM_MAX_PACKET_SIZE];    ///< Buffer to store the packet data
+    int packetPos;                                   ///< Current position in the packet data buffer
+    uint16_t crc;                                    ///< CRC value for the packet
+    uint16_t packetSize;                             ///< Size of the packet data
+    bool repeating;                                  ///< Flag to indicate if the packet is a duplicate
+    int64_t lastEventTime;                           ///< Timestamp of the last event
+    uint32_t blockNum;                               ///< Current block number
+    uint32_t errorCount;                             ///< Number of errors encountered
+    XModemServerPort_s* port;                        ///< Pointer to the port table for the xmodem server
+
+} XModemServer_s;
 
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
  * @brief Initialize the Xmodem server
  * @param[in] xdm - the xmodem server object
- * @param[in] txByte - callback function to transmit a byte to the xmodem client
+ * @param[in] port - the port table for the xmodem server
  * @param[in] parent - pointer to the parent object (optional)
- * @return int - error code. non-zero = an error has occurred;
+ * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-int XmodemServerInit(XmodemServer_s* xdm,
-                     XmodemTxByte_f txByte,
-                     void* parent);
+XModemServerErr_e XModemServerInit(XModemServer_s* xdm,
+                                   XModemServerPort_s* port,
+                                   void* parent);
 
 /**
  * @brief Deinitialize the Xmodem server
  * @param[in] xdm - the xmodem server object
- * @return int - error code. non-zero = an error has occurred;
+ * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-int XmodemServerDeinit(XmodemServer_s* xdm);
-
-/**
- * @brief Receive a byte from the xmodem client
- * @param[in] xdm - the xmodem server object
- * @param[in] byte - the byte to receive
- * @return true - error code. non-zero = an error has occurred;
- * @return false - error code. non-zero = an error has occurred;
- */
-bool XmodemServerRxByte(XmodemServer_s* xdm, uint8_t byte);
-
-/**
- * @brief Get the current state of the xmodem server
- * @param[in] xdm - the xmodem server object
- * @return XmodemServerState_e - error code. non-zero = an error has occurred;
- */
-XmodemServerState_e XmodemServerGetState(XmodemServer_s* xdm);
+XModemServerErr_e XModemServerDeinit(XModemServer_s* xdm);
 
 /**
  * @brief Process the xmodem server
  * @param[in] xdm - the xmodem server object
- * @param[in] packet - the packet to process
- * @param[in] blockNum - the block number to process
- * @param[in] ms_time - the time in milliseconds since the last event
- * @return int - error code. non-zero = an error has occurred;
+ * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-int XmodemServerProc(XmodemServer_s* xdm,
-                     uint8_t* packet,
-                     uint32_t* blockNum,
-                     int64_t ms_time);
+XModemServerErr_e XModemServerProc(XModemServer_s* xdm);
 
 /**
- * @brief Check if the xmodem server is done
- * @param[in] xdm - the xmodem server object
- * @return true - done.
- * @return false - not done.
+ * @brief Reset the xmodem server
+ * @param xdm - the xmodem server object
+ * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-bool XmodemServerIsDone(XmodemServer_s* xdm);
+XModemServerErr_e XModemServerReset(XModemServer_s* xdm);
 
 #ifdef __cplusplus
 }

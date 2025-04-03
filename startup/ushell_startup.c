@@ -428,7 +428,7 @@ static int16_t uShellCmdFsInit(void)
 
     /* Initialize the UShell command fs */
     lfs_t* lfs = MspSearch(22);
-    status = UShellCmdFsInit(lfs);
+    status = UShellCmdFsInit(lfs, &uShellVcpObj);
     if (status != 0)
     {
         USHELL_STARTUP_ASSERT(0);
@@ -474,6 +474,15 @@ static int16_t uShellCmdFsInit(void)
     /* Add the command to the list of commands */
     cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
                                  &uShellCmdFs.cmdCat.cmd);
+    if (cmdStatus != USHELL_CMD_NO_ERR)
+    {
+        USHELL_STARTUP_ASSERT(0);
+        return -1;
+    }
+
+    /* Add the command to the list of commands */
+    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
+                                 &uShellCmdFs.cmdWrite.cmd);
     if (cmdStatus != USHELL_CMD_NO_ERR)
     {
         USHELL_STARTUP_ASSERT(0);

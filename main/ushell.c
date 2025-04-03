@@ -1838,8 +1838,6 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
             (uShell->cmdRoot == NULL) ||
             (inputLen == 0))
         {
-            /* Invalid arguments */
-            USHELL_ASSERT(0);
             break;
         }
 

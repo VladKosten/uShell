@@ -14,9 +14,12 @@ extern "C" {
 #include <string.h>
 #include <stdio.h>
 
+#include "FreeRTOS.h"
 #include "lfs.h"
 #include "ushell_cfg.h"
 #include "ushell_cmd.h"
+#include "ushell_cmd_fs_xmodem.h"
+#include "ushell_vcp.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -98,6 +101,17 @@ extern "C" {
     #define USHELL_CMD_FS_MAX_PATH 64    ///< Maximum path length
 #endif
 
+#ifndef USHELL_CMD_FS_WRITE_NAME
+    #define USHELL_CMD_FS_WRITE_NAME "write"    ///< UShell command name for write
+#endif
+
+/**
+ * \brief UShell command help for write
+ */
+#ifndef USHELL_CMD_FS_WRITE_HELP
+    #define USHELL_CMD_FS_WRITE_HELP "Write file: save a file using XModem transfer (usage: write <name>)"
+#endif
+
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
@@ -143,14 +157,31 @@ typedef struct
 
 typedef struct
 {
+    UShellCmd_s cmd;    ///< UShellCmd object (base object)
+
+} UShellCmdFsWrite_s;
+
+/**
+ * \brief UShellCmdFs object (base object)
+ */
+typedef struct
+{
+    /* Dependent objects */
+    UShellVcp_s* vcp;
+    lfs_t* lfs;    ///< LittleFS object
+    lfs_file_t* currentFile;
+
+    /* Internal use  */
+    XModemServer_s xModem;                 ///< UShellCmd object (base object)
+    char path [USHELL_CMD_FS_MAX_PATH];    ///< Current path
+
+    /* Commands */
     UShellCmdFsLs_s cmdLs;          ///< UShellCmd object (base object)
     UShellCmdFsCd_s cmdCd;          ///< UShellCmd object (base object)
     UShellCmdFsRm_s cmdRm;          ///< UShellCmd object (base object)
     UShellCmdFsMkdir_s cmdMkdir;    ///< UShellCmd object (base object)
     UShellCmdFsCat_s cmdCat;        ///< UShellCmd object (base object)
-
-    lfs_t* lfs;                            ///< LittleFS object
-    char path [USHELL_CMD_FS_MAX_PATH];    ///< Current path
+    UShellCmdFsWrite_s cmdWrite;    ///< UShellCmd object (base object)
 
 } UShellCmdFs_s;
 
@@ -163,11 +194,13 @@ extern UShellCmdFs_s uShellCmdFs;    ///< UShellCmd object (base object)
 
 /**
  * \brief Initialize the commands for file system operations.
- * \param [in] none
+ * \param [in] lfs - pointer to the lfs object
+ * \param [in] vcp - pointer to the UShellVcp object
  * \param [out] none
  * \return UShellOsalErr_e - error code
  */
-int UShellCmdFsInit(lfs_t* lfs);
+int UShellCmdFsInit(lfs_t* lfs,
+                    UShellVcp_s* vcp);
 
 /**
  * \brief Deinitialize the UShell cmd
