@@ -58,7 +58,7 @@ typedef enum
 #define USHELL_CLEAR_SCREEN "\033[2J\033[1;1H"    ///< Clear screen command
 #define USHELL_CLEAR_LINE   "\033[2K\r"           ///< Clear line command with carriage return
 #define USHELL_DEL_CHAR     "\b \b"               ///< Delete character command
-#define USHELL_NEW_LINE     "\n\r"                ///< New line command
+#define USHELL_NEW_LINE     "\n"                  ///< New line command
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
 
@@ -681,6 +681,9 @@ static void uShellVcpWorker(void* const uShell)
                             int cmpRes = strcmp(ushell->io.buffer, USHELL_AUTH_PASSWORD);
                             if (cmpRes == 0)
                             {
+                                /* New line */
+                                uShellPrintStr(ushell, USHELL_NEW_LINE);
+
                                 /* Print succ msg */
                                 uShellPrintStr(ushell, USHELL_AUTH_OK_MSG);
 
@@ -1880,7 +1883,7 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
         else if (matchCount > 1)
         {
             /* Multiple matches — print them */
-            uShellPrintStr(uShell, "\r\n");
+            uShellPrintStr(uShell, "\n");
             for (uint8_t i = 0; i < matchCount; i++)
             {
                 /* Get name of current command */
@@ -1895,7 +1898,7 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
 
                 /* Print the command */
                 uShellPrintStr(uShell, cmdName);
-                uShellPrintStr(uShell, "\r\n");
+                uShellPrintStr(uShell, "\n");
             }
         }
 

@@ -104,21 +104,21 @@ extern "C" {
  * \brief The message displayed when authentication is successful.
  */
 #ifndef USHELL_AUTH_OK_MSG
-    #define USHELL_AUTH_OK_MSG " \n\rAuthentication OK \n\r"
+    #define USHELL_AUTH_OK_MSG " \nAuthentication OK \n"
 #endif
 
 /**
  * \brief The message displayed when authentication fails.
  */
 #ifndef USHELL_AUTH_FAIL_MSG
-    #define USHELL_AUTH_FAIL_MSG "Authentication FAIL \n\r"
+    #define USHELL_AUTH_FAIL_MSG "Authentication FAIL \n"
 #endif
 
 /**
  * \brief The message displayed when the command is not found.
  */
 #ifndef USHELL_CMD_NOT_FOUND_MSG
-    #define USHELL_CMD_NOT_FOUND_MSG "Command not found \n\r"
+    #define USHELL_CMD_NOT_FOUND_MSG "Command not found \n"
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/

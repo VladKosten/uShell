@@ -37,11 +37,11 @@ extern "C" {
 // Prompt for authentication state
 #define USHELL_AUTH_PROMPT                      "Password: "
 // Authentication success message
-#define USHELL_AUTH_OK_MSG                      " \n\rAuthentication OK \n\r"
+#define USHELL_AUTH_OK_MSG                      "Authentication OK \n"
 // Authentication failure message
-#define USHELL_AUTH_FAIL_MSG                    "Authentication FAIL \n\r"
+#define USHELL_AUTH_FAIL_MSG                    "Authentication FAIL \n"
 // Command not found message
-#define USHELL_CMD_NOT_FOUND_MSG                "Command not found \n\r"
+#define USHELL_CMD_NOT_FOUND_MSG                "Command not found \n"
 
 // UShell VCP configuration macros
 // Maximum size of the buffer in the UShell VCP

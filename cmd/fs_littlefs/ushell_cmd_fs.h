@@ -18,7 +18,7 @@ extern "C" {
 #include "lfs.h"
 #include "ushell_cfg.h"
 #include "ushell_cmd.h"
-#include "ushell_cmd_fs_xmodem.h"
+#include "xmodem_server.h"
 #include "ushell_vcp.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
@@ -172,7 +172,7 @@ typedef struct
     lfs_file_t* currentFile;
 
     /* Internal use  */
-    XModemServer_s xModem;                 ///< UShellCmd object (base object)
+    XModemServer_s xModemServer;                 ///< UShellCmd object (base object)
     char path [USHELL_CMD_FS_MAX_PATH];    ///< Current path
 
     /* Commands */

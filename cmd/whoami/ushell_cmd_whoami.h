@@ -27,11 +27,11 @@ extern "C" {
 #endif
 
 #ifndef USHELL_CMD_WHOAMI_SYSTEM_NAME
-    #define USHELL_CMD_WHOAMI_SYSTEM_NAME "Xplained SamE54 \r\n"    ///< UShell command whoami system name
+    #define USHELL_CMD_WHOAMI_SYSTEM_NAME "Xplained SamE54 \n"    ///< UShell command whoami system name
 #endif
 
 #ifndef USHELL_CMD_WHOAMI_SYSTEM_VERSION
-    #define USHELL_CMD_WHOAMI_SYSTEM_VERSION " 0.0.1 ALFA \r\n"    ///< UShell command whoami system version
+    #define USHELL_CMD_WHOAMI_SYSTEM_VERSION " 0.0.1 ALFA \n"    ///< UShell command whoami system version
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/

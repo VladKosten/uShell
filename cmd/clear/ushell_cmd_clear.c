@@ -126,7 +126,7 @@ static UShellCmdErr_e uShellCmdClearExec(void* const cmd,
         /* We dont need arg */
         if (argc > 0)
         {
-            printf("clear: Invalid arguments\r\n ");    // Print error message for invalid arguments
+            printf("clear: Invalid arguments\n ");    // Print error message for invalid arguments
             break;                                      // Exit the loop
         }
 

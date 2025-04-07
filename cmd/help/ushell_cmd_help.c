@@ -135,7 +135,7 @@ static UShellCmdErr_e uShellCmdHelpExec(void* const cmd,
         /* We dont need arg */
         if (argc > 0)
         {
-            printf("help: Invalid arguments\r\n ");    // Print error message for invalid arguments
+            printf("help: Invalid arguments\n ");    // Print error message for invalid arguments
             break;                                     // Exit the loop
         }
 
@@ -143,14 +143,14 @@ static UShellCmdErr_e uShellCmdHelpExec(void* const cmd,
         UShellCmd_s* currCmd = (UShellCmd_s*) uShellCmdHelp.rootCmd;    // Set current command to root command
         if (currCmd == NULL)
         {
-            printf("help: No commands\r\n ");    // Print error message for no commands
+            printf("help: No commands\n ");    // Print error message for no commands
             break;                               // Exit the loop
         }
 
         while (currCmd != NULL)
         {
             /* Print command name and help */
-            printf("    %s: %s\r\n", currCmd->name, currCmd->help);    // Print command name and help message
+            printf("    %s: %s\n", currCmd->name, currCmd->help);    // Print command name and help message
 
             /* Move to the next command */
             currCmd = currCmd->next;    // Set current command to next command
