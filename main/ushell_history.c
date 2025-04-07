@@ -16,7 +16,7 @@
  */
 #ifndef USHELL_HISTORY_ASSERT
     #ifdef USHELL_ASSERT
-        #define USHELL_AUTH_ASSERT(cond) USHELL_HISTORY_ASSERT(cond)
+        #define USHELL_HISTORY_ASSERT(cond) USHELL_ASSERT(cond)
     #else
         #define USHELL_HISTORY_ASSERT(cond)
     #endif
@@ -30,8 +30,8 @@
 
 /**
  * \brief Initialize UShell history object
- * @param[in] history - uShell history object to be initialized
- * @param[in] parent - parent object
+ * \param[in] history - uShell history object to be initialized
+ * \param[in] parent - parent object
  * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryInit(UShellHistory_s* const history,
@@ -67,7 +67,7 @@ UShellHistoryErr_e UShellHistoryInit(UShellHistory_s* const history,
 
 /**
  * \brief Deinit UShell history object
- * @param[in] history - uShell history object to be deinitialized
+ * \param[in] history - uShell history object to be deinitialized
  * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryDeInit(UShellHistory_s* const history)
@@ -98,8 +98,8 @@ UShellHistoryErr_e UShellHistoryDeInit(UShellHistory_s* const history)
 
 /**
  * \brief Add command string to the history buffer
- * @param history - uShell history object
- * @param str - command string to be added
+ * \param history - uShell history object
+ * \param str - command string to be added
  * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryAdd(UShellHistory_s* const history,
@@ -140,10 +140,10 @@ UShellHistoryErr_e UShellHistoryAdd(UShellHistory_s* const history,
 }
 
 /**
- * @brief Get the previous (older) command string from the history buffer.
- * @param[in] history - uShell history object.
- * @param[in] str - buffer for storing the command.
- * @return UShellHistoryErr_e - error code, non-zero value indicates an error.
+ * \brief Get the previous (older) command string from the history buffer.
+ * \param[in] history - uShell history object.
+ * \param[in] str - buffer for storing the command.
+ * \return UShellHistoryErr_e - error code, non-zero value indicates an error.
  */
 UShellHistoryErr_e UShellHistoryCmdPrevGet(UShellHistory_s* const history,
                                            char* const str,
@@ -200,10 +200,10 @@ UShellHistoryErr_e UShellHistoryCmdPrevGet(UShellHistory_s* const history,
 }
 
 /**
- * @brief Get the next (newer) command string from the history buffer.
- * @param[in] history - uShell history object.
- * @param[in] str - buffer for storing the command.
- * @return UShellHistoryErr_e - error code, non-zero value indicates an error.
+ * \brief Get the next (newer) command string from the history buffer.
+ * \param[in] history - uShell history object.
+ * \param[in] str - buffer for storing the command.
+ * \return UShellHistoryErr_e - error code, non-zero value indicates an error.
  */
 UShellHistoryErr_e UShellHistoryCmdNextGet(UShellHistory_s* const history,
                                            char* const str,

@@ -13,10 +13,12 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 
+#include "ushell_cfg.h"
+
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * @brief The maximum number of arguments in the UShell command.
+ * \brief The maximum number of arguments in the UShell command.
  * This value is used to define the maximum number of arguments that can be
  * passed to a command in the UShell.
  */
@@ -58,7 +60,7 @@ typedef UShellCmdErr_e(UShellCmdExec_f)(void* const cmd,
                                         char* const argv []);
 
 /**
- * @brief Describe a cmd hook function.
+ * \brief Describe a cmd hook function.
  */
 typedef struct
 {
@@ -94,9 +96,9 @@ typedef struct UShellCmd_t
  * \return UShellOsalErr_e - error code
  */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
-                             const char* const name,
-                             const UShellCmdHelp_t* const help,
-                             const UShellCmdExec_f* const execFunc);
+                             char* const name,
+                             UShellCmdHelp_t* const help,
+                             UShellCmdExec_f* const execFunc);
 
 /**
  * \brief Deinitialize the UShell  module.
@@ -107,29 +109,29 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
 UShellCmdErr_e UShellCmdDeinit(UShellCmd_s* const cmd);
 
 /**
- * @brief Set the parent
- * @param[in] cmd - the cmd to be set
- * @param[in] parent - the parent to be set
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Set the parent
+ * \param[in] cmd - the cmd to be set
+ * \param[in] parent - the parent to be set
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdParentSet(UShellCmd_s* const cmd,
                                   const void* const parent);
 
 /**
- * @brief Set the hook table
- * @param[in] cmd -  the cmd to be set
- * @param[in] hook -  the hook table to be set
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Set the hook table
+ * \param[in] cmd -  the cmd to be set
+ * \param[in] hook -  the hook table to be set
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdHookTableSet(UShellCmd_s* const cmd,
                                      UShellCmdHookTable_s* const hook);
 
 /**
- * @brief Execute the cmd
- * @param[in] cmd - UShellCmd obj to be executed
- * @param[in] argc - number of arguments
- * @param[in] argv - array of arguments
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Execute the cmd
+ * \param[in] cmd - UShellCmd obj to be executed
+ * \param[in] argc - number of arguments
+ * \param[in] argv - array of arguments
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
                              const int argc,
@@ -154,38 +156,38 @@ UShellCmdErr_e UShellCmdHelpGet(UShellCmd_s* const cmd,
                                 UShellCmdHelp_t** const help);
 
 /**
- * @brief Add cmd to the list
- * @param cmdRoot - the root of the list
- * @param cmd - the cmd to be added
- * @return - error code
+ * \brief Add cmd to the list
+ * \param cmdRoot - the root of the list
+ * \param cmd - the cmd to be added
+ * \return - error code
  */
 UShellCmdErr_e UShellCmdListAdd(UShellCmd_s* const cmdRoot,
                                 UShellCmd_s* const cmd);
 
 /**
- * @brief Remove cmd from the list
- * @param[in] cmdRoot - the root of the list
- * @param[in] cmd - the cmd to be removed
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Remove cmd from the list
+ * \param[in] cmdRoot - the root of the list
+ * \param[in] cmd - the cmd to be removed
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdListRemove(UShellCmd_s** const cmdRoot,
                                    UShellCmd_s* const cmd);
 
 /**
- * @brief Find cmd by name
- * @param[in] cmdRoot - the root of the list
- * @param[in] cmd - the cmd to be found
- * @param[in] isInList - true if the cmd is in the list, false otherwise
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Find cmd by name
+ * \param[in] cmdRoot - the root of the list
+ * \param[in] cmd - the cmd to be found
+ * \param[in] isInList - true if the cmd is in the list, false otherwise
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdIsInList(UShellCmd_s* const cmdRoot,
                                  UShellCmd_s* const cmd,
                                  bool* const isInList);
 /**
- * @brief Get the next cmd in the list
- * @param[in] cmdRoot - the root of the list
- * @param[in] cmd - the cmd to be found
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Get the next cmd in the list
+ * \param[in] cmdRoot - the root of the list
+ * \param[in] cmd - the cmd to be found
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdListNextGet(UShellCmd_s* const cmdRoot,
                                     UShellCmd_s** const cmd);

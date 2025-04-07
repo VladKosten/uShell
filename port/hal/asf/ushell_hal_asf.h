@@ -39,6 +39,7 @@ typedef struct
         bool rxPinActive;    ///< RX pin state.
         uint8_t txPin;       ///< TX pin number.
         bool txPinActive;    ///< TX pin state.
+
     } transceiverPins;
 
 } UShellHalPortCfg_s;

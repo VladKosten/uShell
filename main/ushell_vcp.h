@@ -16,40 +16,33 @@ extern "C" {
 /* Project includes */
 #include "ushell_hal.h"
 #include "ushell_osal.h"
+#include "ushell_cfg.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * \brief Description of the maximum size of the buffer in the UShell
- *
- * This macro defines the maximum size of the buffer used in the UShell.
+ * \brief Description of the maximum size of the buffer in the UShell VCP.
  */
 #ifndef USHELL_VCP_BUFFER_SIZE
     #define USHELL_VCP_BUFFER_SIZE 128U
 #endif
 
 /**
- * \brief Name of the uShell thread.
- *
- * This macro defines the name used when creating the uShell thread.
+ * \brief Name of the uShell VCP thread.
  */
 #ifndef USHELL_VCP_THREAD_NAME
     #define USHELL_VCP_THREAD_NAME "USHELL_VCP"
 #endif
 
 /**
- * \brief Stack size for the uShell thread.
- *
- * This macro defines the stack size allocated for the uShell thread.
+ * \brief Stack size for the uShell VCP  thread.
  */
-#ifndef USHELL_VCP_THREAD_STACK_SIZE
-    #define USHELL_VCP_THREAD_STACK_SIZE 512U
+#ifndef USHELL_VCP_THREAD_STACK_SIZE_BYTE
+    #define USHELL_VCP_THREAD_STACK_SIZE_BYTE 512U
 #endif
 
 /**
- * \brief Priority of the uShell thread.
- *
- * This macro defines the scheduling priority used by the uShell thread.
+ * \brief Priority of the uShell VCP thread.
  */
 #ifndef USHELL_VCP_THREAD_PRIORITY
     #define USHELL_VCP_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
@@ -57,8 +50,6 @@ extern "C" {
 
 /**
  * \brief Timeout for tx operation in the uShell VCP.
- *
- * This macro defines the timeout duration for the tx operation in the uShell VCP.
  */
 #ifndef USHELL_VCP_TX_TIMEOUT_MS
     #define USHELL_VCP_TX_TIMEOUT_MS 3000U
@@ -79,8 +70,8 @@ extern "C" {
  *
  * This macro defines the timer period used in the uShell VCP.
  */
-#ifndef USHELL_VCP_TIMER_NAME
-    #define USHELL_VCP_TIMER_NAME "USHELL_VCP_TIMER"
+#ifndef USHELL_VCP_TIMER_INSPECT_NAME
+    #define USHELL_VCP_TIMER_INSPECT_NAME "USHELL_VCP_TIMER"
 #endif
 
 /**
@@ -95,12 +86,12 @@ extern "C" {
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
- * \brief Describe size of one item in the UShell
+ * \brief Describe size of one item in the UShell VCP
  */
 typedef char UShellVcpItem_t;
 
 /**
- * \brief Enumeration of possible error codes returned by the UShell Hal module.
+ * \brief Enumeration of possible error codes
  */
 typedef enum
 {
@@ -115,8 +106,8 @@ typedef enum
 } UShellVcpErr_e;
 
 /**
- * \brief Description of the uShell IO object
- * @note This object is used to store the buffer for input/output operations in the uShell
+ * \brief Description of the uShell VCP IO object
+ * \note This object is used to store the buffer for input/output operations in the uShell
  */
 typedef struct
 {
@@ -126,8 +117,8 @@ typedef struct
 } UShellVcpIo_s;
 
 /**
- * \brief Description of the uShell object
- * @note This object is used to store the uShell VCP object
+ * \brief Description of the uShell VCP object
+ * \note This object is used to store the uShell VCP object
  */
 typedef struct
 {
@@ -175,38 +166,42 @@ UShellVcpErr_e UShellVcpDeInit(UShellVcp_s* const vcp);
 
 /**
  * \brief Print string to the uShell vcp object
- * @param[in] vcp - uShell object to be printed
- * @param[in] str - string to be printed
- * @param[out] none
+ * \note This function is blocking and will wait for the string to be received.
+ * \param[in] vcp - uShell object to be printed
+ * \param[in] str - string to be printed
+ * \param[out] none
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp, const char* const str);
+UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp,
+                                 const char* const str);
 
 /**
  * \brief Print char to the uShell vcp object
- * @param vcp - uShell object to be printed
- * @param ch - char to be printed
+ * \note This function is blocking and will wait for the string to be received.
+ * \param vcp - uShell object to be printed
+ * \param ch - char to be printed
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp, const char ch);
+UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp,
+                                  const char ch);
 
 /**
  * \brief Scan char from the uShell vcp object
  * \note: This function is blocking and will wait for the character to be received.
- * @param[in] vcp - uShell object to be scanned
- * @param[in] ch - char to be scanned
+ * \param[in] vcp - uShell object to be scanned
+ * \param[in] ch - char to be scanned
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
                                  char* const ch);
 
 /**
- * @brief Scan character from the uShell vcp object in non-blocking mode
- * @note: This function is non-blocking and will return immediately.
- * @note: This function will return USHELL_VCP_EMPTY_ERR if no character is available.
- * @param[in] vcp - uShell object to be scanned
- * @param[in] ch - character to be scanned
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Scan character from the uShell vcp object in non-blocking mode
+ * \note: This function is non-blocking and will return immediately.
+ * \note: This function will return USHELL_VCP_EMPTY_ERR if no character is available.
+ * \param[in] vcp - uShell object to be scanned
+ * \param[in] ch - character to be scanned
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanCharNonBlock(UShellVcp_s* const vcp,
                                          char* const ch);
@@ -214,9 +209,9 @@ UShellVcpErr_e UShellVcpScanCharNonBlock(UShellVcp_s* const vcp,
 /**
  * \brief Scan string from the uShell vcp object
  * \note: This function is blocking and will wait for the string to be received.
- * @param[in] vcp - uShell object to be scanned
- * @param[in] str - string to be scanned
- * @param[in] size - size of the string to be scanned
+ * \param[in] vcp - uShell object to be scanned
+ * \param[in] str - string to be scanned
+ * \param[in] size - size of the string to be scanned
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
@@ -224,10 +219,10 @@ UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
                                 const size_t maxSize);
 
 /**
- * @brief Check if the uShell vcp object is empty
- * @param vcp - uShell object to be checked
- * @param isEmpty - pointer to store the result indicating if the object is empty
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Check if the uShell vcp object is empty
+ * \param vcp - uShell object to be checked
+ * \param isEmpty - pointer to store the result indicating if the object is empty
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpScanIsEmpty(UShellVcp_s* const vcp,
                                     bool* const isEmpty);

@@ -19,105 +19,106 @@ extern "C" {
 #include "ushell_osal.h"
 #include "ushell_history.h"
 #include "ushell_vcp.h"
+#include "ushell_cfg.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * @brief The maximum number of commands in the UShell.
+ * \brief The maximum number of commands in the UShell.
  */
 #ifndef USHELL_MAX_CMD
     #define USHELL_MAX_CMD 15
 #endif
 
 /**
- * @brief The maximum size of the buffer in the UShell.
+ * \brief The maximum number of arguments in the UShell.
+ */
+#ifndef USHELL_UPD_TIME_MS
+    #define USHELL_UPD_TIME_MS 100U
+#endif
+
+/**
+ * \brief The delay time in milliseconds before starting the UShell.
+ */
+#ifndef USHELL_OSAL_START_DELAY_MS
+    #define USHELL_OSAL_START_DELAY_MS 1000U
+#endif
+
+/**
+ * \brief The maximum size of the buffer in the UShell.
  */
 #ifndef USHELL_BUFFER_SIZE
     #define USHELL_BUFFER_SIZE 256
 #endif
 
 /**
- * @brief The default password in the UShell.
+ * \brief The default password in the UShell.
  */
 #ifndef USHELL_AUTH_PASSWORD
     #define USHELL_AUTH_PASSWORD "admin"
 #endif
 
 /**
- * @brief The name of the UShell thread.
+ * \brief The name of the UShell thread.
  */
 #ifndef USHELL_THREAD_NAME
     #define USHELL_THREAD_NAME "USHELL"
 #endif
 
 /**
- * @brief The stack size of the UShell thread in bytes.
+ * \brief The stack size of the UShell thread in bytes.
  */
-#ifndef USHELL_THREAD_STACK_SIZE
-    #define USHELL_THREAD_STACK_SIZE 2048U
+#ifndef USHELL_THREAD_STACK_SIZE_BYTE
+    #define USHELL_THREAD_STACK_SIZE_BYTE 4096U
 #endif
 
 /**
- * @brief The OSAL thread priority for the UShell.
+ * \brief The OSAL thread priority for the UShell.
  */
 #ifndef USHELL_THREAD_PRIORITY
     #define USHELL_THREAD_PRIORITY USHELL_OSAL_THREAD_PRIORITY_LOW
 #endif
 
 /**
- * @brief The CLI update timeout in milliseconds.
- */
-#ifndef USHELL_CLI_UPDATE_TIMEOUT_MS
-    #define USHELL_CLI_UPDATE_TIMEOUT_MS 3000U
-#endif
-
-/**
- * @brief The CLI transmit timeout in milliseconds.
- */
-#ifndef USHELL_CLI_TX_TIMEOUT_MS
-    #define USHELL_CLI_TX_TIMEOUT_MS 1000U
-#endif
-
-/**
- * @brief The default prompt displayed by the UShell.
+ * \brief The default prompt displayed by the UShell.
  */
 #ifndef USHELL_USER_PROMPT
     #define USHELL_USER_PROMPT "uShell> "
 #endif
 
 /**
- * @brief The default message displayed when the UShell is started.
+ * \brief The default message displayed when the UShell is started.
  */
 #ifndef USHELL_HELLO_MSG
     #define USHELL_HELLO_MSG "Press Enter to start ..."
 #endif
 
 /**
- * @brief The password prompt displayed by the UShell.
+ * \brief The password prompt displayed by the UShell.
  */
-#ifndef USHELL_PASSWORD_PROMPT
-    #define USHELL_PASSWORD_PROMPT "Password: "
+#ifndef USHELL_AUTH_PROMPT
+    #define USHELL_AUTH_PROMPT "Password: "
 #endif
 
 /**
- * @brief The message displayed when authentication is successful.
+ * \brief The message displayed when authentication is successful.
  */
 #ifndef USHELL_AUTH_OK_MSG
-    #define USHELL_AUTH_OK_MSG " \n\rAuthentication OK \n\r"
+    #define USHELL_AUTH_OK_MSG " \nAuthentication OK \n"
 #endif
 
 /**
- * @brief The message displayed when authentication fails.
+ * \brief The message displayed when authentication fails.
  */
 #ifndef USHELL_AUTH_FAIL_MSG
-    #define USHELL_AUTH_FAIL_MSG " \n\rAuthentication FAIL \n\r"
+    #define USHELL_AUTH_FAIL_MSG "Authentication FAIL \n"
 #endif
 
 /**
- * @brief The message displayed when the command is not found.
+ * \brief The message displayed when the command is not found.
  */
 #ifndef USHELL_CMD_NOT_FOUND_MSG
-    #define USHELL_CMD_NOT_FOUND_MSG " \n\rCommand not found \n\r"
+    #define USHELL_CMD_NOT_FOUND_MSG "Command not found \n"
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -150,7 +151,7 @@ typedef enum
 
 /**
  * \brief Description of the uShell IO object
- * @note This object is used to store the buffer for input/output operations in the uShell
+ * \note This object is used to store the buffer for input/output operations in the uShell
  */
 typedef struct
 {

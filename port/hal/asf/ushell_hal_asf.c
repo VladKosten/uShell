@@ -73,23 +73,23 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
 
 /**
  * \brief Open function.
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortOpen(void* const hal);
 
 /**
  * \brief Close function.
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortClose(void* const hal);
 
 /**
  * \brief Write function.
- * @param[in] hal Pointer to the HAL instance.
- * @param[in] data Pointer to the data to be written.
- * @param[in] size Size of the data to be written.
+ * \param[in] hal Pointer to the HAL instance.
+ * \param[in] data Pointer to the data to be written.
+ * \param[in] size Size of the data to be written.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortWrite(void* const hal,
@@ -98,10 +98,10 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
 
 /**
  * \brief Read function.
- * @param hal - Pointer to the HAL instance.
- * @param data - Pointer to the buffer to store the read data.
- * @param buffSize - Size of the buffer.
- * @param usedSize - Pointer to the variable to store the size of the data read.
+ * \param hal - Pointer to the HAL instance.
+ * \param data - Pointer to the buffer to store the read data.
+ * \param buffSize - Size of the buffer.
+ * \param usedSize - Pointer to the variable to store the size of the data read.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortRead(void* const hal,
@@ -111,7 +111,7 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
 
 /**
  * \brief Set Tx mode
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  *
  */
@@ -119,16 +119,16 @@ static UShellHalErr_e uShellHalPortSetTxMode(void* const hal);
 
 /**
  * \brief Set Rx mode
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortSetRxMode(void* const hal);
 
 /**
- * @brief Check if data is available for reading.
- * @param[in] hal - Pointer to the HAL instance.
- * @param[in] isAvailable - Pointer to a boolean indicating if data is available.
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \brief Check if data is available for reading.
+ * \param[in] hal - Pointer to the HAL instance.
+ * \param[in] isAvailable - Pointer to a boolean indicating if data is available.
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 static UShellHalErr_e uShellHalPortIsReadDataAvailable(void* const hal,
                                                        bool* const isAvailable);
@@ -196,10 +196,6 @@ UShellHalPortErr_e UShellHalPortInit(UShellHalPort_s* const halPort,
                                      const void* const parent,
                                      const char* const name)
 {
-    /* Check input parameter */
-    USHELL_HAL_PORT_ASSERT(halPort != NULL);
-    USHELL_HAL_PORT_ASSERT(uart != NULL);
-
     /* Local variable */
     UShellHalPortErr_e status = USHELL_HAL_PORT_NO_ERR;
 
@@ -209,6 +205,8 @@ UShellHalPortErr_e UShellHalPortInit(UShellHalPort_s* const halPort,
         if ((halPort == NULL) ||
             (uart == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INVALID_ARGS_ERR;
             break;
         }
@@ -220,6 +218,8 @@ UShellHalPortErr_e UShellHalPortInit(UShellHalPort_s* const halPort,
                                                  &ushellHalPortTable);
         if (statusHal != USHELL_HAL_NO_ERR)
         {
+            /* HAL base object init failed */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
@@ -234,6 +234,8 @@ UShellHalPortErr_e UShellHalPortInit(UShellHalPort_s* const halPort,
         UShellHalPortErr_e statusHalPort = uShellHalPortPoolAdd(halPort, halPort->uart);
         if (statusHalPort != USHELL_HAL_PORT_NO_ERR)
         {
+            /* Add link to the pool failed */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
@@ -242,6 +244,8 @@ UShellHalPortErr_e UShellHalPortInit(UShellHalPort_s* const halPort,
         int32_t statusAsf = usart_async_flush_rx_buffer(halPort->uart);
         if (statusAsf != ERR_NONE)
         {
+            /* Flush failed */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
@@ -250,6 +254,8 @@ UShellHalPortErr_e UShellHalPortInit(UShellHalPort_s* const halPort,
         statusAsf = usart_async_enable(halPort->uart);
         if (statusAsf != ERR_NONE)
         {
+            /* Enable USART failed */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
@@ -272,11 +278,9 @@ UShellHalPortErr_e UShellHalPortInit(UShellHalPort_s* const halPort,
  */
 UShellHalPortErr_e UShellHalPortDeinit(UShellHalPort_s* const halPort)
 {
-    /* Check input parameter */
-    USHELL_HAL_PORT_ASSERT(halPort != NULL);
-
     /* Local variable */
     UShellHalPortErr_e status = USHELL_HAL_PORT_NO_ERR;
+    UShellHalErr_e statusHal = USHELL_HAL_NO_ERR;
 
     /* Process */
     do
@@ -284,6 +288,8 @@ UShellHalPortErr_e UShellHalPortDeinit(UShellHalPort_s* const halPort)
         /* Check input parameters */
         if (halPort == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INVALID_ARGS_ERR;
             break;
         }
@@ -295,9 +301,12 @@ UShellHalPortErr_e UShellHalPortDeinit(UShellHalPort_s* const halPort)
         uShellHalPortPoolRemoveByParent(halPort);
 
         /* Deinit HAL base object */
-        UShellHalErr_e statusHal = UShellHalDeinit(&halPort->base);
-        (void) statusHal;
-        USHELL_HAL_PORT_ASSERT(statusHal == DWIN_HAL_NO_ERR);
+        statusHal = UShellHalDeinit(&halPort->base);
+        if (statusHal != USHELL_HAL_NO_ERR)
+        {
+            /* HAL base object deinit failed */
+            USHELL_HAL_PORT_ASSERT(0);
+        }
 
         /* Clear */
         memset(halPort, 0, sizeof(UShellHalPort_s));
@@ -319,10 +328,6 @@ UShellHalPortErr_e UShellHalPortDeinit(UShellHalPort_s* const halPort)
 static UShellHalPortErr_e uShellHalPortPoolAdd(const void* const parent,
                                                const struct usart_async_descriptor* const uart)
 {
-    /* Check input */
-    USHELL_HAL_PORT_ASSERT(uart != NULL);
-    USHELL_HAL_PORT_ASSERT(parent != NULL);
-
     /* Local variable */
     UShellHalPortErr_e status = USHELL_HAL_PORT_NO_ERR;
 
@@ -332,6 +337,8 @@ static UShellHalPortErr_e uShellHalPortPoolAdd(const void* const parent,
         if ((parent == NULL) ||
             (uart == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INVALID_ARGS_ERR;
             break;
         }
@@ -340,6 +347,8 @@ static UShellHalPortErr_e uShellHalPortPoolAdd(const void* const parent,
         if ((uShellPortLink.uart != NULL) ||
             (uShellPortLink.parent != NULL))
         {
+            /* Link already exists */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
@@ -361,9 +370,6 @@ static UShellHalPortErr_e uShellHalPortPoolAdd(const void* const parent,
  */
 static UShellHalPortErr_e uShellHalPortPoolRemoveByParent(const void* const parent)
 {
-    /* Check input */
-    USHELL_HAL_PORT_ASSERT(parent != NULL);
-
     /* Local variable */
     UShellHalPortErr_e status = USHELL_HAL_PORT_NO_ERR;
 
@@ -373,6 +379,8 @@ static UShellHalPortErr_e uShellHalPortPoolRemoveByParent(const void* const pare
         /* Check input parameters */
         if (parent == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INVALID_ARGS_ERR;
             break;
         }
@@ -380,6 +388,8 @@ static UShellHalPortErr_e uShellHalPortPoolRemoveByParent(const void* const pare
         /* Check parent is the same */
         if (uShellPortLink.parent != parent)
         {
+            USHELL_HAL_PORT_ASSERT(0);
+            status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
 
@@ -401,10 +411,6 @@ static UShellHalPortErr_e uShellHalPortPoolRemoveByParent(const void* const pare
 static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_descriptor* const uart,
                                                      void** const parent)
 {
-    /* Check input */
-    USHELL_HAL_PORT_ASSERT(uart != NULL);
-    USHELL_HAL_PORT_ASSERT(parent != NULL);
-
     /* Local variable */
     UShellHalPortErr_e status = USHELL_HAL_PORT_NO_ERR;
 
@@ -415,6 +421,8 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
         if ((uart == NULL) ||
             (parent == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INVALID_ARGS_ERR;
             break;
         }
@@ -422,6 +430,8 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
         /* Check uart is the same */
         if (uShellPortLink.uart != uart)
         {
+            /* Link not found */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_INIT_ERR;
             break;
         }
@@ -436,15 +446,11 @@ static UShellHalPortErr_e uShellHalPortPoolParentGet(const struct usart_async_de
 
 /**
  * \brief Open function.
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortOpen(void* const hal)
 {
-
-    /* Check input parameter */
-    USHELL_HAL_PORT_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -455,6 +461,8 @@ static UShellHalErr_e uShellHalPortOpen(void* const hal)
         if ((halPort == NULL) ||
             (halPort->uart == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -499,15 +507,11 @@ static UShellHalErr_e uShellHalPortOpen(void* const hal)
 
 /**
  * \brief Close function.
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortClose(void* const hal)
 {
-
-    /* Check input parameter */
-    USHELL_HAL_PORT_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -518,6 +522,8 @@ static UShellHalErr_e uShellHalPortClose(void* const hal)
         if ((halPort == NULL) ||
             (halPort->uart == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -528,6 +534,8 @@ static UShellHalErr_e uShellHalPortClose(void* const hal)
                                                           NULL);
         if (statusAsf != ERR_NONE)
         {
+            /* Attach failed */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;    // Exit: invalid arguments
             break;
         }
@@ -538,6 +546,8 @@ static UShellHalErr_e uShellHalPortClose(void* const hal)
                                                   NULL);
         if (statusAsf != ERR_NONE)
         {
+            /* Attach failed */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;    // Exit: invalid arguments
             break;
         }
@@ -548,6 +558,8 @@ static UShellHalErr_e uShellHalPortClose(void* const hal)
                                                   NULL);
         if (statusAsf != ERR_NONE)
         {
+            /* Attach failed */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;    // Exit: invalid arguments
             break;
         }
@@ -559,20 +571,15 @@ static UShellHalErr_e uShellHalPortClose(void* const hal)
 
 /**
  * \brief Write function.
- * @param[in] hal Pointer to the HAL instance.
- * @param[in] data Pointer to the data to be written.
- * @param[in] size Size of the data to be written.
+ * \param[in] hal Pointer to the HAL instance.
+ * \param[in] data Pointer to the data to be written.
+ * \param[in] size Size of the data to be written.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortWrite(void* const hal,
                                          const UShellHalItem_t* const data,
                                          const size_t size)
 {
-    /* Check input parameter */
-    USHELL_HAL_PORT_ASSERT(hal != NULL);
-    USHELL_HAL_PORT_ASSERT(data != NULL);
-    USHELL_HAL_PORT_ASSERT(size > 0);
-
     /* Local variable */
     UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -585,6 +592,8 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
             (size == 0) ||
             (halPort->uart == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -595,6 +604,8 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
                                      size);
         if (asfStatus != size)
         {
+            /* Write failed */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }
@@ -606,9 +617,9 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
 
 /**
  * \brief Read function.
- * @param[in] hal Pointer to the HAL instance.
- * @param[out] data Pointer to the buffer to store the read data.
- * @param[in] size Size of the buffer.
+ * \param[in] hal Pointer to the HAL instance.
+ * \param[out] data Pointer to the buffer to store the read data.
+ * \param[in] size Size of the buffer.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortRead(void* const hal,
@@ -616,12 +627,6 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
                                         const size_t buffSize,
                                         size_t* const usedSize)
 {
-    /* Check input parameter */
-    USHELL_HAL_PORT_ASSERT(hal != NULL);
-    USHELL_HAL_PORT_ASSERT(data != NULL);
-    USHELL_HAL_PORT_ASSERT(buffSize > 0);
-    USHELL_HAL_PORT_ASSERT(usedSize == NULL);
-
     /* Local variable */
     UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -634,6 +639,8 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
             (buffSize == 0) ||
             (halPort->uart == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -653,15 +660,12 @@ static UShellHalErr_e uShellHalPortRead(void* const hal,
 
 /**
  * \brief Set Tx mode
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  *
  */
 static UShellHalErr_e uShellHalPortSetTxMode(void* const hal)
 {
-    /* Check input parameters */
-    USHELL_HAL_PORT_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -672,6 +676,8 @@ static UShellHalErr_e uShellHalPortSetTxMode(void* const hal)
         /* Check input parameters */
         if ((halPort == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -694,14 +700,11 @@ static UShellHalErr_e uShellHalPortSetTxMode(void* const hal)
 
 /**
  * \brief Set Rx mode
- * @param[in] hal Pointer to the HAL instance.
+ * \param[in] hal Pointer to the HAL instance.
  * \return Error code indicating the result of the operation.
  */
 static UShellHalErr_e uShellHalPortSetRxMode(void* const hal)
 {
-    /* Check input parameters */
-    USHELL_HAL_PORT_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -712,6 +715,8 @@ static UShellHalErr_e uShellHalPortSetRxMode(void* const hal)
         /* Check input parameters */
         if (halPort == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -733,17 +738,14 @@ static UShellHalErr_e uShellHalPortSetRxMode(void* const hal)
 }
 
 /**
- * @brief Check if data is available for reading.
- * @param[in] hal - Pointer to the HAL instance.
- * @param[in] isAvailable - Pointer to a boolean indicating if data is available.
- * @return UShellHalErr_e - error code. non-zero = an error has occurred;
+ * \brief Check if data is available for reading.
+ * \param[in] hal - Pointer to the HAL instance.
+ * \param[in] isAvailable - Pointer to a boolean indicating if data is available.
+ * \return UShellHalErr_e - error code. non-zero = an error has occurred;
  */
 static UShellHalErr_e uShellHalPortIsReadDataAvailable(void* const hal,
                                                        bool* const isAvailable)
 {
-    /* Check input parameters */
-    USHELL_HAL_PORT_ASSERT(hal != NULL);
-
     /* Local variable */
     UShellHalPort_s* halPort = (UShellHalPort_s*) hal;
     UShellHalErr_e status = USHELL_HAL_NO_ERR;
@@ -756,6 +758,8 @@ static UShellHalErr_e uShellHalPortIsReadDataAvailable(void* const hal,
         if ((halPort == NULL) ||
             (isAvailable == NULL))
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
@@ -779,25 +783,32 @@ static UShellHalErr_e uShellHalPortIsReadDataAvailable(void* const hal,
  */
 static void uShellHalPortErrorCb(const struct usart_async_descriptor* const usart)
 {
-    /* Check input parameters*/
-    USHELL_HAL_PORT_ASSERT(usart != NULL);
+    /* Local variable */
+    void* parent = NULL;
+    UShellHalPort_s* halPort = NULL;
+    UShellHalPortErr_e statusHalPort = USHELL_HAL_PORT_NO_ERR;
 
     do
     {
         /* Check input parameter */
         if (usart == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             break;
         }
 
         /* Find link in the pool */
-        void* parent = NULL;
-        UShellHalPortErr_e statusHalPort = uShellHalPortPoolParentGet(usart, &parent);
-        (void) statusHalPort;
-        USHELL_HAL_PORT_ASSERT(statusHalPort == USHELL_HAL_PORT_NO_ERR);
+        statusHalPort = uShellHalPortPoolParentGet(usart, &parent);
+        if (statusHalPort != USHELL_HAL_PORT_NO_ERR)
+        {
+            /* Link not found */
+            USHELL_HAL_PORT_ASSERT(0);
+            break;
+        }
 
         /* Equating pointers */
-        UShellHalPort_s* halPort = (UShellHalPort_s*) parent;
+        halPort = (UShellHalPort_s*) parent;
 
         /* Check error callback */
         if (NULL == halPort->base.rxTxErrorCb)
@@ -807,6 +818,7 @@ static void uShellHalPortErrorCb(const struct usart_async_descriptor* const usar
 
         /* Call error callback */
         halPort->base.rxTxErrorCb((void*) halPort, USHELL_HAL_CB_RX_TX_ERROR);
+
     } while (0);
 }
 
@@ -817,28 +829,35 @@ static void uShellHalPortErrorCb(const struct usart_async_descriptor* const usar
  */
 static void uShellHalPortRxReceiveCb(const struct usart_async_descriptor* const usart)
 {
-    /* Check input parameters*/
-    USHELL_HAL_PORT_ASSERT(usart != NULL);
+    /* Local variable */
+    void* parent = NULL;
+    UShellHalPort_s* halPort = NULL;
+    UShellHalPortErr_e statusHalPort = USHELL_HAL_PORT_NO_ERR;
 
     do
     {
         /* Check input parameter */
         if (usart == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             break;
         }
 
         /* Find link in the pool */
-        void* parent = NULL;
-        UShellHalPortErr_e statusHalPort = uShellHalPortPoolParentGet(usart, &parent);
-        (void) statusHalPort;
-        USHELL_HAL_PORT_ASSERT(statusHalPort == USHELL_HAL_PORT_NO_ERR);
+        statusHalPort = uShellHalPortPoolParentGet(usart, &parent);
+        if (statusHalPort != USHELL_HAL_PORT_NO_ERR)
+        {
+            /* Link not found */
+            USHELL_HAL_PORT_ASSERT(0);
+            break;
+        }
 
         /* Equating pointers */
-        UShellHalPort_s* halPort = (UShellHalPort_s*) parent;
+        halPort = (UShellHalPort_s*) parent;
 
         /* Check error callback */
-        if (NULL == halPort->base.rxTxErrorCb)
+        if (NULL == halPort->base.rxReceivedCb)
         {
             break;
         }
@@ -856,34 +875,42 @@ static void uShellHalPortRxReceiveCb(const struct usart_async_descriptor* const 
  */
 static void uShellHalPortTxCompleteCb(const struct usart_async_descriptor* const usart)
 {
-    /* Check input parameters*/
-    USHELL_HAL_PORT_ASSERT(usart != NULL);
+    /* Local variable */
+    void* parent = NULL;
+    UShellHalPort_s* halPort = NULL;
+    UShellHalPortErr_e statusHalPort = USHELL_HAL_PORT_NO_ERR;
 
     do
     {
         /* Check input parameter */
         if (usart == NULL)
         {
+            /* Input parameters are invalid */
+            USHELL_HAL_PORT_ASSERT(0);
             break;
         }
 
         /* Find link in the pool */
-        void* parent = NULL;
-        UShellHalPortErr_e statusHalPort = uShellHalPortPoolParentGet(usart, &parent);
-        (void) statusHalPort;
-        USHELL_HAL_PORT_ASSERT(statusHalPort == USHELL_HAL_PORT_NO_ERR);
+        statusHalPort = uShellHalPortPoolParentGet(usart, &parent);
+        if (statusHalPort != USHELL_HAL_PORT_NO_ERR)
+        {
+            /* Link not found */
+            USHELL_HAL_PORT_ASSERT(0);
+            break;
+        }
 
         /* Equating pointers */
-        UShellHalPort_s* halPort = (UShellHalPort_s*) parent;
+        halPort = (UShellHalPort_s*) parent;
 
         /* Check error callback */
-        if (NULL == halPort->base.rxTxErrorCb)
+        if (NULL == halPort->base.txCompleteCb)
         {
             break;
         }
 
         /* Call error callback */
-        halPort->base.txCompleteCb((void*) halPort, USHELL_HAL_CB_TX_COMPLETE);
+        halPort->base.txCompleteCb((void*) halPort,
+                                   USHELL_HAL_CB_TX_COMPLETE);
 
     } while (0);
 }

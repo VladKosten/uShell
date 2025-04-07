@@ -13,6 +13,8 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 
+#include "ushell_cfg.h"
+
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
@@ -82,8 +84,8 @@ typedef struct
 
 /**
  * \brief Initialize UShell history object
- * @param[in] history - uShell history object to be initialized
- * @param[in] parent - parent object
+ * \param[in] history - uShell history object to be initialized
+ * \param[in] parent - parent object
  * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryInit(UShellHistory_s* const history,
@@ -91,37 +93,37 @@ UShellHistoryErr_e UShellHistoryInit(UShellHistory_s* const history,
 
 /**
  * \brief Deinit UShell history object
- * @param[in] history - uShell history object to be deinitialized
+ * \param[in] history - uShell history object to be deinitialized
  * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryDeInit(UShellHistory_s* const history);
 
 /**
  * \brief Add command string to the history buffer
- * @param history - uShell history object
- * @param str - command string to be added
+ * \param history - uShell history object
+ * \param str - command string to be added
  * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryAdd(UShellHistory_s* const history,
                                     const char* const str);
 
 /**
- * @brief Get the previous command string from the history buffer
- * @param[in] history - uShell history object
- * @param[in] str - command string to be added
- * @param[in] bufferSize - size of the buffer
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \brief Get the previous command string from the history buffer
+ * \param[in] history - uShell history object
+ * \param[in] str - command string to be added
+ * \param[in] bufferSize - size of the buffer
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryCmdPrevGet(UShellHistory_s* const history,
                                            char* const str,
                                            const size_t bufferSize);
 
 /**
- * @brief Get the next command string from the history buffer
- * @param[in] history - uShell history object
- * @param[in] str - command string to be added
- * @param[in] bufferSize - size of the buffer
- * @return UShellHistoryErr_e - error code. non-zero = an error has occurred;
+ * \brief Get the next command string from the history buffer
+ * \param[in] history - uShell history object
+ * \param[in] str - command string to be added
+ * \param[in] bufferSize - size of the buffer
+ * \return UShellHistoryErr_e - error code. non-zero = an error has occurred;
  */
 UShellHistoryErr_e UShellHistoryCmdNextGet(UShellHistory_s* const history,
                                            char* const str,
