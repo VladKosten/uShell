@@ -8,4 +8,5 @@ target_include_directories(UShellCmdFs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(UShellCmdFs PUBLIC UShellCmd
                                   PUBLIC UShellConfig
                                   PUBLIC LittleFs
-                                  PUBLIC XModemServer)
+                                  PUBLIC XModemServer
+                                  PUBLIC XModemClient)

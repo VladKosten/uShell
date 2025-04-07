@@ -109,7 +109,7 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
  * \param ms - delay in milliseconds
  * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemDelay(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
                                                 const int ms);
 
 /**
@@ -119,7 +119,7 @@ static XModemServerErr_e uShellCmdFsXModemDelay(void* const xmodem,
  * @param[in] parent - pointer to the parent object (optional)
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemTxByte(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
                                                  const uint8_t byte,
                                                  void* const parent);
 
@@ -130,7 +130,7 @@ static XModemServerErr_e uShellCmdFsXModemTxByte(void* const xmodem,
  * @param[in] parent - pointer to the parent object (optional)
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemRxByte(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
                                                  uint8_t* byte,
                                                  void* const parent);
 
@@ -141,7 +141,7 @@ static XModemServerErr_e uShellCmdFsXModemRxByte(void* const xmodem,
  * @param[in] parent - pointer to the parent object (optional)
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemIsRxByte(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
                                                    bool* isRx,
                                                    void* const parent);
 
@@ -152,7 +152,7 @@ static XModemServerErr_e uShellCmdFsXModemIsRxByte(void* const xmodem,
  * @param[in] size - size of the data to write
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemWrite(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
                        uint8_t* const data,
                        const int size);
 
@@ -161,14 +161,23 @@ static XModemServerErr_e uShellCmdFsXModemWrite(void* const xmodem,
  */
 UShellCmdFs_s uShellCmdFs = {0};
 
-static XModemServerPort_s uShellCmdFsXModemPort =
+static XModemServerPort_s uShellCmdFsXModemServerPort =
     {
-        .delayMs = uShellCmdFsXModemDelay,
-        .transmitByte = uShellCmdFsXModemTxByte,
-        .receiveByte = uShellCmdFsXModemRxByte,
-        .writeToMemory = uShellCmdFsXModemWrite,
-        .isReceivedByte = uShellCmdFsXModemIsRxByte,
+        .delayMs = uShellCmdFsXModemServerDelay,
+        .transmitByte = uShellCmdFsXModemServerTxByte,
+        .receiveByte = uShellCmdFsXModemServerRxByte,
+        .writeToMemory = uShellCmdFsXModemServerWrite,
+        .isReceivedByte = uShellCmdFsXModemServerIsRxByte,
 };
+
+static XModemClientPort_s uShellCmdFsXModemClientPort =
+{
+    .delayMs = uShellCmdFsXModemClientDelay,
+    .isReceivedByte = uShellCmdFsXModemClientIsRxByte,
+    .ReadFromMemory = uShellCmdFsXModemClientReadFromMemory,
+    .receiveByte = uShellCmdFsXModemClientRxByte,
+    .transmitByte = uShellCmdFsXModemClientTxByte,
+}
 
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
@@ -360,6 +369,10 @@ int UShellCmdFsInit(UShellCmd_s* const rootCmd,
             status = -8;                // Set status to error
             break;                      // Exit the loop
         }
+
+        XModemClientErr_e xmodemClientStatus = XModemClientInit(&uShellCmdFs.xModemClient,
+                                                                &uShellCmdFsXModemPort,
+                                                                &uShellCmdFs);
 
         /* Save the lfs object to the command object */
         uShellCmdFs.lfs = lfs;
@@ -840,7 +853,7 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
         if (xmodemStatus != XMODEM_SERVER_NO_ERR)
         {
 
-            printf("write: XModem transfer error: %d\n", xmodemStatus);
+            printf("write: XModem transfer error: \n");
         }
         else
         {
@@ -908,15 +921,15 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
         printf("read: ready to send file %s via XModem...\n", fullPath);
 
         /* Transmit file data via XModem transfer */
-        // XModemServerErr_e xmodemStatus = XModemServerProc(&uShellCmdFs.xModemServer);
-        // if (xmodemStatus != XMODEM_SERVER_NO_ERR)
-        // {
-        //     printf("read: XModem transfer error: %d\n", xmodemStatus);
-        // }
-        // else
-        // {
-        //     printf("read: XModem transfer completed successfully\n");
-        // }
+        XModemClientErr_e clientStatus = XModemClientProc(&uShellCmdFs.xModemClient);
+        if (clientStatus != XMODEM_SERVER_NO_ERR)
+        {
+            printf("read: XModem transfer err \n");
+        }
+        else
+        {
+            printf("read: XModem transfer completed successfully\n");
+        }
 
         /* Close the file after transfer */
         lfs_file_close(uShellCmdFs.lfs, &file);
@@ -935,7 +948,7 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
  * \param ms - delay in milliseconds
  * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemDelay(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
                                                 const int ms)
 {
     /* Local variable */
@@ -969,7 +982,7 @@ static XModemServerErr_e uShellCmdFsXModemDelay(void* const xmodem,
  * @param[in] parent - pointer to the parent object (optional)
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemTxByte(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
                                                  const uint8_t byte,
                                                  void* const parent)
 {
@@ -1012,7 +1025,7 @@ static XModemServerErr_e uShellCmdFsXModemTxByte(void* const xmodem,
  * @param[in] parent - pointer to the parent object (optional)
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemRxByte(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
                                                  uint8_t* byte,
                                                  void* const parent)
 
@@ -1058,7 +1071,7 @@ static XModemServerErr_e uShellCmdFsXModemRxByte(void* const xmodem,
  * @param[in] parent - pointer to the parent object (optional)
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemIsRxByte(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
                                                    bool* isRx,
                                                    void* const parent)
 {
@@ -1107,7 +1120,7 @@ static XModemServerErr_e uShellCmdFsXModemIsRxByte(void* const xmodem,
  * @param[in] size - size of the data to write
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemWrite(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
                                                 uint8_t* const data,
                                                 const int size)
 {

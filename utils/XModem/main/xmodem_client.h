@@ -20,14 +20,7 @@ extern "C" {
 /**
  * @brief XModem ADU size
  */
-#define XMODEM_SERVER_MAX_ERR_COUNT 15U    ///< Maximum number of errors before aborting the transfer
-
-/**
- * @brief XModem start timeout in milliseconds
- */
-#ifndef XMODEM_START_TIMEOUT_MS
-    #define XMODEM_START_TIMEOUT_MS 1000U    ///< Timeout for the start of the transfer
-#endif
+#define XMODEM_CLIENT_MAX_ERR_COUNT 15U    ///< Maximum number of errors before aborting the transfer
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
@@ -36,23 +29,23 @@ extern "C" {
  */
 typedef enum
 {
-    XMODEM_SERVER_NO_ERR = 0,          ///< Exit: no errors (success)
-    XMODEM_SERVER_INVALID_ARGS_ERR,    ///< Exit: error - invalid pointers (e.g. null pointers)
-    XMODEM_SERVER_RUN_TIME_ERR,        ///< Exit: error - runtime error (e.g. invalid state)
-    XMODEM_SERVER_TRANSFER_ERR,        ///< Exit: error - transfer err
-    XMODEM_SERVER_PORT_ERR,            ///< Exit: error - port err
+    XMODEM_CLIENT_NO_ERR = 0,          ///< Exit: no errors (success)
+    XMODEM_CLIENT_INVALID_ARGS_ERR,    ///< Exit: error - invalid pointers (e.g. null pointers)
+    XMODEM_CLIENT_RUN_TIME_ERR,        ///< Exit: error - runtime error (e.g. invalid state)
+    XMODEM_CLIENT_TRANSFER_ERR,        ///< Exit: error - transfer err
+    XMODEM_CLIENT_PORT_ERR,            ///< Exit: error - port err
 
-} XModemServerErr_e;
-
-/**
- * \brief Enumeration of XModem constants.
- */
-typedef size_t XModemServerPacketInd_t;    ///< Packet index type
+} XModemClientErr_e;
 
 /**
  * \brief Enumeration of XModem constants.
  */
-typedef size_t XModemServerErrCount_t;    ///< Error count type
+typedef size_t XModemClientPacketInd_t;    ///< Packet index type
+
+/**
+ * \brief Enumeration of XModem constants.
+ */
+typedef size_t XModemClientErrCount_t;    ///< Error count type
 
 /**
  * @brief States for the XModem server state machine.
@@ -61,32 +54,32 @@ typedef size_t XModemServerErrCount_t;    ///< Error count type
 typedef enum
 {
     XMODEM_CLIENT_STATE_START,        /**< Initial state, sending NAK to the client and waiting symbol */
-    XMODEM_CLIENT_STATE_SOH,          /**< Waiting for the SOH character from the client. */
+    XMODEM_CLIENT_STATE_PRE
     XMODEM_CLIENT_STATE_PACKET_GET,   /**< Receiving the packet from the client. */
     XMODEM_CLIENT_STATE_PACKET_PROC,  /**< Processing the received packet. */
     XMODEM_CLIENT_STATE_TRANSFER_END, /**< Transfer completed. */
 
-} XModemServerState_e;
+} XModemClientState_e;
 
 /**
  * @brief Port table for the xmodem server
  */
 typedef struct
 {
-    XModemServerErr_e (*isReceivedByte)(void* xmodem, bool* isRx, void* parent);      ///< Hooks to check if a byte is available from the xmodem client
-    XModemServerErr_e (*transmit)(void* xmodem, uint8_t* data, const size_t size);    ///< Hooks to transmit a byte to the xmodem client
-    XModemServerErr_e (*receiveByte)(void* xmodem, uint8_t* byte, void* parent);      ///< Hooks to receive a byte from the xmodem client
-    XModemServerErr_e (*delayMs)(void* xmodem, int ms);                               ///< Hooks to delay for a specified time
-    XModemServerErr_e (*ReadFromMemory)(void* xmodem, uint8_t* data, int size);       ///< Hooks to write data from the xmodem client
+    XModemClientErr_e (*isReceivedByte)(void* xmodem, bool* isRx, void* parent);      ///< Hooks to check if a byte is available from the xmodem client
+    XModemClientErr_e (*transmit)(void* xmodem, uint8_t* data, const size_t size);    ///< Hooks to transmit a byte to the xmodem client
+    XModemClientErr_e (*receiveByte)(void* xmodem, uint8_t* byte, void* parent);      ///< Hooks to receive a byte from the xmodem client
+    XModemClientErr_e (*delayMs)(void* xmodem, int ms);                               ///< Hooks to delay for a specified time
+    XModemClientErr_e (*ReadFromMemory)(void* xmodem, uint8_t* data, int size);       ///< Hooks to write data from the xmodem client
 
-} XModemServerPort_s;
+} XModemClientPort_s;
 
 typedef struct
 {
     uint8_t data [XMODEM_ADU_SIZE];    ///< Data buffer
     size_t size;                       ///< Size of the data buffer
 
-} XModemServerIo_s;
+} XModemClientIo_s;
 
 /**
  * \brief Describe XModem server
@@ -94,17 +87,17 @@ typedef struct
 typedef struct
 {
     /* Dependencies */
-    XModemServerPort_s* port;    ///< Pointer to the port table
+    XModemClientPort_s* port;    ///< Pointer to the port table
     const void* parent;          ///< Pointer to the parent object
 
     /* Internal use */
     XModem_s xmodem;                             ///< XModem object
-    XModemServerState_e state;                   ///< Current state of the xmodem server
-    XModemServerIo_s io;                         ///< I/O buffer for the xmodem server
-    XModemServerPacketInd_t currentPacketInd;    ///< Current packet size
-    XModemServerErrCount_t currentErrCount;      ///< Current error count
+    XModemClientState_e state;                   ///< Current state of the xmodem server
+    XModemClientIo_s io;                         ///< I/O buffer for the xmodem server
+    XModemClientPacketInd_t currentPacketInd;    ///< Current packet size
+    XModemClientErrCount_t currentErrCount;      ///< Current error count
 
-} XModemServer_s;
+} XModemClient_s;
 
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
@@ -113,25 +106,25 @@ typedef struct
  * \param [in] xmodem - XModem obj to be initialized
  * \param [in] port - pointer to the port table for the xmodem server
  * \param [in] parent - pointer to the parent object
- * \return XModemServerErr_e - error code
+ * \return XModemClientErr_e - error code
  */
-XModemServerErr_e XModemServerInit(XModemServer_s* const xmodem,
-                                   XModemServerPort_s* const port,
+XModemClientErr_e XModemClientInit(XModemClient_s* const xmodem,
+                                   XModemClientPort_s* const port,
                                    const void* const parent);
 
 /**
  * \brief Deinitialize the XModem module.
  * \param [in] xmodem - XModem obj to be deinitialized
- * \return XModemServerErr_e - error code
+ * \return XModemClientErr_e - error code
  */
-XModemServerErr_e XModemServerDeinit(XModemServer_s* const xmodem);
+XModemClientErr_e XModemClientDeinit(XModemClient_s* const xmodem);
 
 /**
  * @brief Process the XModem server state machine.
  * @param[in] xmodem - the xmodem server object
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * @return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
-XModemServerErr_e XModemServerProc(XModemServer_s* const xmodem);
+XModemClientErr_e XModemClientProc(XModemClient_s* const xmodem);
 
 #ifdef __cplusplus
 }
