@@ -21,7 +21,15 @@
 #include "ushell_cmd_clear.h"
 #include "ushell_cmd_whoami.h"
 #include "ushell_cmd_fs.h"
-#include "msp.h"
+
+#ifdef USHELL_STARTUP_OSAL_PORT_FREERTOS
+    #include "ushell_osal_freertos.h"
+#endif
+
+/* Include HAL port-specific headers here: */
+#ifdef USHELL_STARTUP_HAL_PORT_ATMEL
+    #include "ushell_hal_asf.h"
+#endif
 
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
@@ -29,7 +37,11 @@
  * \brief MatrixKbd ASSERT macro definition
  */
 #ifndef USHELL_STARTUP_ASSERT
-    #define USHELL_STARTUP_ASSERT(cond)
+    #ifdef USHELL_ASSERT
+        #define USHELL_STARTUP_ASSERT(cond) USHELL_ASSERT(cond)
+    #else
+        #define USHELL_STARTUP_ASSERT(cond)
+    #endif
 #endif
 
 /**
@@ -104,39 +116,11 @@ static int16_t uShellVcpHalInit(void);
 static int16_t uShellVcpInit(void);
 
 /**
- * \brief uShell command help initialization
- * \param rootCmd - The first cmd in the list of commands to be initialized
- * \return int16_t - error code. non-zero = an error has occurred;
- */
-static int16_t uShellCmdHelpInit(void);
-
-/**
- * \brief uShell command clear initialization
- * \param none
- * \return int16_t - error code. non-zero = an error has occurred;
- */
-static int16_t uShellCmdClearInit(void);
-
-/**
- * \brief uShell command whoami initialization
- * \param none
- * \return int16_t - error code. non-zero = an error has occurred;
- */
-static int16_t uShellCmdWhoAmiInit(void);
-
-/**
- * \brief uShell Fs  command fs initialization
- * \param none
- * \return int16_t - error code. non-zero = an error has occurred;
- */
-static int16_t uShellCmdFsInit(void);
-
-/**
  * \brief uShell command initialization
  * \param void
  * \return int16_t - error code. non-zero = an error has occurred;
  */
-static int16_t uShellCmdInit(void);
+static int16_t uShellCmdInit(void* const littleFs);
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
 
@@ -146,7 +130,7 @@ static int16_t uShellCmdInit(void);
  * \param[out]  no;
  * \return int16_t - error code. non-zero = an error has occurred;
  */
-int16_t UShellStartup(void)
+int16_t UShellStartup(void* const littleFs)
 {
     /* Local variable */
     int16_t status = 0;
@@ -170,7 +154,7 @@ int16_t UShellStartup(void)
         }
 
         /* Initialize the uShell command */
-        status = uShellCmdInit();
+        status = uShellCmdInit(littleFs);
         if (status != 0)
         {
             USHELL_STARTUP_ASSERT(0);
@@ -336,201 +320,74 @@ static int16_t uShellVcpInit(void)
 }
 
 /**
- * \brief uShell command help initialization
- * \param rootCmd - The first cmd in the list of commands to be initialized
- * \return int16_t - error code. non-zero = an error has occurred;
- */
-static int16_t uShellCmdHelpInit(void)
-{
-    /* Local variable */
-    int16_t status = 0;
-
-    /* Initialize the UShell command help */
-    status = UShellCmdHelpInit(&uShellCmdHelp.cmd);
-    if (status != 0)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    return status;
-}
-
-/**
- * \brief uShell command clear initialization
- * \param rootCmd - The first cmd in the list of commands to be initialized
- * \return int16_t - error code. non-zero = an error has occurred;
- */
-static int16_t uShellCmdClearInit(void)
-{
-    /* Local variable */
-    int16_t status = 0;
-
-    /* Initialize the UShell command clear */
-    status = UShellCmdClearInit();
-    if (status != 0)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    /* Add the command to the list of commands */
-    UShellCmdErr_e cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
-                                                &uShellCmdClear.cmd);
-    if (cmdStatus != USHELL_CMD_NO_ERR)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    return status;
-}
-
-/**
- * \brief uShell command whoami initialization
- * \param none
- * \return int16_t - error code. non-zero = an error has occurred;
- */
-static int16_t uShellCmdWhoAmiInit(void)
-{
-    /* Local variable */
-    int16_t status = 0;
-
-    /* Initialize the UShell command clear */
-    status = UShellCmdWhoAmIInit();
-    if (status != 0)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    /* Add the command to the list of commands */
-    UShellCmdErr_e cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
-                                                &uShellCmdWhoAmI.cmd);
-    if (cmdStatus != USHELL_CMD_NO_ERR)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    return status;
-}
-
-/**
- * \brief uShell Fs  command fs initialization
- * \param none
- * \return int16_t - error code. non-zero = an error has occurred;
- */
-static int16_t uShellCmdFsInit(void)
-{
-    /* Local variable */
-    int16_t status = 0;
-
-    /* Initialize the UShell command fs */
-    lfs_t* lfs = MspSearch(22);
-    status = UShellCmdFsInit(lfs, &uShellVcpObj);
-    if (status != 0)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    /* Add the command to the list of commands */
-    UShellCmdErr_e cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
-                                                &uShellCmdFs.cmdLs.cmd);
-    if (cmdStatus != USHELL_CMD_NO_ERR)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    /* Add the command to the list of commands */
-    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
-                                 &uShellCmdFs.cmdCd.cmd);
-    if (cmdStatus != USHELL_CMD_NO_ERR)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    /* Add the command to the list of commands */
-    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
-                                 &uShellCmdFs.cmdRm.cmd);
-    if (cmdStatus != USHELL_CMD_NO_ERR)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    /* Add the command to the list of commands */
-    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
-                                 &uShellCmdFs.cmdMkdir.cmd);
-    if (cmdStatus != USHELL_CMD_NO_ERR)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    /* Add the command to the list of commands */
-    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
-                                 &uShellCmdFs.cmdCat.cmd);
-    if (cmdStatus != USHELL_CMD_NO_ERR)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    /* Add the command to the list of commands */
-    cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
-                                 &uShellCmdFs.cmdWrite.cmd);
-    if (cmdStatus != USHELL_CMD_NO_ERR)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
-
-    return status;
-}
-
-/**
  * \brief uShell command initialization
  * \param void
  * \return int16_t - error code. non-zero = an error has occurred;
  */
-static int16_t uShellCmdInit(void)
+static int16_t uShellCmdInit(void* const littleFs)
 {
     /* Local variable */
     int16_t status = 0;
+    UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;
 
     /* Initialize the UShell command */
-
-    status = uShellCmdHelpInit();
-    if (status != 0)
+    do
     {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
+        /* Add the help command */
+        status = UShellCmdHelpInit(&uShellCmdHelp.cmd);
+        if (status != 0)
+        {
+            USHELL_STARTUP_ASSERT(0);
+            return -1;
+        }
 
-    status = uShellCmdClearInit();
-    if (status != 0)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
+        /* Add the clear command */
+        status = UShellCmdClearInit();
+        if (status != 0)
+        {
+            USHELL_STARTUP_ASSERT(0);
+            return -2;
+        }
 
-    status = uShellCmdWhoAmiInit();
-    if (status != 0)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
+        /* Add the command to the list of commands */
+        cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
+                                     &uShellCmdClear.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_STARTUP_ASSERT(0);
+            return -3;
+        }
 
-    status = uShellCmdFsInit();
-    if (status != 0)
-    {
-        USHELL_STARTUP_ASSERT(0);
-        return -1;
-    }
+        /* Init the whoami command */
+        status = UShellCmdWhoAmIInit();
+        if (status != 0)
+        {
+            USHELL_STARTUP_ASSERT(0);
+            return -4;
+        }
+
+        /* Add the command to the list of commands */
+        cmdStatus = UShellCmdListAdd(&uShellCmdHelp.cmd,
+                                     &uShellCmdWhoAmI.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_STARTUP_ASSERT(0);
+            return -5;
+        }
+
+        /* Add the command to the list of commands */
+        status = UShellCmdFsInit(&uShellCmdHelp.cmd,
+                                 littleFs,
+                                 &uShellVcpObj);
+        if (status != 0)
+        {
+            USHELL_STARTUP_ASSERT(0);
+            return -6;
+        }
+
+
+    } while (0);
+
 
     return status;
 }

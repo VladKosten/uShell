@@ -14,7 +14,7 @@ extern "C" {
 #include <string.h>
 
 #include "xmodem.h"
-#include "ushell_cfg.h"
+#include "xmodem_cfg.h"
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**

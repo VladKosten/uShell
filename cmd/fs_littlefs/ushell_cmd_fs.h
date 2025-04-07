@@ -109,7 +109,21 @@ extern "C" {
  * \brief UShell command help for write
  */
 #ifndef USHELL_CMD_FS_WRITE_HELP
-    #define USHELL_CMD_FS_WRITE_HELP "Write file: save a file using XModem transfer (usage: write <name>)"
+    #define USHELL_CMD_FS_WRITE_HELP "save a file using XModem transfer (usage: write <name>)"
+#endif
+
+/**
+ * \brief UShell command name for read
+ */
+#ifndef USHELL_CMD_FS_READ_NAME
+    #define USHELL_CMD_FS_READ_NAME "read"    ///< UShell command name for read
+#endif
+
+/**
+ * \brief UShell command help for read
+ */
+#ifndef USHELL_CMD_FS_READ_HELP
+    #define USHELL_CMD_FS_READ_HELP "read a file using XModem transfer (usage: read <name>)"
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -155,11 +169,23 @@ typedef struct
     UShellCmd_s cmd;    ///< UShellCmd object (base object)
 } UShellCmdFsCat_s;
 
+/**
+* @brief Describe UShellCmdFsWrite.
+ */
 typedef struct
 {
     UShellCmd_s cmd;    ///< UShellCmd object (base object)
 
 } UShellCmdFsWrite_s;
+
+/**
+* @brief Describe UShellCmdFsRead.
+ */
+typedef struct
+{
+    UShellCmd_s cmd;    ///< UShellCmd object (base object)
+
+} UShellCmdFsRead_s;
 
 /**
  * \brief UShellCmdFs object (base object)
@@ -182,6 +208,7 @@ typedef struct
     UShellCmdFsMkdir_s cmdMkdir;    ///< UShellCmd object (base object)
     UShellCmdFsCat_s cmdCat;        ///< UShellCmd object (base object)
     UShellCmdFsWrite_s cmdWrite;    ///< UShellCmd object (base object)
+    UShellCmdFsRead_s cmdRead;      ///< UShellCmd object (base object)
 
 } UShellCmdFs_s;
 
@@ -194,13 +221,15 @@ extern UShellCmdFs_s uShellCmdFs;    ///< UShellCmd object (base object)
 
 /**
  * \brief Initialize the commands for file system operations.
+ * \param [in] rootCmd - pointer to the root command
  * \param [in] lfs - pointer to the lfs object
  * \param [in] vcp - pointer to the UShellVcp object
  * \param [out] none
  * \return UShellOsalErr_e - error code
  */
-int UShellCmdFsInit(lfs_t* lfs,
-                    UShellVcp_s* vcp);
+int UShellCmdFsInit(UShellCmd_s* const rootCmd,
+                    lfs_t*  const lfs,
+                    UShellVcp_s* const vcp);
 
 /**
  * \brief Deinitialize the UShell cmd

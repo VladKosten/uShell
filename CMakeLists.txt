@@ -14,11 +14,8 @@ if(USHELL_UNIT_TEST_BUILD OR USHELL_UNIT_TEST_BUILD)
     option(HAL_PORT_CMOCK "Use CMOCK HAL port" ON)
     option(OSAL_PORT_POSIX "Use POSIX OSAL port" ON)
     add_subdirectory(test)
-else()
-    message("-- UShell INCLUDE IN APPLICATION")
-    option(HAL_PORT_ASF "Use ASF HAL port" ON)
-    option(OSAL_PORT_FREERTOS "Use FreeRTOS OSAL port" ON)
-    add_subdirectory(startup)
+else ()
+    message("-- UShell INCLUDE IN APPLICATION WITH DEFAULT STARTUP")
 endif()
 
 # Add subdirectories

@@ -10,17 +10,10 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-#include "ushell_startup_cfg.h"
+#include "ushell_cfg.h"
 #include "ushell.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
-
-/**
- * \brief uShell assert definition
- */
-#ifndef USHELL_STARTUP_ASSERT
-    #error USHELL_STARTUP_ASSERT not defined
-#endif
 
 /**
  * \brief Check define for uShell startup name
@@ -56,11 +49,11 @@ extern "C" {
 
 /**
  * \brief The uShell startup procedure
- * \param[in] void;
+ * \param[in] void* const littleFs - pointer to the littlefs object(optional)
  * \param[out]  no;
  * \return int16_t - error code. non-zero = an error has occurred;
  */
-int16_t UShellStartup(void);
+int16_t UShellStartup(void* const littleFs);
 
 /**
  * \brief The uShell shutdown procedure

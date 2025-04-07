@@ -93,6 +93,17 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
                                            char* const argv []);
 
 /**
+* @brief Execute the read command.
+* @param[in] cmd - UShellCmd object
+* @param[in] argc - number of arguments
+* @param[in] argv - array of arguments
+* @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
+                                           const int argc,
+                                           char* const argv []);
+
+/**
  * \brief Delay function for the xmodem server.
  * \param xmodem - xmodem server object
  * \param ms - delay in milliseconds
@@ -141,8 +152,7 @@ static XModemServerErr_e uShellCmdFsXModemIsRxByte(void* const xmodem,
  * @param[in] size - size of the data to write
  * @return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e
-uShellCmdFsXModemWrite(void* const xmodem,
+static XModemServerErr_e uShellCmdFsXModemWrite(void* const xmodem,
                        uint8_t* const data,
                        const int size);
 
@@ -164,13 +174,15 @@ static XModemServerPort_s uShellCmdFsXModemPort =
 
 /**
  * \brief Initialize the commands for file system operations.
+ * \param [in] rootCmd - pointer to the root command
  * \param [in] lfs - pointer to the lfs object
  * \param [in] vcp - pointer to the UShellVcp object
  * \param [out] none
  * \return UShellOsalErr_e - error code
  */
-int UShellCmdFsInit(lfs_t* lfs,
-                    UShellVcp_s* vcp)
+int UShellCmdFsInit(UShellCmd_s* const rootCmd,
+                    lfs_t*  const lfs,
+                    UShellVcp_s* const vcp)
 {
     /* Local variable */
     int status = 0;                                  // Variable to store command status
@@ -180,7 +192,8 @@ int UShellCmdFsInit(lfs_t* lfs,
     {
         /* Check input parameter */
         if ((lfs == NULL) ||
-            (vcp == NULL))
+            (vcp == NULL) ||
+            (rootCmd == NULL))
         {
             USHELL_CMD_FS_ASSERT(0);    // Set status to error if lfs or vcp is NULL
             status = -1;                // Set status to error
@@ -203,6 +216,15 @@ int UShellCmdFsInit(lfs_t* lfs,
             break;                      // Exit the loop
         }
 
+        /* Add cmd to root */
+        cmdStatus = UShellCmdListAdd(rootCmd, &uShellCmdFs.cmdLs.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command attachment fails
+            status = -2;                // Set status to error
+            break;                      // Exit the loop
+        }
+
         /* Init cd command */
         cmdStatus = UShellCmdInit(&uShellCmdFs.cmdCd.cmd,
                                   USHELL_CMD_FS_CD_NAME,
@@ -211,6 +233,15 @@ int UShellCmdFsInit(lfs_t* lfs,
         if (cmdStatus != USHELL_CMD_NO_ERR)
         {
             USHELL_CMD_FS_ASSERT(0);    // Set status to error if command initialization fails
+            status = -3;                // Set status to error
+            break;                      // Exit the loop
+        }
+
+        /* Add cmd to root */
+        cmdStatus = UShellCmdListAdd(rootCmd, &uShellCmdFs.cmdCd.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command attachment fails
             status = -3;                // Set status to error
             break;                      // Exit the loop
         }
@@ -227,6 +258,15 @@ int UShellCmdFsInit(lfs_t* lfs,
             break;                      // Exit the loop
         }
 
+        /* Add cmd to root */
+        cmdStatus = UShellCmdListAdd(rootCmd, &uShellCmdFs.cmdRm.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command attachment fails
+            status = -4;                // Set status to error
+            break;                      // Exit the loop
+        }
+
         /* Init mkdir command */
         cmdStatus = UShellCmdInit(&uShellCmdFs.cmdMkdir.cmd,
                                   USHELL_CMD_FS_MKDIR_NAME,
@@ -235,6 +275,14 @@ int UShellCmdFsInit(lfs_t* lfs,
         if (cmdStatus != USHELL_CMD_NO_ERR)
         {
             USHELL_CMD_FS_ASSERT(0);    // Set status to error if command initialization fails
+            status = -5;                // Set status to error
+            break;                      // Exit the loop
+        }
+        /* Add cmd to root */
+        cmdStatus = UShellCmdListAdd(rootCmd, &uShellCmdFs.cmdMkdir.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command attachment fails
             status = -5;                // Set status to error
             break;                      // Exit the loop
         }
@@ -251,15 +299,12 @@ int UShellCmdFsInit(lfs_t* lfs,
             break;                      // Exit the loop
         }
 
-        /* Init rm command */
-        cmdStatus = UShellCmdInit(&uShellCmdFs.cmdRm.cmd,
-                                  USHELL_CMD_FS_RM_NAME,
-                                  USHELL_CMD_FS_RM_HELP,
-                                  uShellCmdFsRmExec);
+        /* Add cmd to root */
+        cmdStatus = UShellCmdListAdd(rootCmd, &uShellCmdFs.cmdCat.cmd);
         if (cmdStatus != USHELL_CMD_NO_ERR)
         {
-            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command initialization fails
-            status = -7;                // Set status to error
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command attachment fails
+            status = -6;                // Set status to error
             break;                      // Exit the loop
         }
 
@@ -268,6 +313,42 @@ int UShellCmdFsInit(lfs_t* lfs,
                                   USHELL_CMD_FS_WRITE_NAME,
                                   USHELL_CMD_FS_WRITE_HELP,
                                   uShellCmdFsWriteExec);
+        if( cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command initialization fails
+            status = -8;                // Set status to error
+            break;                      // Exit the loop
+        }
+
+        /* Add cmd to root */
+        cmdStatus = UShellCmdListAdd(rootCmd, &uShellCmdFs.cmdWrite.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command attachment fails
+            status = -8;                // Set status to error
+            break;                      // Exit the loop
+        }
+
+        /* Init read command */
+        cmdStatus = UShellCmdInit(&uShellCmdFs.cmdRead.cmd,
+                                  USHELL_CMD_FS_READ_NAME,
+                                  USHELL_CMD_FS_READ_HELP,
+                                  uShellCmdFsReadExec);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command initialization fails
+            status = -9;                // Set status to error
+            break;                      // Exit the loop
+        }
+
+        /* Add cmd to root */
+        cmdStatus = UShellCmdListAdd(rootCmd, &uShellCmdFs.cmdRead.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if command attachment fails
+            status = -9;                // Set status to error
+            break;                      // Exit the loop
+        }
 
         /* Init xmodem command */
         XModemServerErr_e xmodemStatus = XModemServerInit(&uShellCmdFs.xModemServer,
@@ -771,6 +852,77 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
 
         /* Remove the current file object reference */
         uShellCmdFs.currentFile = NULL;    // Remove the current file object reference
+
+    } while (0);
+
+    return status;
+}
+
+/**
+* @brief Execute the read command.
+* @param[in] cmd - UShellCmd object
+* @param[in] argc - number of arguments
+* @param[in] argv - array of arguments
+* @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ */
+static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
+                                           const int argc,
+                                           char* const argv [])
+{
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+    const char* fileName = argv[0];
+    char fullPath[USHELL_CMD_FS_MAX_PATH] = {0};
+    int statusFs = 0;
+    lfs_file_t file;
+
+    do
+    {
+        /* Check input parameter */
+        if (argc != 1)
+        {
+            printf("Usage: read <file>\n");
+            break;
+        }
+
+        /* Form the full path using the current directory and the provided file name */
+        if (uShellCmdFs.path[strlen(uShellCmdFs.path) - 1] == '/')
+            snprintf(fullPath, sizeof(fullPath), "%s%s", uShellCmdFs.path, fileName);
+        else
+            snprintf(fullPath, sizeof(fullPath), "%s/%s", uShellCmdFs.path, fileName);
+
+        /* Open the file for reading */
+        statusFs = lfs_file_open(uShellCmdFs.lfs,
+                                 &file,
+                                 fullPath,
+                                 LFS_O_RDONLY);
+        if (statusFs < 0)
+        {
+            printf("read: cannot open file %s for reading\n", fullPath);
+            break;
+        }
+
+        /* Save the current file object to the xmodem server */
+        uShellCmdFs.currentFile = &file;
+
+        /* Initialize the xmodem server for transmitting file data */
+        printf("read: ready to send file %s via XModem...\n", fullPath);
+
+        /* Transmit file data via XModem transfer */
+        // XModemServerErr_e xmodemStatus = XModemServerProc(&uShellCmdFs.xModemServer);
+        // if (xmodemStatus != XMODEM_SERVER_NO_ERR)
+        // {
+        //     printf("read: XModem transfer error: %d\n", xmodemStatus);
+        // }
+        // else
+        // {
+        //     printf("read: XModem transfer completed successfully\n");
+        // }
+
+        /* Close the file after transfer */
+        lfs_file_close(uShellCmdFs.lfs, &file);
+
+        /* Remove the current file object reference */
+        uShellCmdFs.currentFile = NULL;
 
     } while (0);
 
