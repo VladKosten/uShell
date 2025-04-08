@@ -12,7 +12,6 @@
 
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
-
 /**
  * \brief Assert macro for the xmodem server module.
  */
@@ -36,43 +35,43 @@
  * @return true -  byte received successfully.
  * @return false - byte not received successfully.
  */
-static XModemServerErr_e xModemServerIsRxByte(XModemServer_s* xmodem,
+static XModemServerErr_e xModemServerIsRxByte(XModemServer_s* server,
                                               bool* isRxByte);
 
 /**
  * @brief Receive a byte from the xmodem client
- * @param[in] xdm - the xmodem server object
+ * @param[in] server - the xmodem server object
  * @param[in] byte - the byte to receive
  * @return true -  byte received successfully.
  * @return false - byte not received successfully.
  */
-static XModemServerErr_e xModemServerRxByte(XModemServer_s* const xdm,
+static XModemServerErr_e xModemServerRxByte(XModemServer_s* const server,
                                             uint8_t* const byte);
 
 /**
  * @brief Transmit a byte to the xmodem client
- * @param[in] xdm - the xmodem server object
+ * @param[in] server - the xmodem server object
  * @param[in] byte - the byte to transmit
  * @return int - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e xModemServerTxByte(XModemServer_s* xdm,
+static XModemServerErr_e xModemServerTxByte(XModemServer_s* server,
                                             uint8_t byte);
 
 /**
  * @brief Delay for a specified time
- * @param xdm - the xmodem server object
+ * @param server - the xmodem server object
  * @param ms - the time in milliseconds to delay
  */
-static XModemServerErr_e xModemServerDelayS(XModemServer_s* xdm,
+static XModemServerErr_e xModemServerDelayS(XModemServer_s* server,
                                             int ms);
 
 /**
  * @brief Write data from the xmodem client
- * @param xdm - the xmodem server object
+ * @param server - the xmodem server object
  * @param data - the data to write
  * @param size - the size of the data to write
  */
-static XModemServerErr_e xModemServerWrite(XModemServer_s* xdm,
+static XModemServerErr_e xModemServerWrite(XModemServer_s* server,
                                            uint8_t* data,
                                            int size);
 
@@ -98,17 +97,18 @@ static void xModemServerIoFlush(XModemServer_s* server);
  * \param [in] parent - pointer to the parent object
  * \return XModemServerErr_e - error code
  */
-XModemServerErr_e XModemServerInit(XModemServer_s* const xmodem,
+XModemServerErr_e XModemServerInit(XModemServer_s* const server,
                                    XModemServerPort_s* const port,
                                    const void* const parent)
 {
     /* Local var */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;    // Variable to store the status of the operation
+    XModemErr_e xmodemStatus = XMODEM_NO_ERR;           // Variable to store the status of the operation
 
     do
     {
         /* Check input parameter */
-        if ((xmodem == NULL) ||
+        if ((server == NULL) ||
             (port == NULL) ||
             (parent == NULL))
         {
@@ -128,10 +128,19 @@ XModemServerErr_e XModemServerInit(XModemServer_s* const xmodem,
         }
 
         /* Initialize the xmodem server object */
-        memset(xmodem, 0, sizeof(XModemServer_s));    // Flush the xmodem server object
+        memset(server, 0, sizeof(XModemServer_s));    // Flush the xmodem server object
 
-        xmodem->port = port;        // Set the port table
-        xmodem->parent = parent;    // Set the parent object
+        /* Initialize the xmodem object */
+        xmodemStatus = XModemInit(&server->xmodem, server, XMODEM_CRC_16);
+        if (xmodemStatus != XMODEM_NO_ERR)    // Check if the xmodem object is in error state
+        {
+            status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
+            break;                                      // Exit the loop
+        }
+
+        /* Set the port table and parent object */
+        server->port = port;        // Set the port table
+        server->parent = parent;    // Set the parent object
 
     } while (0);
 
@@ -143,7 +152,7 @@ XModemServerErr_e XModemServerInit(XModemServer_s* const xmodem,
  * \param [in] xmodem - XModem obj to be deinitialized
  * \return XModemServerErr_e - error code
  */
-XModemServerErr_e XModemServerDeinit(XModemServer_s* const xmodem)
+XModemServerErr_e XModemServerDeinit(XModemServer_s* const server)
 {
     /* Local var */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;    // Variable to store the status of the operation
@@ -152,14 +161,14 @@ XModemServerErr_e XModemServerDeinit(XModemServer_s* const xmodem)
     do
     {
         /* Check input parameter */
-        if (xmodem == NULL)
+        if (server == NULL)
         {
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
             break;                                      // Exit the loop
         }
 
         /* Flush the xmodem server object */
-        memset(xmodem, 0, sizeof(*xmodem));    // Flush the xmodem server object
+        memset(server, 0, sizeof(XModemServer_s));    // Flush the xmodem server object
 
     } while (0);
 
@@ -175,8 +184,6 @@ XModemServerErr_e XModemServerProc(XModemServer_s* const xmodem)
 {
     /* Local var */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;    // Variable to store the status of the operation
-    uint8_t byte = 0;                                   // Variable to store the received byte
-    bool isRxByte = false;                              // Variable to store the received byte flag
 
     do
     {
@@ -186,11 +193,6 @@ XModemServerErr_e XModemServerProc(XModemServer_s* const xmodem)
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
             break;                                      // Exit the loop
         }
-
-        /* Flush the state machine */
-        xmodem->state = XMODEM_SERVER_STATE_START;    // Set the state to start
-        xmodem->currentPacketInd = 0;                 // Set the current packet index to 0
-        xmodem->currentErrCount = 0;                  // Set the current error count to 0
 
         status = xModemServerFSMProc(xmodem);    // Process the state machine
         if (status != XMODEM_SERVER_NO_ERR)      // Check if the state machine is in error state
@@ -241,7 +243,7 @@ static XModemServerErr_e xModemServerIsRxByte(XModemServer_s* xmodem,
         }
 
         /* Receive the byte from the xmodem client */
-        status = xmodem->port->isReceivedByte(xmodem, isRxByte, xmodem->parent);
+        status = xmodem->port->isReceivedByte(xmodem, isRxByte);
 
     } while (0);
 
@@ -250,12 +252,12 @@ static XModemServerErr_e xModemServerIsRxByte(XModemServer_s* xmodem,
 
 /**
  * @brief Receive a byte from the xmodem client
- * @param[in] xdm - the xmodem server object
+ * @param[in] server - the xmodem server object
  * @param[in] byte - the buffer to receive the byte
  * @return true -  byte received successfully.
  * @return false - byte not received successfully.
  */
-static XModemServerErr_e xModemServerRxByte(XModemServer_s* const xdm,
+static XModemServerErr_e xModemServerRxByte(XModemServer_s* const server,
                                             uint8_t* const byte)
 {
     /* Local var */
@@ -265,7 +267,7 @@ static XModemServerErr_e xModemServerRxByte(XModemServer_s* const xdm,
     do
     {
         /* Check input parameter */
-        if ((xdm == NULL) ||
+        if ((server == NULL) ||
             (byte == NULL))
         {
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
@@ -273,15 +275,15 @@ static XModemServerErr_e xModemServerRxByte(XModemServer_s* const xdm,
         }
 
         /* Check if the byte is valid */
-        if ((xdm->port == NULL) ||
-            (xdm->port->receiveByte == NULL))
+        if ((server->port == NULL) ||
+            (server->port->receiveByte == NULL))
         {
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
             break;                                      // Exit the loop
         }
 
         /* Receive the byte from the xmodem client */
-        status = xdm->port->receiveByte(xdm, byte, xdm->parent);
+        status = server->port->receiveByte(server, byte);
 
     } while (0);
 
@@ -290,11 +292,11 @@ static XModemServerErr_e xModemServerRxByte(XModemServer_s* const xdm,
 
 /**
  * @brief Transmit a byte to the xmodem client
- * @param[in] xdm - the xmodem server object
+ * @param[in] server - the xmodem server object
  * @param[in] byte - the byte to transmit
  * @return int - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e xModemServerTxByte(XModemServer_s* xdm, uint8_t byte)
+static XModemServerErr_e xModemServerTxByte(XModemServer_s* server, uint8_t byte)
 {
     /* Local var */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;    // Variable to store the status of the operation
@@ -303,22 +305,22 @@ static XModemServerErr_e xModemServerTxByte(XModemServer_s* xdm, uint8_t byte)
     do
     {
         /* Check input parameter */
-        if (xdm == NULL)
+        if (server == NULL)
         {
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
             break;                                      // Exit the loop
         }
 
         /* Check if the byte is valid */
-        if ((xdm->port == NULL) ||
-            (xdm->port->transmitByte == NULL))
+        if ((server->port == NULL) ||
+            (server->port->transmitByte == NULL))
         {
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
             break;                                      // Exit the loop
         }
 
         /* Transmit the byte to the xmodem client */
-        status = xdm->port->transmitByte(xdm, byte, xdm->parent);
+        status = server->port->transmitByte(server, byte);
 
     } while (0);
 
@@ -327,10 +329,10 @@ static XModemServerErr_e xModemServerTxByte(XModemServer_s* xdm, uint8_t byte)
 
 /**
  * @brief Delay for a specified time
- * @param xdm - the xmodem server object
+ * @param server - the xmodem server object
  * @param ms - the time in milliseconds to delay
  */
-static XModemServerErr_e xModemServerDelayS(XModemServer_s* xdm, int ms)
+static XModemServerErr_e xModemServerDelayS(XModemServer_s* server, int ms)
 {
     /* Local var */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;    // Variable to store the status of the operation
@@ -339,7 +341,7 @@ static XModemServerErr_e xModemServerDelayS(XModemServer_s* xdm, int ms)
     do
     {
         /* Check input parameter */
-        if ((xdm == NULL) ||
+        if ((server == NULL) ||
             (ms <= 0))
         {
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
@@ -347,15 +349,15 @@ static XModemServerErr_e xModemServerDelayS(XModemServer_s* xdm, int ms)
         }
 
         /* Check if the delay function is valid */
-        if ((xdm->port == NULL) ||
-            (xdm->port->delayMs == NULL))
+        if ((server->port == NULL) ||
+            (server->port->delayMs == NULL))
         {
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
             break;                                      // Exit the loop
         }
 
         /* Delay for the specified time */
-        status = xdm->port->delayMs(xdm, ms);
+        status = server->port->delayMs(server, ms);
 
     } while (0);
 
@@ -364,11 +366,11 @@ static XModemServerErr_e xModemServerDelayS(XModemServer_s* xdm, int ms)
 
 /**
  * @brief Write data from the xmodem client
- * @param xdm - the xmodem server object
+ * @param server - the xmodem server object
  * @param data - the data to write
  * @param size - the size of the data to write
  */
-static XModemServerErr_e xModemServerWrite(XModemServer_s* xdm,
+static XModemServerErr_e xModemServerWrite(XModemServer_s* server,
                                            uint8_t* data,
                                            int size)
 {
@@ -379,7 +381,7 @@ static XModemServerErr_e xModemServerWrite(XModemServer_s* xdm,
     do
     {
         /* Check input parameter */
-        if ((xdm == NULL) ||
+        if ((server == NULL) ||
             (data == NULL) ||
             (size <= 0))
         {
@@ -388,15 +390,15 @@ static XModemServerErr_e xModemServerWrite(XModemServer_s* xdm,
         }
 
         /* Check if the write function is valid */
-        if ((xdm->port == NULL) ||
-            (xdm->port->writeToMemory == NULL))
+        if ((server->port == NULL) ||
+            (server->port->writeToMemory == NULL))
         {
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error if command is NULL
             break;                                      // Exit the loop
         }
 
         /* Write data from the xmodem client */
-        status = xdm->port->writeToMemory(xdm, data, size);
+        status = server->port->writeToMemory(server, data, size);
 
     } while (0);
 
@@ -419,7 +421,7 @@ static void xModemServerIoFlush(XModemServer_s* server)
         }
 
         /* Flush the buffer */
-        memset(server->io.data, 0, XMODEM_ADU_SIZE);
+        memset(server->io.data, 0, XMODEM_ADU_CRC16_SIZE);
         server->io.size = 0;
 
     } while (0);
@@ -439,6 +441,11 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
     bool isRxByte = false;                              // Variable to store the received byte flag
     bool txIsEnd = false;
 
+    /* Reset the state machine */
+    server->state = XMODEM_SERVER_STATE_START;    // Set the state to start
+    server->currentPacketInd = 0;                 // Set the current packet index to 0
+    server->currentErrCount = 0;                  // Set the current error count to 0
+
     /* Process the state machine */
     do
     {
@@ -449,13 +456,6 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
             {
                 do
                 {
-                    /* Check the error count */
-                    if (server->currentErrCount >= XMODEM_SERVER_MAX_ERR_COUNT)    // Check if the error count is exceeded
-                    {
-                        status = XMODEM_SERVER_TRANSFER_ERR;    // Set status to error if command is NULL
-                        break;                                               // Exit the loop
-                    }
-
 
                     /* Delay */
                     status = xModemServerDelayS(server, XMODEM_START_TIMEOUT_MS);
@@ -474,12 +474,11 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                     /* Check if the byte is received */
                     if (isRxByte == false)    // Check if the byte is received
                     {
-                        /* Upd err count */
-                        server->currentErrCount++;    // Increment the error count
+                        uint8_t byte = (server->xmodem.crcType == XMODEM_CRC_16) ? XMODEM_CONST_C : XMODEM_CONST_NACK;
 
                         /* Send the SOH character */
-                        status = xModemServerTxByte(server, XMODEM_CONST_C);    // Send the SOH character
-                        if (status != XMODEM_SERVER_NO_ERR)                     // Check if the byte is sent successfully
+                        status = xModemServerTxByte(server, byte);    // Send the SOH character
+                        if (status != XMODEM_SERVER_NO_ERR)           // Check if the byte is sent successfully
                         {
                             break;    // Exit the loop
                         }
@@ -494,7 +493,7 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                         break;    // Exit the loop
                     }
 
-                    if(byte != XMODEM_SERVER_STATE_SOH)
+                    if (byte != XMODEM_SERVER_STATE_SOH)
                     {
                         /* Upd err count */
                         server->currentErrCount++;    // Increment the error count
@@ -523,13 +522,6 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
             /* Wait for the SOH character */
             case XMODEM_SERVER_STATE_SOH :
             {
-                /* Check the error count */
-                if (server->currentErrCount >= XMODEM_SERVER_MAX_ERR_COUNT)    // Check if the error count is exceeded
-                {
-                    status = XMODEM_SERVER_TRANSFER_ERR;    // Set status to error if command is NULL
-                    break;                                                // Exit the loop
-                }
-
                 /* Flush xmodem object */
                 xmodemStatus = XModemFlush(&server->xmodem);    // Flush the xmodem object
                 if (xmodemStatus != XMODEM_NO_ERR)              // Check if the xmodem object is flushed successfully
@@ -548,18 +540,18 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                 }
 
                 /* Check if the byte is received */
-                switch(byte)
+                switch (byte)
                 {
-                    case XMODEM_CONST_SOH:
+                    case XMODEM_CONST_SOH :
 
                         /* Save the received byte to the I/O buffer */
                         server->io.data [server->io.size++] = byte;    // Save the received byte to the I/O buffer
 
                         /* Change State */
                         server->state = XMODEM_SERVER_STATE_PACKET_GET;    // Change the state to receive the packet
-                        break;                                               // Exit the loop
+                        break;                                             // Exit the loop
 
-                    case XMODEM_CONST_EOT:
+                    case XMODEM_CONST_EOT :
 
                         /* Change State */
                         status = xModemServerTxByte(server, XMODEM_CONST_ACK);
@@ -572,13 +564,12 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                         server->state = XMODEM_SERVER_STATE_TRANSFER_END;    // Change the state to transfer end
                         break;
 
-
-                    default:
+                    default :
 
                         /* Err upd */
                         server->currentErrCount++;    // Increment the error count
 
-                        break;                                               // Exit the loop
+                        break;    // Exit the loop
                 }
 
                 break;
@@ -596,13 +587,15 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                         break;    // Exit the loop
                     }
 
-
-
                     /* Save the received byte to the I/O buffer */
                     server->io.data [server->io.size++] = byte;    // Save the received byte to the I/O buffer
 
+                    size_t sizeToReceive = (server->xmodem.crcType == XMODEM_CRC_16)
+                                               ? XMODEM_ADU_CRC16_SIZE
+                                               : XMODEM_ADU_CRC8_SIZE;    // Set the size to send
+
                     /* Check if the I/O buffer is full */
-                    if ((server->io.size >= XMODEM_ADU_SIZE))    // Check if the I/O buffer is full
+                    if (server->io.size >= sizeToReceive)    // Check if the I/O buffer is full
                     {
                         server->state = XMODEM_SERVER_STATE_PACKET_PROC;    // Change the state to process the packet
                         break;                                              // Exit the loop
@@ -636,7 +629,7 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                         }
 
                         server->state = XMODEM_SERVER_STATE_SOH;    // Change the state to receive the packet
-                        break;                                             // Exit the loop
+                        break;                                      // Exit the loop
                     }
 
                     /* Get id of packet */
@@ -663,13 +656,13 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                         }
 
                         server->state = XMODEM_SERVER_STATE_SOH;    // Change the state to receive the packet
-                        break;                                             // Exit the loop
+                        break;                                      // Exit the loop
                     }
 
                     /* Get data from pdu */
                     xmodemStatus = XModemPduDataGet(&server->xmodem,
                                                     server->io.data,
-                                                    XMODEM_ADU_SIZE,
+                                                    XMODEM_ADU_CRC16_SIZE,
                                                     &server->io.size);
                     if (xmodemStatus != XMODEM_NO_ERR)    // Check if the id of the packet is received successfully
                     {
@@ -719,6 +712,13 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
             {
                 status = XMODEM_SERVER_TRANSFER_ERR;
             }
+        }
+
+        /* Check the error count */
+        if (server->currentErrCount >= XMODEM_SERVER_MAX_ERR_COUNT)    // Check if the error count is exceeded
+        {
+            status = XMODEM_SERVER_TRANSFER_ERR;    // Set status to error if command is NULL
+            break;                                  // Exit the loop
         }
 
         /* Check status */

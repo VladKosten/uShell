@@ -519,6 +519,56 @@ UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp,
 }
 
 /**
+ * @brief Print raw byte to the uShell vcp object
+ * @param[in] vcp - uShell object to be printed
+ * @param[in] byte - byte to be printed
+ * @param[in] size - size of the byte to be printed
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+UShellVcpErr_e UShellVcpPrintRawByte(UShellVcp_s* const vcp,
+                                     const uint8_t* const byte,
+                                     const size_t size)
+{
+    /* Local variable */
+    UShellVcpErr_e status = USHELL_VCP_NO_ERR;
+
+    do
+    {
+        /* Check input parameters */
+        if ((vcp == NULL) ||
+            (byte == NULL) ||
+            (size == 0U))
+        {
+            /* Input parameters are invalid */
+            USHELL_VCP_ASSERT(0);
+            status = USHELL_VCP_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Lock the print lock */
+        uShellVcpPrintLock(vcp);
+
+        /* Print string to the vcp object */
+        status = uShellVcpPrintBytes(vcp,
+                                     byte,
+                                     size);
+
+        /* Unlock the print lock */
+        uShellVcpPrintUnlock(vcp);
+
+        if (status != USHELL_VCP_NO_ERR)
+        {
+            /* Print failed */
+            USHELL_VCP_ASSERT(0);
+            break;
+        }
+
+    } while (0);
+
+    return status;
+}
+
+/**
  * \brief Scan char from the vcp vcp object
  * \param[in] vcp - vcp object to be scanned
  * \param[in] ch - char to be scanned

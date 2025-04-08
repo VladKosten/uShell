@@ -186,14 +186,26 @@ UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp,
                                   const char ch);
 
 /**
+ * @brief Print raw byte to the uShell vcp object
+ * @param[in] vcp - uShell object to be printed
+ * @param[in] byte - byte to be printed
+ * @param[in] size - size of the byte to be printed
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ */
+UShellVcpErr_e UShellVcpPrintRawByte(UShellVcp_s* const vcp,
+                                     const uint8_t* const byte,
+                                     const size_t size);
+
+/**
  * \brief Scan char from the uShell vcp object
  * \note: This function is blocking and will wait for the character to be received.
  * \param[in] vcp - uShell object to be scanned
  * \param[in] ch - char to be scanned
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpScanChar(UShellVcp_s* const vcp,
-                                 char* const ch);
+UShellVcpErr_e
+UShellVcpScanChar(UShellVcp_s* const vcp,
+                  char* const ch);
 
 /**
  * \brief Scan character from the uShell vcp object in non-blocking mode
