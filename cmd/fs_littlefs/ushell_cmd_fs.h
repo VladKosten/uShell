@@ -171,7 +171,7 @@ typedef struct
 } UShellCmdFsCat_s;
 
 /**
-* @brief Describe UShellCmdFsWrite.
+ * \brief Describe UShellCmdFsWrite.
  */
 typedef struct
 {
@@ -180,7 +180,7 @@ typedef struct
 } UShellCmdFsWrite_s;
 
 /**
-* @brief Describe UShellCmdFsRead.
+ * \brief Describe UShellCmdFsRead.
  */
 typedef struct
 {
@@ -199,8 +199,8 @@ typedef struct
     lfs_file_t* currentFile;
 
     /* Internal use  */
-    XModemServer_s xModemServer;    ///< UShellCmd object (base object)
-    XModemClient_s xModemClient;    ///< UShellCmd object (base object)
+    XModemServer_s xModemServer;           ///< UShellCmd object (base object)
+    XModemClient_s xModemClient;           ///< UShellCmd object (base object)
     char path [USHELL_CMD_FS_MAX_PATH];    ///< Current path
 
     /* Commands */
@@ -230,7 +230,7 @@ extern UShellCmdFs_s uShellCmdFs;    ///< UShellCmd object (base object)
  * \return UShellOsalErr_e - error code
  */
 int UShellCmdFsInit(UShellCmd_s* const rootCmd,
-                    lfs_t*  const lfs,
+                    lfs_t* const lfs,
                     UShellVcp_s* const vcp);
 
 /**

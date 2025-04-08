@@ -93,15 +93,15 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
                                            char* const argv []);
 
 /**
-* @brief Execute the read command.
-* @param[in] cmd - UShellCmd object
-* @param[in] argc - number of arguments
-* @param[in] argv - array of arguments
-* @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Execute the read command.
+ * \param[in] cmd - UShellCmd object
+ * \param[in] argc - number of arguments
+ * \param[in] argv - array of arguments
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
-                                           const int argc,
-                                           char* const argv []);
+                                          const int argc,
+                                          char* const argv []);
 
 /**
  * \brief Delay function for the xmodem server.
@@ -110,57 +110,106 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
  * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
-                                                const int ms);
+                                                      const int ms);
 
 /**
- * @brief TxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to transmit
- * @param[in] parent - pointer to the parent object (optional)
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief TxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to transmit
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
-                                                 const uint8_t byte,
-                                                 void* const parent);
+                                                       const uint8_t byte);
 
 /**
- * @brief RxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to receive
- * @param[in] parent - pointer to the parent object (optional)
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief RxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to receive
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
-                                                 uint8_t* byte,
-                                                 void* const parent);
+                                                       uint8_t* byte);
 
 /**
- * @brief IsRxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] isRx - byte to check
- * @param[in] parent - pointer to the parent object (optional)
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief IsRxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] isRx - byte to check
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
-                                                   bool* isRx,
-                                                   void* const parent);
+                                                         bool* isRx);
 
 /**
- * @brief Write function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] data - data to write
- * @param[in] size - size of the data to write
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief Write function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] data - data to write
+ * \param[in] size - size of the data to write
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
-                       uint8_t* const data,
-                       const int size);
+                                                      uint8_t* const data,
+                                                      const int size);
+
+/**
+ * \brief Check byte is rx
+ * \param client - xmodem client object
+ * \param isRx - buffer to store the rx status
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientIsRxByte(void* client,
+                                                         bool* isRx);
+
+/**
+ * \brief Write function for the xmodem client.
+ * \param client - xmodem client object
+ * \param data - data to write
+ * \param size - size of the data to write
+ * \param usedSize - size of the data written
+ * \param offset - offset to write the data
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientReadFromMemory(void* client,
+                                                               uint8_t* data,
+                                                               const size_t size,
+                                                               size_t* const usedSize,
+                                                               const size_t offset);
+
+/**
+ * \brief Receive byte function for the xmodem client.
+ * \param client - xmodem client object
+ * \param byte - byte to receive
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientRxByte(void* client,
+                                                       uint8_t* byte);
+
+/**
+ * \brief Delay function for the xmodem client.
+ * \param client - xmodem client object
+ * \param ms - delay in milliseconds
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms);
+
+/**
+ * \brief Transmit function for the xmodem client.
+ * \param client - xmodem client object
+ * \param data - data to transmit
+ * \param size - size of the data to transmit
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client,
+                                                         uint8_t* data,
+                                                         int size);
 
 /**
  * \brief UShellCmdFsCd object (base object)
  */
 UShellCmdFs_s uShellCmdFs = {0};
 
+/**
+ * \brief XModem Server Port
+ */
 static XModemServerPort_s uShellCmdFsXModemServerPort =
     {
         .delayMs = uShellCmdFsXModemServerDelay,
@@ -170,14 +219,17 @@ static XModemServerPort_s uShellCmdFsXModemServerPort =
         .isReceivedByte = uShellCmdFsXModemServerIsRxByte,
 };
 
+/**
+ * \brief XModem Client Port
+ */
 static XModemClientPort_s uShellCmdFsXModemClientPort =
-{
-    .delayMs = uShellCmdFsXModemClientDelay,
-    .isReceivedByte = uShellCmdFsXModemClientIsRxByte,
-    .ReadFromMemory = uShellCmdFsXModemClientReadFromMemory,
-    .receiveByte = uShellCmdFsXModemClientRxByte,
-    .transmitByte = uShellCmdFsXModemClientTxByte,
-}
+    {
+        .delayMs = uShellCmdFsXModemClientDelay,
+        .isReceivedByte = uShellCmdFsXModemClientIsRxByte,
+        .readFromMemory = uShellCmdFsXModemClientReadFromMemory,
+        .receiveByte = uShellCmdFsXModemClientRxByte,
+        .transmit = uShellCmdFsXModemClientTransmit,
+};
 
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
@@ -190,7 +242,7 @@ static XModemClientPort_s uShellCmdFsXModemClientPort =
  * \return UShellOsalErr_e - error code
  */
 int UShellCmdFsInit(UShellCmd_s* const rootCmd,
-                    lfs_t*  const lfs,
+                    lfs_t* const lfs,
                     UShellVcp_s* const vcp)
 {
     /* Local variable */
@@ -322,7 +374,7 @@ int UShellCmdFsInit(UShellCmd_s* const rootCmd,
                                   USHELL_CMD_FS_WRITE_NAME,
                                   USHELL_CMD_FS_WRITE_HELP,
                                   uShellCmdFsWriteExec);
-        if( cmdStatus != USHELL_CMD_NO_ERR)
+        if (cmdStatus != USHELL_CMD_NO_ERR)
         {
             USHELL_CMD_FS_ASSERT(0);    // Set status to error if command initialization fails
             status = -8;                // Set status to error
@@ -361,7 +413,7 @@ int UShellCmdFsInit(UShellCmd_s* const rootCmd,
 
         /* Init xmodem command */
         XModemServerErr_e xmodemStatus = XModemServerInit(&uShellCmdFs.xModemServer,
-                                                          &uShellCmdFsXModemPort,
+                                                          &uShellCmdFsXModemServerPort,
                                                           &uShellCmdFs);
         if (xmodemStatus != XMODEM_SERVER_NO_ERR)
         {
@@ -371,7 +423,7 @@ int UShellCmdFsInit(UShellCmd_s* const rootCmd,
         }
 
         XModemClientErr_e xmodemClientStatus = XModemClientInit(&uShellCmdFs.xModemClient,
-                                                                &uShellCmdFsXModemPort,
+                                                                &uShellCmdFsXModemClientPort,
                                                                 &uShellCmdFs);
 
         /* Save the lfs object to the command object */
@@ -872,19 +924,19 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
 }
 
 /**
-* @brief Execute the read command.
-* @param[in] cmd - UShellCmd object
-* @param[in] argc - number of arguments
-* @param[in] argv - array of arguments
-* @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Execute the read command.
+ * \param[in] cmd - UShellCmd object
+ * \param[in] argc - number of arguments
+ * \param[in] argv - array of arguments
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
-                                           const int argc,
-                                           char* const argv [])
+                                          const int argc,
+                                          char* const argv [])
 {
     UShellCmdErr_e status = USHELL_CMD_NO_ERR;
-    const char* fileName = argv[0];
-    char fullPath[USHELL_CMD_FS_MAX_PATH] = {0};
+    const char* fileName = argv [0];
+    char fullPath [USHELL_CMD_FS_MAX_PATH] = {0};
     int statusFs = 0;
     lfs_file_t file;
 
@@ -898,7 +950,7 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
         }
 
         /* Form the full path using the current directory and the provided file name */
-        if (uShellCmdFs.path[strlen(uShellCmdFs.path) - 1] == '/')
+        if (uShellCmdFs.path [strlen(uShellCmdFs.path) - 1] == '/')
             snprintf(fullPath, sizeof(fullPath), "%s%s", uShellCmdFs.path, fileName);
         else
             snprintf(fullPath, sizeof(fullPath), "%s/%s", uShellCmdFs.path, fileName);
@@ -949,7 +1001,7 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
  * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
-                                                const int ms)
+                                                      const int ms)
 {
     /* Local variable */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;      // Variable to store the status of the operation
@@ -976,15 +1028,13 @@ static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
 }
 
 /**
- * @brief TxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to transmit
- * @param[in] parent - pointer to the parent object (optional)
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief TxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to transmit
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
-                                                 const uint8_t byte,
-                                                 void* const parent)
+                                                       const uint8_t byte)
 {
     /* Local variable */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;      // Variable to store the status of the operation
@@ -1019,15 +1069,13 @@ static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
 }
 
 /**
- * @brief RxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to receive
- * @param[in] parent - pointer to the parent object (optional)
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief RxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to receive
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
-                                                 uint8_t* byte,
-                                                 void* const parent)
+                                                       uint8_t* byte)
 
 {
     /* Local variable */
@@ -1065,15 +1113,13 @@ static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
 }
 
 /**
- * @brief IsRxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to check
- * @param[in] parent - pointer to the parent object (optional)
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief IsRxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to check
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
-                                                   bool* isRx,
-                                                   void* const parent)
+                                                         bool* isRx)
 {
     /* Local variable */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;      // Variable to store the status of the operation
@@ -1114,15 +1160,15 @@ static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
 }
 
 /**
- * @brief Write function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] data - data to write
- * @param[in] size - size of the data to write
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief Write function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] data - data to write
+ * \param[in] size - size of the data to write
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
-                                                uint8_t* const data,
-                                                const int size)
+                                                      uint8_t* const data,
+                                                      const int size)
 {
     /* Local variable */
     XModemServerErr_e status = XMODEM_SERVER_NO_ERR;
@@ -1163,6 +1209,235 @@ static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
             status = XMODEM_SERVER_PORT_ERR;
             USHELL_CMD_FS_ASSERT(0);    // Set status to error if file sync fails
             break;                      // Exit the loop
+        }
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * \brief Check byte is rx
+ * \param client - xmodem client object
+ * \param isRx - buffer to store the rx status
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientIsRxByte(void* client,
+                                                         bool* isRx)
+{
+    {
+        /* Local variable */
+        XModemClientErr_e status = XMODEM_SERVER_NO_ERR;               // Variable to store the status of the operation
+        UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;                  // Variable to store the status of the operation
+        XModemClient_s* clientXmodem = (XModemClient_s*) client;       // Cast the xmodem object to UShellCmdFs_s type
+        UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientXmodem->parent;    // Cast the parent object to UShellCmdFs_s type
+        UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;                    // Cast the vcp object to UShellVcp_s type
+        bool empty = false;                                            // Variable to check if the vcp is empty
+
+        do
+        {
+            /* Check input parameter */
+            if ((clientXmodem == NULL) ||
+                (cmd == NULL) ||
+                (vcp == NULL) ||
+                (isRx == NULL))
+            {
+                USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
+                status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
+                break;                                      // Exit the loop
+            }
+
+            /* Send byte */
+            vcpStatus = UShellVcpScanIsEmpty(vcp, &empty);    // Check if the byte is empty from the vcp object
+            if (vcpStatus != USHELL_VCP_NO_ERR)
+            {
+                USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
+                status = XMODEM_SERVER_PORT_ERR;    // Set status to error
+                break;                              // Exit the loop
+            }
+
+            /* Set the isRx flag based on the empty status */
+            *isRx = (empty) ? false : true;    // Set the isRx flag based on the empty status
+
+        } while (0);
+
+        return status;
+    }
+}
+
+/**
+ * \brief Write function for the xmodem client.
+ * \param client - xmodem client object
+ * \param data - data to write
+ * \param size - size of the data to write
+ * \param usedSize - size of the data written
+ * \param offset - offset to write the data
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientReadFromMemory(void* client,
+                                                               uint8_t* data,
+                                                               const size_t size,
+                                                               size_t* const usedSize,
+                                                               const size_t offset)
+{
+    {
+        /* Local variable */
+        XModemClientErr_e status = XMODEM_SERVER_NO_ERR;
+        XModemClient_s* clientXmodem = (XModemClient_s*) client;
+        UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientXmodem->parent;
+        int ret = 0;    // Variable to store the return value of the file write operation
+
+        do
+        {
+            /* Check input parameter */
+            if ((clientXmodem == NULL) ||
+                (cmd == NULL) ||
+                (data == NULL) ||
+                (cmd->currentFile == NULL))
+            {
+                USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
+                status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
+                break;                                      // Exit the loop
+            }
+
+            /* Offset the file pointer to the specified offset */
+            ret = lfs_file_seek(cmd->lfs,
+                                cmd->currentFile,
+                                offset,
+                                LFS_SEEK_SET);
+            if (ret < 0)
+            {
+                status = XMODEM_SERVER_PORT_ERR;
+                USHELL_CMD_FS_ASSERT(0);    // Set status to error if file seek fails
+                break;                      // Exit the loop
+            }
+
+            /* Write received data using LittleFS */
+            ret = lfs_file_read(cmd->lfs,
+                                cmd->currentFile,
+                                data,
+                                size);
+
+            /* Return size of data read */
+            *usedSize = ret;    // Set the used size to the number of bytes read
+
+        } while (0);
+
+        return status;
+    }
+}
+
+/**
+ * \brief Receive byte function for the xmodem client.
+ * \param client - xmodem client object
+ * \param byte - byte to receive
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientRxByte(void* client,
+                                                       uint8_t* byte)
+{
+    /* Local variable */
+    XModemClientErr_e status = XMODEM_SERVER_NO_ERR;               // Variable to store the status of the operation
+    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;                  // Variable to store the status of the operation
+    XModemClient_s* clientXmodem = (XModemClient_s*) client;       // Cast the xmodem object to UShellCmdFs_s type
+    UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientXmodem->parent;    // Cast the parent object to UShellCmdFs_s type
+    UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;                    // Cast the vcp object to UShellVcp_s type
+
+    do
+    {
+        /* Check input parameter */
+        if ((clientXmodem == NULL) ||
+            (cmd == NULL) ||
+            (vcp == NULL) ||
+            (byte == NULL))
+        {
+            USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
+            status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
+            break;                                      // Exit the loop
+        }
+
+        /* Send byte */
+        vcpStatus = UShellVcpScanChar(vcp, byte);    // Receive the byte from the vcp object
+        if (vcpStatus != USHELL_VCP_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
+            status = XMODEM_SERVER_PORT_ERR;    // Set status to error
+            break;                              // Exit the loop
+        }
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * \brief Delay function for the xmodem client.
+ * \param client - xmodem client object
+ * \param ms - delay in milliseconds
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms)
+{
+    /* Local variable */
+    XModemClientErr_e status = XMODEM_SERVER_NO_ERR;               // Variable to store the status of the operation
+    XModemClient_s* clientXModem = (XModemClient_s*) client;       // Cast the xmodem object to UShellCmdFs_s type
+    UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientXModem->parent;    // Cast the parent object to UShellCmdFs_s type
+
+    do
+    {
+        /* Check input parameter */
+        if ((clientXModem == NULL) ||
+            (cmd == NULL))
+        {
+            USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
+            status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
+            break;                                      // Exit the loop
+        }
+
+        /* Delay */
+        vTaskDelay(pdMS_TO_TICKS(ms));    // Delay for the specified time
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * \brief Transmit function for the xmodem client.
+ * \param client - xmodem client object
+ * \param data - data to transmit
+ * \param size - size of the data to transmit
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
+ */
+static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client,
+                                                         uint8_t* data,
+                                                         int size)
+{
+    /* Local variable */
+    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;              // Variable to store the status of the operation
+    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;                 // Variable to store the status of the operation
+    XModemServer_s* clientModem = (XModemServer_s*) client;       // Cast the xmodem object to UShellCmdFs_s type
+    UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientModem->parent;    // Cast the parent object to UShellCmdFs_s type
+    UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;                   // Cast the vcp object to UShellVcp_s type
+    do
+    {
+        /* Check input parameter */
+        if ((clientModem == NULL) ||
+            (cmd == NULL) ||
+            (vcp == NULL))
+        {
+            USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
+            status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
+            break;                                      // Exit the loop
+        }
+
+        /* Send byte */
+        vcpStatus = UShellVcpPrintRawByte(vcp, data, size);    // Send the byte to the vcp object
+        if (vcpStatus != USHELL_VCP_NO_ERR)
+        {
+            USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
+            status = XMODEM_SERVER_PORT_ERR;    // Set status to error
+            break;                              // Exit the loop
         }
 
     } while (0);

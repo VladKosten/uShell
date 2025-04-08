@@ -17,14 +17,19 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * @brief XModem ADU size
+ * \brief XModem ADU with CRC16 size
  */
-#define XMODEM_ADU_SIZE 133U    ///< XModem packet size + header + CRC
+#define XMODEM_ADU_CRC16_SIZE 133U    ///< XModem packet size + header + CRC
 
 /**
- * @brief XModem PDU size
+ * \brief XModem ADU with CRC8 size
  */
-#define XMODEM_PDU_SIZE 128U    ///< XModem packet size
+#define XMODEM_ADU_CRC8_SIZE  132U    ///< XModem packet size + header + CRC
+
+/**
+ * \brief XModem PDU size
+ */
+#define XMODEM_PDU_SIZE       128U    ///< XModem packet size
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
@@ -48,15 +53,15 @@ typedef enum
  */
 typedef enum
 {
-    XMODEM_CONST_SOH = 0x01,     ///< Start of header
-    XMODEM_CONST_STX = 0x02,     ///< Start of text
-    XMODEM_CONST_EOT = 0x04,     ///< End of transmission
-    XMODEM_CONST_ACK = 0x06,     ///< Acknowledge
-    XMODEM_CONST_NACK = 0x15,    ///< Negative acknowledge
-    XMODEM_CONST_CAN = 0x18,     ///< Cancel
-    XMODEM_CONST_ETB = 0x17,     ///< End of transmission block
+    XMODEM_CONST_SOH = 0x01,      ///< Start of header
+    XMODEM_CONST_STX = 0x02,      ///< Start of text
+    XMODEM_CONST_EOT = 0x04,      ///< End of transmission
+    XMODEM_CONST_ACK = 0x06,      ///< Acknowledge
+    XMODEM_CONST_NACK = 0x15,     ///< Negative acknowledge
+    XMODEM_CONST_CAN = 0x18,      ///< Cancel
+    XMODEM_CONST_ETB = 0x17,      ///< End of transmission block
     XMODEM_CONST_C = 0x43,        ///< C character
-    XMODEM_END_OF_FILE = 0x1A,     ///< End of file character
+    XMODEM_END_OF_FILE = 0x1A,    ///< End of file character
 
 } XModemConst_e;
 
@@ -70,6 +75,16 @@ typedef struct
 } XModemPdu_s;
 
 /**
+ * \brief Enumeration of XModem CRC types.
+ */
+typedef enum
+{
+    XMODEM_CRC_8,     ///< CRC-8 checksum type
+    XMODEM_CRC_16,    ///< CRC-16 checksum type
+
+} XModemCrcType_e;
+
+/**
  * \brief Packet structure for XModem protocol.
  */
 typedef struct
@@ -78,7 +93,8 @@ typedef struct
     uint8_t id;          ///< Packet ID
     uint8_t idComp;      ///< Packet ID complement
     XModemPdu_s pdu;     ///< Packet data unit
-    uint16_t crc;        ///< CRC checksum
+    uint8_t crcHigh;     ///< CRC checksum high byte
+    uint8_t crcLow;      ///< CRC checksum low byte
 
 } XModemAdu_s;
 
@@ -87,10 +103,9 @@ typedef struct
  */
 typedef struct
 {
-    /* Mandatory */
-    const void* parent;    ///< Pointer to the parent object
-    XModemAdu_s adu;       ///< Packet structure
-
+    const void* parent;         ///< Pointer to the parent object
+    XModemCrcType_e crcType;    ///< CRC type
+    XModemAdu_s adu;            ///< Packet structure
 } XModem_s;
 
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
@@ -102,7 +117,8 @@ typedef struct
  * \return XModemErr_e - error code
  */
 XModemErr_e XModemInit(XModem_s* const xmodem,
-                       const void* const parent);
+                       const void* const parent,
+                       const XModemCrcType_e crc);
 
 /**
  * \brief Deinitialize the XModem module.
@@ -110,6 +126,15 @@ XModemErr_e XModemInit(XModem_s* const xmodem,
  * \return XModemErr_e - error code
  */
 XModemErr_e XModemDeinit(XModem_s* const xmodem);
+
+/**
+ * \brief Set the XModem CRC type.
+ * \param [in] xmodem - XModem obj to be processed
+ * \param [in] crc - CRC type to be set
+ * \return XModemErr_e - error code
+ */
+XModemErr_e XModemCrcSet(XModem_s* const xmodem,
+                         const XModemCrcType_e crc);
 
 /**
  * \brief Flush the XModem module.
