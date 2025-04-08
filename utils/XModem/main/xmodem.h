@@ -17,17 +17,17 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * @brief XModem ADU with CRC16 size
+ * \brief XModem ADU with CRC16 size
  */
 #define XMODEM_ADU_CRC16_SIZE 133U    ///< XModem packet size + header + CRC
 
 /**
- * @brief XModem ADU with CRC8 size
+ * \brief XModem ADU with CRC8 size
  */
 #define XMODEM_ADU_CRC8_SIZE  132U    ///< XModem packet size + header + CRC
 
 /**
- * @brief XModem PDU size
+ * \brief XModem PDU size
  */
 #define XMODEM_PDU_SIZE       128U    ///< XModem packet size
 
@@ -103,7 +103,6 @@ typedef struct
  */
 typedef struct
 {
-    /* Mandatory */
     const void* parent;         ///< Pointer to the parent object
     XModemCrcType_e crcType;    ///< CRC type
     XModemAdu_s adu;            ///< Packet structure

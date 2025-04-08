@@ -93,11 +93,11 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
                                            char* const argv []);
 
 /**
- * @brief Execute the read command.
- * @param[in] cmd - UShellCmd object
- * @param[in] argc - number of arguments
- * @param[in] argv - array of arguments
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Execute the read command.
+ * \param[in] cmd - UShellCmd object
+ * \param[in] argc - number of arguments
+ * \param[in] argv - array of arguments
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
                                           const int argc,
@@ -113,60 +113,60 @@ static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
                                                       const int ms);
 
 /**
- * @brief TxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to transmit
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief TxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to transmit
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
                                                        const uint8_t byte);
 
 /**
- * @brief RxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to receive
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief RxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to receive
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
                                                        uint8_t* byte);
 
 /**
- * @brief IsRxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] isRx - byte to check
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief IsRxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] isRx - byte to check
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
                                                          bool* isRx);
 
 /**
- * @brief Write function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] data - data to write
- * @param[in] size - size of the data to write
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief Write function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] data - data to write
+ * \param[in] size - size of the data to write
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
                                                       uint8_t* const data,
                                                       const int size);
 
 /**
- * @brief Check byte is rx
- * @param client - xmodem client object
- * @param isRx - buffer to store the rx status
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Check byte is rx
+ * \param client - xmodem client object
+ * \param isRx - buffer to store the rx status
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientIsRxByte(void* client,
                                                          bool* isRx);
 
 /**
- * @brief Write function for the xmodem client.
- * @param client - xmodem client object
- * @param data - data to write
- * @param size - size of the data to write
- * @param usedSize - size of the data written
- * @param offset - offset to write the data
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Write function for the xmodem client.
+ * \param client - xmodem client object
+ * \param data - data to write
+ * \param size - size of the data to write
+ * \param usedSize - size of the data written
+ * \param offset - offset to write the data
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientReadFromMemory(void* client,
                                                                uint8_t* data,
@@ -175,28 +175,28 @@ static XModemClientErr_e uShellCmdFsXModemClientReadFromMemory(void* client,
                                                                const size_t offset);
 
 /**
- * @brief Receive byte function for the xmodem client.
- * @param client - xmodem client object
- * @param byte - byte to receive
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Receive byte function for the xmodem client.
+ * \param client - xmodem client object
+ * \param byte - byte to receive
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientRxByte(void* client,
                                                        uint8_t* byte);
 
 /**
- * @brief Delay function for the xmodem client.
- * @param client - xmodem client object
- * @param ms - delay in milliseconds
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Delay function for the xmodem client.
+ * \param client - xmodem client object
+ * \param ms - delay in milliseconds
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms);
 
 /**
- * @brief Transmit function for the xmodem client.
- * @param client - xmodem client object
- * @param data - data to transmit
- * @param size - size of the data to transmit
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Transmit function for the xmodem client.
+ * \param client - xmodem client object
+ * \param data - data to transmit
+ * \param size - size of the data to transmit
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client,
                                                          uint8_t* data,
@@ -208,7 +208,7 @@ static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client,
 UShellCmdFs_s uShellCmdFs = {0};
 
 /**
- * @brief XModem Server Port
+ * \brief XModem Server Port
  */
 static XModemServerPort_s uShellCmdFsXModemServerPort =
     {
@@ -220,7 +220,7 @@ static XModemServerPort_s uShellCmdFsXModemServerPort =
 };
 
 /**
- * @brief XModem Client Port
+ * \brief XModem Client Port
  */
 static XModemClientPort_s uShellCmdFsXModemClientPort =
     {
@@ -924,11 +924,11 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
 }
 
 /**
- * @brief Execute the read command.
- * @param[in] cmd - UShellCmd object
- * @param[in] argc - number of arguments
- * @param[in] argv - array of arguments
- * @return UShellCmdErr_e - error code. non-zero = an error has occurred;
+ * \brief Execute the read command.
+ * \param[in] cmd - UShellCmd object
+ * \param[in] argc - number of arguments
+ * \param[in] argv - array of arguments
+ * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
                                           const int argc,
@@ -1028,10 +1028,10 @@ static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
 }
 
 /**
- * @brief TxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to transmit
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief TxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to transmit
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
                                                        const uint8_t byte)
@@ -1069,10 +1069,10 @@ static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
 }
 
 /**
- * @brief RxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to receive
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief RxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to receive
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
                                                        uint8_t* byte)
@@ -1113,10 +1113,10 @@ static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
 }
 
 /**
- * @brief IsRxByte function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] byte - byte to check
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief IsRxByte function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] byte - byte to check
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
                                                          bool* isRx)
@@ -1160,11 +1160,11 @@ static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
 }
 
 /**
- * @brief Write function for the xmodem server.
- * @param[in] xmodem - xmodem server object
- * @param[in] data - data to write
- * @param[in] size - size of the data to write
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief Write function for the xmodem server.
+ * \param[in] xmodem - xmodem server object
+ * \param[in] data - data to write
+ * \param[in] size - size of the data to write
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
                                                       uint8_t* const data,
@@ -1217,10 +1217,10 @@ static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
 }
 
 /**
- * @brief Check byte is rx
- * @param client - xmodem client object
- * @param isRx - buffer to store the rx status
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Check byte is rx
+ * \param client - xmodem client object
+ * \param isRx - buffer to store the rx status
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientIsRxByte(void* client,
                                                          bool* isRx)
@@ -1266,13 +1266,13 @@ static XModemClientErr_e uShellCmdFsXModemClientIsRxByte(void* client,
 }
 
 /**
- * @brief Write function for the xmodem client.
- * @param client - xmodem client object
- * @param data - data to write
- * @param size - size of the data to write
- * @param usedSize - size of the data written
- * @param offset - offset to write the data
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Write function for the xmodem client.
+ * \param client - xmodem client object
+ * \param data - data to write
+ * \param size - size of the data to write
+ * \param usedSize - size of the data written
+ * \param offset - offset to write the data
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientReadFromMemory(void* client,
                                                                uint8_t* data,
@@ -1328,10 +1328,10 @@ static XModemClientErr_e uShellCmdFsXModemClientReadFromMemory(void* client,
 }
 
 /**
- * @brief Receive byte function for the xmodem client.
- * @param client - xmodem client object
- * @param byte - byte to receive
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Receive byte function for the xmodem client.
+ * \param client - xmodem client object
+ * \param byte - byte to receive
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientRxByte(void* client,
                                                        uint8_t* byte)
@@ -1371,10 +1371,10 @@ static XModemClientErr_e uShellCmdFsXModemClientRxByte(void* client,
 }
 
 /**
- * @brief Delay function for the xmodem client.
- * @param client - xmodem client object
- * @param ms - delay in milliseconds
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Delay function for the xmodem client.
+ * \param client - xmodem client object
+ * \param ms - delay in milliseconds
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms)
 {
@@ -1403,11 +1403,11 @@ static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms)
 }
 
 /**
- * @brief Transmit function for the xmodem client.
- * @param client - xmodem client object
- * @param data - data to transmit
- * @param size - size of the data to transmit
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Transmit function for the xmodem client.
+ * \param client - xmodem client object
+ * \param data - data to transmit
+ * \param size - size of the data to transmit
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client,
                                                          uint8_t* data,

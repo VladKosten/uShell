@@ -28,49 +28,49 @@
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]=====================================================================
 
 /**
- * @brief Receive a byte from the xmodem client
- * @param[in] xmodem - the xmodem client object
- * @param[in] byte - the buffer to receive the byte
- * @return true -  byte received successfully.
- * @return false - byte not received successfully.
+ * \brief Receive a byte from the xmodem client
+ * \param[in] xmodem - the xmodem client object
+ * \param[in] byte - the buffer to receive the byte
+ * \return true -  byte received successfully.
+ * \return false - byte not received successfully.
  */
 static XModemClientErr_e xModemClientIsRxByte(XModemClient_s* xmodem,
                                               bool* isRxByte);
 
 /**
- * @brief Receive a byte from the xmodem client
- * @param[in] client - the xmodem client object
- * @param[in] byte - the byte to receive
- * @return true -  byte received successfully.
- * @return false - byte not received successfully.
+ * \brief Receive a byte from the xmodem client
+ * \param[in] client - the xmodem client object
+ * \param[in] byte - the byte to receive
+ * \return true -  byte received successfully.
+ * \return false - byte not received successfully.
  */
 static XModemClientErr_e xModemClientRxByte(XModemClient_s* const client,
                                             uint8_t* const byte);
 
 /**
- * @brief Transmit a byte to the xmodem client
- * @param[in] client - the xmodem client object
- * @param[in] byte - the byte to transmit
- * @return int - error code. non-zero = an error has occurred;
+ * \brief Transmit a byte to the xmodem client
+ * \param[in] client - the xmodem client object
+ * \param[in] byte - the byte to transmit
+ * \return int - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e xModemClientTransmit(XModemClient_s* client,
                                               uint8_t* data,
                                               const size_t size);
 
 /**
- * @brief Delay for a specified time
- * @param client - the xmodem client object
- * @param ms - the time in milliseconds to delay
+ * \brief Delay for a specified time
+ * \param client - the xmodem client object
+ * \param ms - the time in milliseconds to delay
  */
 static XModemClientErr_e xModemClientDelayS(XModemClient_s* client,
                                             int ms);
 
 /**
- * @brief Read data from the xmodem client
- * @param client - the xmodem client object
- * @param data - the buffer to read the data
- * @param size - the size of the data to read
- * @param usedSize - the size of the data read
+ * \brief Read data from the xmodem client
+ * \param client - the xmodem client object
+ * \param data - the buffer to read the data
+ * \param size - the size of the data to read
+ * \param usedSize - the size of the data read
  */
 static XModemClientErr_e xModemClientReadFromMemory(XModemClient_s* client,
                                                     uint8_t* data,
@@ -79,15 +79,15 @@ static XModemClientErr_e xModemClientReadFromMemory(XModemClient_s* client,
                                                     const size_t offset);
 
 /**
- * @brief Process the XModem client state machine.
- * @param client - the xmodem client object
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Process the XModem client state machine.
+ * \param client - the xmodem client object
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e xModemClientFSMProc(XModemClient_s* client);
 
 /**
- * @brief Flush the io buffer
- * @param client - the xmodem client obj;
+ * \brief Flush the io buffer
+ * \param client - the xmodem client obj;
  */
 static void xModemClientIoFlush(XModemClient_s* client);
 
@@ -179,9 +179,9 @@ XModemClientErr_e XModemClientDeinit(XModemClient_s* const client)
 }
 
 /**
- * @brief Process the XModem client state machine.
- * @param[in] xmodem - the xmodem client object
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Process the XModem client state machine.
+ * \param[in] xmodem - the xmodem client object
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 XModemClientErr_e XModemClientProc(XModemClient_s* const client)
 {
@@ -213,11 +213,11 @@ XModemClientErr_e XModemClientProc(XModemClient_s* const client)
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
 
 /**
- * @brief Receive a byte from the xmodem client
- * @param[in] xmodem - the xmodem client object
- * @param[in] byte - the buffer to receive the byte
- * @return true -  byte received successfully.
- * @return false - byte not received successfully.
+ * \brief Receive a byte from the xmodem client
+ * \param[in] xmodem - the xmodem client object
+ * \param[in] byte - the buffer to receive the byte
+ * \return true -  byte received successfully.
+ * \return false - byte not received successfully.
  */
 static XModemClientErr_e xModemClientIsRxByte(XModemClient_s* xmodem,
                                               bool* isRxByte)
@@ -253,11 +253,11 @@ static XModemClientErr_e xModemClientIsRxByte(XModemClient_s* xmodem,
 }
 
 /**
- * @brief Receive a byte from the xmodem client
- * @param[in] client - the xmodem client object
- * @param[in] byte - the buffer to receive the byte
- * @return true -  byte received successfully.
- * @return false - byte not received successfully.
+ * \brief Receive a byte from the xmodem client
+ * \param[in] client - the xmodem client object
+ * \param[in] byte - the buffer to receive the byte
+ * \return true -  byte received successfully.
+ * \return false - byte not received successfully.
  */
 static XModemClientErr_e xModemClientRxByte(XModemClient_s* const client,
                                             uint8_t* const byte)
@@ -293,11 +293,11 @@ static XModemClientErr_e xModemClientRxByte(XModemClient_s* const client,
 }
 
 /**
- * @brief Transmit a byte to the xmodem client
- * @param[in] client - the xmodem client object
- * @param[in] data - the data to transmit
- * @param[in] size - the size of the data to transmit
- * @return int - error code. non-zero = an error has occurred;
+ * \brief Transmit a byte to the xmodem client
+ * \param[in] client - the xmodem client object
+ * \param[in] data - the data to transmit
+ * \param[in] size - the size of the data to transmit
+ * \return int - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e xModemClientTransmit(XModemClient_s* client,
                                               uint8_t* data,
@@ -333,9 +333,9 @@ static XModemClientErr_e xModemClientTransmit(XModemClient_s* client,
 }
 
 /**
- * @brief Delay for a specified time
- * @param client - the xmodem client object
- * @param ms - the time in milliseconds to delay
+ * \brief Delay for a specified time
+ * \param client - the xmodem client object
+ * \param ms - the time in milliseconds to delay
  */
 static XModemClientErr_e xModemClientDelayS(XModemClient_s* client, int ms)
 {
@@ -370,11 +370,11 @@ static XModemClientErr_e xModemClientDelayS(XModemClient_s* client, int ms)
 }
 
 /**
- * @brief Read data from the xmodem client
- * @param client - the xmodem client object
- * @param data - the buffer to read the data
- * @param size - the size of the data to read
- * @param usedSize - the size of the data read
+ * \brief Read data from the xmodem client
+ * \param client - the xmodem client object
+ * \param data - the buffer to read the data
+ * \param size - the size of the data to read
+ * \param usedSize - the size of the data read
  */
 static XModemClientErr_e xModemClientReadFromMemory(XModemClient_s* client,
                                                     uint8_t* data,
@@ -415,8 +415,8 @@ static XModemClientErr_e xModemClientReadFromMemory(XModemClient_s* client,
 }
 
 /**
- * @brief Flush the io buffer
- * @param client - the xmodem client obj;
+ * \brief Flush the io buffer
+ * \param client - the xmodem client obj;
  */
 static void xModemClientIoFlush(XModemClient_s* client)
 {
@@ -437,9 +437,9 @@ static void xModemClientIoFlush(XModemClient_s* client)
 }
 
 /**
- * @brief Process the XModem client state machine.
- * @param xmodem - the xmodem client object
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Process the XModem client state machine.
+ * \param xmodem - the xmodem client object
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e xModemClientFSMProc(XModemClient_s* client)
 {

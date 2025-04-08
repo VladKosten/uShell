@@ -28,18 +28,18 @@
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]=====================================================================
 
 /**
- * @brief Calculate the CRC16 of a byte
- * @param[in] crc - the current CRC value
- * @param[in] byte - the byte to calculate the CRC for
- * @return uint16_t - error code. non-zero = an error has occurred;
+ * \brief Calculate the CRC16 of a byte
+ * \param[in] crc - the current CRC value
+ * \param[in] byte - the byte to calculate the CRC for
+ * \return uint16_t - error code. non-zero = an error has occurred;
  */
 static uint16_t xModemCrc16(uint8_t* data, size_t size);
 
 /**
- * @brief Calculate the CRC8 of a byte
- * @param[in] crc - the current CRC value
- * @param[in] byte - the byte to calculate the CRC for
- * @return uint8_t - error code. non-zero = an error has occurred;
+ * \brief Calculate the CRC8 of a byte
+ * \param[in] crc - the current CRC value
+ * \param[in] byte - the byte to calculate the CRC for
+ * \return uint8_t - error code. non-zero = an error has occurred;
  */
 static uint8_t xModemCrc8(uint8_t* data, size_t size);
 
@@ -586,10 +586,10 @@ static uint16_t xModemCrc16(uint8_t* data, size_t size)
 }
 
 /**
- * @brief Calculate the CRC8 of a byte
- * @param[in] crc - the current CRC value
- * @param[in] byte - the byte to calculate the CRC for
- * @return uint8_t - error code. non-zero = an error has occurred;
+ * \brief Calculate the CRC8 of a byte
+ * \param[in] crc - the current CRC value
+ * \param[in] byte - the byte to calculate the CRC for
+ * \return uint8_t - error code. non-zero = an error has occurred;
  */
 static uint8_t xModemCrc8(uint8_t* data, size_t size)
 {

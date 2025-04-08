@@ -28,63 +28,63 @@
 //===============================================================[ INTERNAL FUNCTIONS AND OBJECTS DECLARATION ]=====================================================================
 
 /**
- * @brief Receive a byte from the xmodem client
- * @param[in] xmodem - the xmodem server object
- * @param[in] byte - the buffer to receive the byte
- * @param[in] parent - pointer to the parent object (optional)
- * @return true -  byte received successfully.
- * @return false - byte not received successfully.
+ * \brief Receive a byte from the xmodem server
+ * \param[in] xmodem - the xmodem server object
+ * \param[in] byte - the buffer to receive the byte
+ * \param[in] parent - pointer to the parent object (optional)
+ * \return true -  byte received successfully.
+ * \return false - byte not received successfully.
  */
 static XModemServerErr_e xModemServerIsRxByte(XModemServer_s* server,
                                               bool* isRxByte);
 
 /**
- * @brief Receive a byte from the xmodem client
- * @param[in] server - the xmodem server object
- * @param[in] byte - the byte to receive
- * @return true -  byte received successfully.
- * @return false - byte not received successfully.
+ * \brief Receive a byte from the xmodem server
+ * \param[in] server - the xmodem server object
+ * \param[in] byte - the byte to receive
+ * \return true -  byte received successfully.
+ * \return false - byte not received successfully.
  */
 static XModemServerErr_e xModemServerRxByte(XModemServer_s* const server,
                                             uint8_t* const byte);
 
 /**
- * @brief Transmit a byte to the xmodem client
- * @param[in] server - the xmodem server object
- * @param[in] byte - the byte to transmit
- * @return int - error code. non-zero = an error has occurred;
+ * \brief Transmit a byte to the xmodem server
+ * \param[in] server - the xmodem server object
+ * \param[in] byte - the byte to transmit
+ * \return int - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e xModemServerTxByte(XModemServer_s* server,
                                             uint8_t byte);
 
 /**
- * @brief Delay for a specified time
- * @param server - the xmodem server object
- * @param ms - the time in milliseconds to delay
+ * \brief Delay for a specified time
+ * \param server - the xmodem server object
+ * \param ms - the time in milliseconds to delay
  */
 static XModemServerErr_e xModemServerDelayS(XModemServer_s* server,
                                             int ms);
 
 /**
- * @brief Write data from the xmodem client
- * @param server - the xmodem server object
- * @param data - the data to write
- * @param size - the size of the data to write
+ * \brief Write data from the xmodem server
+ * \param server - the xmodem server object
+ * \param data - the data to write
+ * \param size - the size of the data to write
  */
 static XModemServerErr_e xModemServerWrite(XModemServer_s* server,
                                            uint8_t* data,
                                            int size);
 
 /**
- * @brief Process the XModem server state machine.
- * @param server - the xmodem server object
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief Process the XModem server state machine.
+ * \param server - the xmodem server object
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server);
 
 /**
- * @brief Flush the io buffer
- * @param server - the xmodem server obj;
+ * \brief Flush the io buffer
+ * \param server - the xmodem server obj;
  */
 static void xModemServerIoFlush(XModemServer_s* server);
 
@@ -176,9 +176,9 @@ XModemServerErr_e XModemServerDeinit(XModemServer_s* const server)
 }
 
 /**
- * @brief Process the XModem server state machine.
- * @param[in] xmodem - the xmodem server object
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief Process the XModem server state machine.
+ * \param[in] xmodem - the xmodem server object
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 XModemServerErr_e XModemServerProc(XModemServer_s* const xmodem)
 {
@@ -210,12 +210,12 @@ XModemServerErr_e XModemServerProc(XModemServer_s* const xmodem)
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
 
 /**
- * @brief Receive a byte from the xmodem client
- * @param[in] xmodem - the xmodem server object
- * @param[in] byte - the buffer to receive the byte
- * @param[in] parent - pointer to the parent object (optional)
- * @return true -  byte received successfully.
- * @return false - byte not received successfully.
+ * \brief Receive a byte from the xmodem server
+ * \param[in] xmodem - the xmodem server object
+ * \param[in] byte - the buffer to receive the byte
+ * \param[in] parent - pointer to the parent object (optional)
+ * \return true -  byte received successfully.
+ * \return false - byte not received successfully.
  */
 static XModemServerErr_e xModemServerIsRxByte(XModemServer_s* xmodem,
                                               bool* isRxByte)
@@ -242,7 +242,7 @@ static XModemServerErr_e xModemServerIsRxByte(XModemServer_s* xmodem,
             break;                                      // Exit the loop
         }
 
-        /* Receive the byte from the xmodem client */
+        /* Receive the byte from the xmodem server */
         status = xmodem->port->isReceivedByte(xmodem, isRxByte);
 
     } while (0);
@@ -251,11 +251,11 @@ static XModemServerErr_e xModemServerIsRxByte(XModemServer_s* xmodem,
 }
 
 /**
- * @brief Receive a byte from the xmodem client
- * @param[in] server - the xmodem server object
- * @param[in] byte - the buffer to receive the byte
- * @return true -  byte received successfully.
- * @return false - byte not received successfully.
+ * \brief Receive a byte from the xmodem server
+ * \param[in] server - the xmodem server object
+ * \param[in] byte - the buffer to receive the byte
+ * \return true -  byte received successfully.
+ * \return false - byte not received successfully.
  */
 static XModemServerErr_e xModemServerRxByte(XModemServer_s* const server,
                                             uint8_t* const byte)
@@ -282,7 +282,7 @@ static XModemServerErr_e xModemServerRxByte(XModemServer_s* const server,
             break;                                      // Exit the loop
         }
 
-        /* Receive the byte from the xmodem client */
+        /* Receive the byte from the xmodem server */
         status = server->port->receiveByte(server, byte);
 
     } while (0);
@@ -291,10 +291,10 @@ static XModemServerErr_e xModemServerRxByte(XModemServer_s* const server,
 }
 
 /**
- * @brief Transmit a byte to the xmodem client
- * @param[in] server - the xmodem server object
- * @param[in] byte - the byte to transmit
- * @return int - error code. non-zero = an error has occurred;
+ * \brief Transmit a byte to the xmodem server
+ * \param[in] server - the xmodem server object
+ * \param[in] byte - the byte to transmit
+ * \return int - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e xModemServerTxByte(XModemServer_s* server, uint8_t byte)
 {
@@ -319,7 +319,7 @@ static XModemServerErr_e xModemServerTxByte(XModemServer_s* server, uint8_t byte
             break;                                      // Exit the loop
         }
 
-        /* Transmit the byte to the xmodem client */
+        /* Transmit the byte to the xmodem server */
         status = server->port->transmitByte(server, byte);
 
     } while (0);
@@ -328,9 +328,9 @@ static XModemServerErr_e xModemServerTxByte(XModemServer_s* server, uint8_t byte
 }
 
 /**
- * @brief Delay for a specified time
- * @param server - the xmodem server object
- * @param ms - the time in milliseconds to delay
+ * \brief Delay for a specified time
+ * \param server - the xmodem server object
+ * \param ms - the time in milliseconds to delay
  */
 static XModemServerErr_e xModemServerDelayS(XModemServer_s* server, int ms)
 {
@@ -365,10 +365,10 @@ static XModemServerErr_e xModemServerDelayS(XModemServer_s* server, int ms)
 }
 
 /**
- * @brief Write data from the xmodem client
- * @param server - the xmodem server object
- * @param data - the data to write
- * @param size - the size of the data to write
+ * \brief Write data from the xmodem server
+ * \param server - the xmodem server object
+ * \param data - the data to write
+ * \param size - the size of the data to write
  */
 static XModemServerErr_e xModemServerWrite(XModemServer_s* server,
                                            uint8_t* data,
@@ -397,7 +397,7 @@ static XModemServerErr_e xModemServerWrite(XModemServer_s* server,
             break;                                      // Exit the loop
         }
 
-        /* Write data from the xmodem client */
+        /* Write data from the xmodem server */
         status = server->port->writeToMemory(server, data, size);
 
     } while (0);
@@ -406,8 +406,8 @@ static XModemServerErr_e xModemServerWrite(XModemServer_s* server,
 }
 
 /**
- * @brief Flush the io buffer
- * @param server - the xmodem server obj;
+ * \brief Flush the io buffer
+ * \param server - the xmodem server obj;
  */
 static void xModemServerIoFlush(XModemServer_s* server)
 {
@@ -428,9 +428,9 @@ static void xModemServerIoFlush(XModemServer_s* server)
 }
 
 /**
- * @brief Process the XModem server state machine.
- * @param xmodem - the xmodem server object
- * @return XModemServerErr_e - error code. non-zero = an error has occurred;
+ * \brief Process the XModem server state machine.
+ * \param xmodem - the xmodem server object
+ * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
 static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
 {
@@ -622,7 +622,7 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                         server->currentErrCount++;    // Increment the error count
 
                         /* Send NAK*/
-                        status = xModemServerTxByte(server, XMODEM_CONST_NACK);    // Send NAK to the client
+                        status = xModemServerTxByte(server, XMODEM_CONST_NACK);    // Send NAK to the server
                         if (status != XMODEM_SERVER_NO_ERR)                        // Check if the byte is sent successfully
                         {
                             break;    // Exit the loop
@@ -649,7 +649,7 @@ static XModemServerErr_e xModemServerFSMProc(XModemServer_s* server)
                         server->currentErrCount++;    // Increment the error count
 
                         /* Send NAK*/
-                        status = xModemServerTxByte(server, XMODEM_CONST_NACK);    // Send NAK to the client
+                        status = xModemServerTxByte(server, XMODEM_CONST_NACK);    // Send NAK to the server
                         if (status != XMODEM_SERVER_NO_ERR)                        // Check if the byte is sent successfully
                         {
                             break;    // Exit the loop

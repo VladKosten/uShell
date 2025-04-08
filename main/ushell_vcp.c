@@ -519,11 +519,11 @@ UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp,
 }
 
 /**
- * @brief Print raw byte to the uShell vcp object
- * @param[in] vcp - uShell object to be printed
- * @param[in] byte - byte to be printed
- * @param[in] size - size of the byte to be printed
- * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * \brief Print raw byte to the uShell vcp object
+ * \param[in] vcp - uShell object to be printed
+ * \param[in] byte - byte to be printed
+ * \param[in] size - size of the byte to be printed
+ * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
 UShellVcpErr_e UShellVcpPrintRawByte(UShellVcp_s* const vcp,
                                      const uint8_t* const byte,

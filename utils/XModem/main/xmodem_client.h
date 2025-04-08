@@ -18,14 +18,14 @@ extern "C" {
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
- * @brief XModem client max err
+ * \brief XModem client max err
  */
 #ifndef XMODEM_CLIENT_MAX_ERR_COUNT
     #define XMODEM_CLIENT_MAX_ERR_COUNT 5U    ///< Maximum number of errors before aborting the transfer
 #endif
 
 /**
- * @brief XModem start timeout
+ * \brief XModem start timeout
  */
 #ifndef XMODEM_CLIENT_START_TIMEOUT_MS
     #define XMODEM_CLIENT_START_TIMEOUT_MS 200U    ///< Timeout for the start of the transfer
@@ -62,8 +62,8 @@ typedef size_t XModemClientErrCount_t;    ///< Error count type
 typedef size_t XModemClientSize_t;    ///< Size type
 
 /**
- * @brief States for the XModem client state machine.
- * @note The XMODEM_STATE_COUNT value represents the total number of states.
+ * \brief States for the XModem client state machine.
+ * \note The XMODEM_STATE_COUNT value represents the total number of states.
  */
 typedef enum
 {
@@ -75,7 +75,7 @@ typedef enum
 } XModemClientState_e;
 
 /**
- * @brief Port table for the xmodem client
+ * \brief Port table for the xmodem client
  */
 typedef struct
 {
@@ -138,9 +138,9 @@ XModemClientErr_e XModemClientInit(XModemClient_s* const client,
 XModemClientErr_e XModemClientDeinit(XModemClient_s* const client);
 
 /**
- * @brief Process the XModem client state machine.
- * @param[in] xmodem - the xmodem client object
- * @return XModemClientErr_e - error code. non-zero = an error has occurred;
+ * \brief Process the XModem client state machine.
+ * \param[in] xmodem - the xmodem client object
+ * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 XModemClientErr_e XModemClientProc(XModemClient_s* const client);
 
