@@ -10,6 +10,16 @@
 
 #include "ushell_cmd_whoami.h"
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
+/**
+ * \brief Assert macro for the whoami module.
+ */
+#ifndef USHELL_CMD_WHOAMI_ASSERT
+    #ifdef USHELL_ASSERT
+        #define USHELL_CMD_WHOAMI_ASSERT(cond) USHELL_ASSERT(cond)
+    #else
+        #define USHELL_CMD_FS_ASSERT(cond)
+    #endif
+#endif
 
 //====================================================================[ INTERNAL DATA TYPES DEFINITIONS ]===========================================================================
 
@@ -23,31 +33,41 @@ UShellCmdWhoAmI_s uShellCmdWhoAmI = {0};    ///< UShellCmdWhoAmI object (base ob
 /**
  * \brief Execute the whoami command.
  * \param cmd - UShellCmd object
+ * \param readSocket - UShell socket object for reading
+ * \param writeSocket - UShell socket object for writing
  * \param argc - number of arguments
  * \param argv - array of arguments
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdWhoAmIExec(void* const cmd,
+                                          UShellSocket_s* const readSocket,
+                                          UShellSocket_s* const writeSocket,
                                           const int argc,
                                           char* const argv []);
 
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
 /**
- * \brief Initialize the UShell  module.
- * \param [in] none
+ * \brief Initialize the UShell  whoami module.
+ * \param [in] rootCmd - The first cmd in the list of commands to be initialized
  * \param [out] none
  * \return UShellOsalErr_e - error code
  */
-int UShellCmdWhoAmIInit(void)
+int UShellCmdWhoAmIInit(UShellCmd_s* rootCmd)
 {
-
     /* Local variable */
     int status = 0;                                  // Variable to store the status of the operation
     UShellCmdErr_e cmdStatus = USHELL_CMD_NO_ERR;    // Variable to store command status
 
     do
     {
+        /* Check input */
+        if (rootCmd == NULL)
+        {
+            USHELL_CMD_WHOAMI_ASSERT(0);    // Set status to error if root command is NULL
+            status = -1;                    // Set status to error if root command is NULL
+            break;                          // Exit the loop
+        }
 
         /* Initialize the UShellCmdWhoAmI object */
         memset(&uShellCmdWhoAmI, 0, sizeof(uShellCmdWhoAmI));
@@ -59,8 +79,18 @@ int UShellCmdWhoAmIInit(void)
                                   uShellCmdWhoAmIExec);
         if (cmdStatus != USHELL_CMD_NO_ERR)
         {
-            status = -2;    // Set status to error if command initialization fails
-            break;          // Exit the loop
+            USHELL_CMD_WHOAMI_ASSERT(0);    // Set status to error if command initialization fails
+            status = -2;                    // Set status to error if command initialization fails
+            break;                          // Exit the loop
+        }
+
+        /* Add cmd to root */
+        cmdStatus = UShellCmdListAdd(rootCmd, &uShellCmdWhoAmI.cmd);
+        if (cmdStatus != USHELL_CMD_NO_ERR)
+        {
+            USHELL_CMD_WHOAMI_ASSERT(0);    // Set status to error if command attachment fails
+            status = -3;                    // Set status to error if command attachment fails
+            break;                          // Exit the loop
         }
 
     } while (0);
@@ -69,7 +99,7 @@ int UShellCmdWhoAmIInit(void)
 }
 
 /**
- * \brief Deinitialize the UShell  module.
+ * \brief Deinitialize the UShell cmd
  * \param [in] none
  * \param [out] none
  * \return UShellOsalErr_e - error code
@@ -86,8 +116,9 @@ int UShellCmdWhoAmIDeinit()
         cmdStatus = UShellCmdDeinit(&uShellCmdWhoAmI.cmd);
         if (cmdStatus != USHELL_CMD_NO_ERR)
         {
-            status = -1;    // Set status to error if command deinitialization fails
-            break;          // Exit the loop
+            USHELL_CMD_WHOAMI_ASSERT(0);    // Set status to error if command deinitialization fails
+            status = -1;                    // Set status to error if command deinitialization fails
+            break;                          // Exit the loop
         }
 
         /* Remove the UShellCmdWhoAmI object from the list */
@@ -101,23 +132,28 @@ int UShellCmdWhoAmIDeinit()
 //============================================================================ [PRIVATE FUNCTIONS ]=================================================================================
 
 /**
- * \brief Execute the help command.
+ * \brief Execute the whoami command.
  * \param cmd - UShellCmd object
  * \param argc - number of arguments
  * \param argv - array of arguments
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdWhoAmIExec(void* const cmd,
+                                          UShellSocket_s* const readSocket,
+                                          UShellSocket_s* const writeSocket,
                                           const int argc,
                                           char* const argv [])
 {
     /* Local variable */
-    UShellCmdErr_e status = USHELL_CMD_NO_ERR;    // Variable to store command status
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;                // Variable to store command status
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store socket status
+    (void) socketStatus;                                      // Unused variable
 
     do
     {
         /* Check input parameter */
-        if ((cmd == NULL))
+        if ((cmd == NULL) ||
+            (cmd != &uShellCmdWhoAmI.cmd))
         {
             status = USHELL_CMD_INVALID_ARGS_ERR;    // Set status to error if command is NULL
             break;                                   // Exit the loop
@@ -126,13 +162,20 @@ static UShellCmdErr_e uShellCmdWhoAmIExec(void* const cmd,
         /* We dont need arg */
         if (argc > 0)
         {
-            printf("whoiam : Invalid arguments\n ");    // Print error message for invalid arguments
-            break;                                        // Exit the loop
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "whoiam : Invalid arguments\n ");    // Print error message for invalid arguments
+            USHELL_CMD_WHOAMI_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);       // Set status to error if socket write fails
+            break;                                                                // Exit the loop
         }
 
         /* WhoAmI the screen */
-        printf("System Name: %s", USHELL_CMD_WHOAMI_SYSTEM_NAME);          // Print system name
-        printf("System Version: %s", USHELL_CMD_WHOAMI_SYSTEM_VERSION);    // Print system version
+        /* WhoAmI the screen */
+        socketStatus = UShellSocketPrint(writeSocket,
+                                         "Device: %s\n"
+                                         "Version: %s\n",
+                                         USHELL_CMD_WHOAMI_DEVICE_NAME,
+                                         USHELL_CMD_WHOAMI_DEVICE_VERSION);    // Print device name and version
+        USHELL_CMD_WHOAMI_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);        // Set status to error if socket write fails
 
     } while (0);
 

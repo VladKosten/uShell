@@ -17,6 +17,7 @@ extern "C" {
 #include "ushell_hal.h"
 #include "ushell_osal.h"
 #include "ushell_cfg.h"
+#include "ushell_socket.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -52,7 +53,7 @@ extern "C" {
  * \brief Timeout for tx operation in the uShell VCP.
  */
 #ifndef USHELL_VCP_TX_TIMEOUT_MS
-    #define USHELL_VCP_TX_TIMEOUT_MS 3000U
+    #define USHELL_VCP_TX_TIMEOUT_MS 500U
 #endif
 
 /**
@@ -83,6 +84,13 @@ extern "C" {
     #define USHELL_VCP_TIMER_INSPECT_PERIOD_MS 1000U
 #endif
 
+/**
+ * \brief Maximum number of active sockets in the uShell VCP for write operations.
+ */
+#ifndef USHELL_VCP_ACTIVE_SESSION_MAX
+    #define USHELL_VCP_ACTIVE_SESSION_MAX 6U
+#endif
+
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
 
 /**
@@ -101,9 +109,20 @@ typedef enum
     USHELL_VCP_PORT_ERR,            ///< Exit: error - port error (e.g. port layer error)
     USHELL_VCP_XFER_ERR,            ///< Exit: error - transfer error
     USHELL_VCP_TIMEOUT_ERR,         ///< Exit: error - timeout error
+    USHELL_VCP_SESSION_SLOT_ERR,    ///< Exit: error - session slot error
     USHELL_VCP_EMPTY_ERR,           ///< Exit: error - empty buffer error
 
 } UShellVcpErr_e;
+
+/**
+ * \brief Enumeration of direction types
+ */
+typedef enum
+{
+    USHELL_VCP_DIR_READ = 0,    ///< Input type (Scan type)
+    USHELL_VCP_DIR_WRITE        ///< Output type (Print type)
+
+} UShellVcpDirect_e;
 
 /**
  * \brief Description of the uShell VCP IO object
@@ -115,6 +134,30 @@ typedef struct
     size_t ind;                                         ///< Size of the buffer
 
 } UShellVcpIo_s;
+
+/**
+ * \brief Description of the uShell VCP session parameter object
+ * \note This object is used to store the session parameter for the uShell VCP object
+ */
+typedef struct
+{
+    void* owner;               ///< Owner of the session
+    UShellVcpDirect_e type;    ///< Type of the socket (input or/and output)
+
+} UShellVcpSessionParam_s;
+
+/**
+ * \brief Description of the uShell VCP session object
+ * \note This object is used to store the session for the uShell VCP object
+ */
+typedef struct
+{
+    UShellVcpSessionParam_s param;          ///< Session parameter object
+    UShellOsalStreamBuffHandle_t stream;    ///< Stream object for the uShell VCP object
+    UShellSocket_s socket;                  ///< Read socket object
+    bool used;                              ///< Flag to indicate if the session is used
+
+} UShellVcpSession_s;
 
 /**
  * \brief Description of the uShell VCP object
@@ -131,8 +174,9 @@ typedef struct
     const UShellHal_s* hal;      ///< HAL object
 
     /* Internal use  */
-    UShellVcpIo_s io;     ///< IO object
-    bool usedForStdIO;    ///< Flag to indicate if the object is used for stdio (ONLY ONE INSTANCE CAN BE USED FOR STDIO)
+    UShellVcpSession_s session [USHELL_VCP_ACTIVE_SESSION_MAX];    ///< Session object for the uShell VCP object
+    UShellVcpIo_s io;                                              ///< IO object
+    bool usedForStdIO;                                             ///< Flag to indicate
 
 } UShellVcp_s;
 
@@ -165,79 +209,24 @@ UShellVcpErr_e UShellVcpInit(UShellVcp_s* const vcp,
 UShellVcpErr_e UShellVcpDeInit(UShellVcp_s* const vcp);
 
 /**
- * \brief Print string to the uShell vcp object
- * \note This function is blocking and will wait for the string to be received.
- * \param[in] vcp - uShell object to be printed
- * \param[in] str - string to be printed
- * \param[out] none
+ * \brief Open a session for the uShell vcp object
+ * \param[in] vcp - uShell object to be opened
+ * \param[in] param - session parameter object
+ * \param[in] socket - socket to read/write data
  * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintStr(UShellVcp_s* const vcp,
-                                 const char* const str);
+UShellVcpErr_e UShellVcpSessionOpen(UShellVcp_s* const vcp,
+                                    const UShellVcpSessionParam_s param,
+                                    UShellSocket_s** const socket);
 
 /**
- * \brief Print char to the uShell vcp object
- * \note This function is blocking and will wait for the string to be received.
- * \param vcp - uShell object to be printed
- * \param ch - char to be printed
- * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
+ * @brief Close a session for the uShell vcp object
+ * @param[in] vcp - uShell object to be closed
+ * @param[in] param - session parameter object
+ * @return UShellVcpErr_e - error code. non-zero = an error has occurred;
  */
-UShellVcpErr_e UShellVcpPrintChar(UShellVcp_s* const vcp,
-                                  const char ch);
-
-/**
- * \brief Print raw byte to the uShell vcp object
- * \param[in] vcp - uShell object to be printed
- * \param[in] byte - byte to be printed
- * \param[in] size - size of the byte to be printed
- * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
- */
-UShellVcpErr_e UShellVcpPrintRawByte(UShellVcp_s* const vcp,
-                                     const uint8_t* const byte,
-                                     const size_t size);
-
-/**
- * \brief Scan char from the uShell vcp object
- * \note: This function is blocking and will wait for the character to be received.
- * \param[in] vcp - uShell object to be scanned
- * \param[in] ch - char to be scanned
- * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
- */
-UShellVcpErr_e
-UShellVcpScanChar(UShellVcp_s* const vcp,
-                  char* const ch);
-
-/**
- * \brief Scan character from the uShell vcp object in non-blocking mode
- * \note: This function is non-blocking and will return immediately.
- * \note: This function will return USHELL_VCP_EMPTY_ERR if no character is available.
- * \param[in] vcp - uShell object to be scanned
- * \param[in] ch - character to be scanned
- * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
- */
-UShellVcpErr_e UShellVcpScanCharNonBlock(UShellVcp_s* const vcp,
-                                         char* const ch);
-
-/**
- * \brief Scan string from the uShell vcp object
- * \note: This function is blocking and will wait for the string to be received.
- * \param[in] vcp - uShell object to be scanned
- * \param[in] str - string to be scanned
- * \param[in] size - size of the string to be scanned
- * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
- */
-UShellVcpErr_e UShellVcpScanStr(UShellVcp_s* const vcp,
-                                char* const str,
-                                const size_t maxSize);
-
-/**
- * \brief Check if the uShell vcp object is empty
- * \param vcp - uShell object to be checked
- * \param isEmpty - pointer to store the result indicating if the object is empty
- * \return UShellVcpErr_e - error code. non-zero = an error has occurred;
- */
-UShellVcpErr_e UShellVcpScanIsEmpty(UShellVcp_s* const vcp,
-                                    bool* const isEmpty);
+UShellVcpErr_e UShellVcpSessionClose(UShellVcp_s* const vcp,
+                                     const UShellVcpSessionParam_s param);
 
 #ifdef __cplusplus
 }

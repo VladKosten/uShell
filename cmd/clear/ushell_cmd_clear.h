@@ -39,17 +39,12 @@ typedef struct
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
- * \brief UShellCmdClear object (base object)
- */
-extern UShellCmdClear_s uShellCmdClear;
-
-/**
  * \brief Initialize the UShell command clear module.
- * \param [in] none
+ * \param [in] rootCmd - The first cmd in the list of commands to be initialized
  * \param [out] none
  * \return UShellOsalErr_e - error code
  */
-int UShellCmdClearInit(void);
+int UShellCmdClearInit(UShellCmd_s* rootCmd);
 
 /**
  * \brief Deinitialize the UShell command clear module.

@@ -54,8 +54,8 @@ static void uShellCmdUnlock(UShellCmd_s* const cmd);
  * \return UShellOsalErr_e - error code
  */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
-                             char* const name,
-                             UShellCmdHelp_t* const help,
+                             UShellCmdName_t name,
+                             UShellCmdHelp_t help,
                              UShellCmdExec_f* const execFunc)
 {
 
@@ -81,7 +81,7 @@ UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
         cmd->name = name;
 
         /* Set the help string */
-        cmd->help = help;
+        cmd->help = (UShellCmdHelp_t) help;
 
         /* Set the portable structure */
         cmd->execFunc = execFunc;
@@ -179,11 +179,15 @@ UShellCmdErr_e UShellCmdHookTableSet(UShellCmd_s* const cmd,
 /**
  * \brief Execute the cmd
  * \param[in] cmd - UShellCmd obj to be executed
+ * \param[in] readSocket - socket to read from
+ * \param[in] writeSocket - socket to write to
  * \param[in] argc - number of arguments
  * \param[in] argv - array of arguments
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
+                             UShellSocket_s* const readSocket,
+                             UShellSocket_s* const writeSocket,
                              const int argc,
                              char* const argv [])
 {
@@ -207,7 +211,7 @@ UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
         do
         {
             /* Execute the cmd */
-            status = cmd->execFunc(cmd, argc, argv);
+            status = cmd->execFunc(cmd, readSocket, writeSocket, argc, argv);
             if (status != USHELL_CMD_NO_ERR)
             {
                 break;

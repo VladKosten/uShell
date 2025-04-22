@@ -15,6 +15,7 @@ extern "C" {
 #include <stdio.h>
 
 #include "ushell_cmd.h"
+#include "ushell_cfg.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -46,8 +47,8 @@ typedef struct
 extern UShellCmdHelp_s uShellCmdHelp;
 
 /**
- * \brief Initialize the UShell  module.
- * \param [in] rootCmd - The first cmd in the list of commands to be initialized
+ * \brief Initialize the UShell cmd help module.
+ * \param [in] rootCmd - The first cmd in the list of commands to be init (base its help)
  * \param [out] none
  * \return UShellOsalErr_e - error code
  */

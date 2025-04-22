@@ -605,7 +605,6 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
         if (asfStatus != size)
         {
             /* Write failed */
-            USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_PORT_ERR;
             break;
         }

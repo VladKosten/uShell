@@ -45,7 +45,7 @@ extern "C" {
  * \brief UShell OSAL stream buffer slots number
  */
 #ifndef USHELL_OSAL_STREAM_BUFF_SLOTS_NUM
-    #define USHELL_OSAL_STREAM_BUFF_SLOTS_NUM (2)
+    #define USHELL_OSAL_STREAM_BUFF_SLOTS_NUM (6)
 #endif
 
 /**
@@ -978,6 +978,14 @@ typedef struct
                                                const UShellOsalEventGroupHandle_t eventGroupHandle,
                                                UShellOsalEventGroupBits_e* const bitsActive);
 
+    /**
+     * \brief Get the current time in milliseconds.
+     * \param[in] osal Pointer to the OSAL instance.
+     * \param[out] timeMs Pointer to store the current time in milliseconds.
+     * \return Error code indicating the result of the operation.
+     */
+    UShellOsalErr_e (*timeMsGet)(void* const osal, UShellOsalTimeMs_t* const timeMs);
+
 } UShellOsalPortable_s;
 
 /**
@@ -1549,6 +1557,15 @@ UShellOsalErr_e UShellEventGroupBitsWait(UShellOsal_s* const osal,
 UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
                                               const UShellOsalEventGroupHandle_t eventGroupHandle,
                                               UShellOsalEventGroupBits_e* const bitsActive);
+
+/**
+ * @brief Get time in milliseconds
+ * @param[in] osal - pointer to OSAL instance
+ * @param[in] timeMs - pointer to an object into which the current time in milliseconds will be copied
+ * @return PiTalkVoiceOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimeMsGet(UShellOsal_s* const osal,
+                                    UShellOsalTimeMs_t* const timeMs);
 
 /**
  * \brief Get an event group handle of the given OSAL object

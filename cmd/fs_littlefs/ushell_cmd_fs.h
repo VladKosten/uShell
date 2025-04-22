@@ -20,7 +20,6 @@ extern "C" {
 #include "ushell_cmd.h"
 #include "xmodem_server.h"
 #include "xmodem_client.h"
-#include "ushell_vcp.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -194,7 +193,6 @@ typedef struct
 typedef struct
 {
     /* Dependent objects */
-    UShellVcp_s* vcp;
     lfs_t* lfs;    ///< LittleFS object
     lfs_file_t* currentFile;
 
@@ -202,15 +200,13 @@ typedef struct
     XModemServer_s xModemServer;           ///< UShellCmd object (base object)
     XModemClient_s xModemClient;           ///< UShellCmd object (base object)
     char path [USHELL_CMD_FS_MAX_PATH];    ///< Current path
-
-    /* Commands */
-    UShellCmdFsLs_s cmdLs;          ///< UShellCmd object (base object)
-    UShellCmdFsCd_s cmdCd;          ///< UShellCmd object (base object)
-    UShellCmdFsRm_s cmdRm;          ///< UShellCmd object (base object)
-    UShellCmdFsMkdir_s cmdMkdir;    ///< UShellCmd object (base object)
-    UShellCmdFsCat_s cmdCat;        ///< UShellCmd object (base object)
-    UShellCmdFsWrite_s cmdWrite;    ///< UShellCmd object (base object)
-    UShellCmdFsRead_s cmdRead;      ///< UShellCmd object (base object)
+    UShellCmdFsLs_s cmdLs;                 ///< UShellCmd object (base object)
+    UShellCmdFsCd_s cmdCd;                 ///< UShellCmd object (base object)
+    UShellCmdFsRm_s cmdRm;                 ///< UShellCmd object (base object)
+    UShellCmdFsMkdir_s cmdMkdir;           ///< UShellCmd object (base object)
+    UShellCmdFsCat_s cmdCat;               ///< UShellCmd object (base object)
+    UShellCmdFsWrite_s cmdWrite;           ///< UShellCmd object (base object)
+    UShellCmdFsRead_s cmdRead;             ///< UShellCmd object (base object)
 
 } UShellCmdFs_s;
 
@@ -230,8 +226,7 @@ extern UShellCmdFs_s uShellCmdFs;    ///< UShellCmd object (base object)
  * \return UShellOsalErr_e - error code
  */
 int UShellCmdFsInit(UShellCmd_s* const rootCmd,
-                    lfs_t* const lfs,
-                    UShellVcp_s* const vcp);
+                    lfs_t* const lfs);
 
 /**
  * \brief Deinitialize the UShell cmd
