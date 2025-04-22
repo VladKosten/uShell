@@ -15,6 +15,7 @@ extern "C" {
 #include <stdio.h>
 
 #include "ushell_cmd.h"
+#include "ushell_cfg.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -26,12 +27,12 @@ extern "C" {
     #define USHELL_CMD_WHOAMI_HELP "Display information about the system"    ///< UShell command whoami description
 #endif
 
-#ifndef USHELL_CMD_WHOAMI_SYSTEM_NAME
-    #define USHELL_CMD_WHOAMI_SYSTEM_NAME "Xplained SamE54 \n"    ///< UShell command whoami system name
+#ifndef USHELL_CMD_WHOAMI_DEVICE_NAME
+    #define USHELL_CMD_WHOAMI_DEVICE_NAME "Xplained SamE54"    ///< UShell command whoami system name
 #endif
 
-#ifndef USHELL_CMD_WHOAMI_SYSTEM_VERSION
-    #define USHELL_CMD_WHOAMI_SYSTEM_VERSION " 0.0.1 ALFA \n"    ///< UShell command whoami system version
+#ifndef USHELL_CMD_WHOAMI_DEVICE_VERSION
+    #define USHELL_CMD_WHOAMI_DEVICE_VERSION "1.0.1"    ///< UShell command whoami system version
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -48,17 +49,12 @@ typedef struct
 /*===========================================================[PUBLIC INTERFACE]=============================================*/
 
 /**
- * \brief UShellWhoAmIHelp object (base object)
- */
-extern UShellCmdWhoAmI_s uShellCmdWhoAmI;
-
-/**
- * \brief Initialize the UShell  module.
- * \param [in] none
+ * \brief Initialize the UShell  whoami module.
+ * \param [in] rootCmd - The first cmd in the list of commands to be initialized
  * \param [out] none
  * \return UShellOsalErr_e - error code
  */
-int UShellCmdWhoAmIInit();
+int UShellCmdWhoAmIInit(UShellCmd_s* rootCmd);
 
 /**
  * \brief Deinitialize the UShell cmd

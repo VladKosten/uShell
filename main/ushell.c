@@ -92,12 +92,14 @@ static void uShellVcpWorker(void* const uShell);
  * \param hal - hal object
  * \param cfg - configuration object
  * \param cmdRoot - root command
+ * \param vcp - vcp object
  * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellOsal_s* const osal,
                                    UShellCfg_s* const cfg,
-                                   UShellCmd_s* const cmdRoot);
+                                   UShellCmd_s* const cmdRoot,
+                                   UShellVcp_s* const vcp);
 
 /**
  * \brief Deinitialize the runtime environment
@@ -121,6 +123,22 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
  * \return USHELL_NO_ERR if success, otherwise error code
  */
 static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell);
+
+/**
+ * \brief Initialize the runtime environment HAL
+ * \param uShell - uShell object
+ * \param hal - hal object
+ * \return USHELL_NO_ERR if success, otherwise error code
+ */
+static UShellErr_e uShellRtEnvVcpInit(UShell_s* const uShell,
+                                      UShellVcp_s* const vcp);
+
+/**
+ * \brief Deinitialize the runtime environment HAL
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
+ */
+static UShellErr_e uShellRtEnvVcpDeInit(UShell_s* const uShell);
 
 /**
  * \brief Initialize the runtime environment command
@@ -316,13 +334,13 @@ UShellErr_e UShellInit(UShell_s* const uShell,
         /* Set the attribute  */
         uShell->parent = parent;
         uShell->name = name;
-        uShell->vcp = vcp;
 
         /* Initialize the runtime environment */
         status = uShellRtEnvInit(uShell,
                                  (UShellOsal_s*) osal,
                                  (UShellCfg_s*) cfg,
-                                 (UShellCmd_s*) cmdRoot);
+                                 (UShellCmd_s*) cmdRoot,
+                                 (UShellVcp_s*) vcp);
         if (status != USHELL_NO_ERR)
         {
             /* RT env init error */
@@ -332,9 +350,6 @@ UShellErr_e UShellInit(UShell_s* const uShell,
 
         /* Set init state */
         uShell->fsmState = USHELL_STATE_INIT;
-
-        /* Clear the screen */
-        uShellPrintStr(uShell, USHELL_CLEAR_SCREEN);
 
     } while (0);
 
@@ -595,8 +610,9 @@ static void uShellVcpWorker(void* const uShell)
 
     /* Local variables */
     UShell_s* ushell = (UShell_s*) uShell;
-    UShellVcp_s* vcp = (UShellVcp_s*) ushell->vcp;
-    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;
+    UShellSocket_s* readSocket = ushell->vcpSessionCfg.readSocket;
+    UShellSocket_s* writeSocket = ushell->vcpSessionCfg.writeSocket;
     UShellItem_t item = 0;
 
     /* Delay to start the thread */
@@ -623,8 +639,8 @@ static void uShellVcpWorker(void* const uShell)
                     uShellPrintStr(ushell, USHELL_HELLO_MSG);
 
                     /* Check we have any input symbol */
-                    vcpStatus = UShellVcpScanCharNonBlock(vcp, &item);
-                    if (vcpStatus != USHELL_VCP_NO_ERR)
+                    socketStatus = UShellSocketRead(readSocket, &item, 1U, 0U);
+                    if (socketStatus != USHELL_SOCKET_NO_ERR)
                     {
                         break;
                     }
@@ -664,8 +680,8 @@ static void uShellVcpWorker(void* const uShell)
                     uShellPrintStr(ushell, ushell->io.buffer);
 
                     /* Check we have any input symbol */
-                    vcpStatus = UShellVcpScanCharNonBlock(vcp, &item);
-                    if (vcpStatus != USHELL_VCP_NO_ERR)
+                    socketStatus = UShellSocketRead(readSocket, &item, 1U, 0U);
+                    if (socketStatus != USHELL_SOCKET_NO_ERR)
                     {
                         break;
                     }
@@ -757,9 +773,9 @@ static void uShellVcpWorker(void* const uShell)
                     /* Print IO */
                     uShellPrintStr(ushell, ushell->io.buffer);
 
-                    /* Get data */
-                    vcpStatus = UShellVcpScanCharNonBlock(vcp, &item);
-                    if (vcpStatus != USHELL_VCP_NO_ERR)
+                    /* Check we have any input symbol */
+                    socketStatus = UShellSocketRead(readSocket, &item, 1U, 0U);
+                    if (socketStatus != USHELL_SOCKET_NO_ERR)
                     {
                         break;
                     }
@@ -883,11 +899,11 @@ static void uShellVcpWorker(void* const uShell)
 
                 do
                 {
-                    /* Get data*/
-                    vcpStatus = UShellVcpScanCharNonBlock(vcp, &item);
-                    if (vcpStatus != USHELL_VCP_NO_ERR)
+                    /* Check we have any input symbol */
+                    socketStatus = UShellSocketRead(readSocket, &item, 1U, 0U);
+                    if (socketStatus != USHELL_SOCKET_NO_ERR)
                     {
-                        item = 0;
+                        break;
                     }
 
                     /* Process the data */
@@ -918,6 +934,14 @@ static void uShellVcpWorker(void* const uShell)
                             /* Change state to proc input */
                             ushell->fsmState = USHELL_STATE_PROC_INP;
 
+                            break;
+                        }
+
+                        case 'C' :
+                        case 'D' :
+                        {
+                            /*  Change state to proc input */
+                            ushell->fsmState = USHELL_STATE_PROC_INP;
                             break;
                         }
 
@@ -977,7 +1001,8 @@ static void uShellVcpWorker(void* const uShell)
 static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
                                    UShellOsal_s* const osal,
                                    UShellCfg_s* const cfg,
-                                   UShellCmd_s* const cmdRoot)
+                                   UShellCmd_s* const cmdRoot,
+                                   UShellVcp_s* const vcp)
 {
     /* Local variables */
     UShellErr_e status = USHELL_NO_ERR;
@@ -1010,11 +1035,11 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
             }
         }
 
-        /* Initialize the runtime environment OSAL */
-        status = uShellRtEnvOsalInit(uShell, osal);
+        /* Initialize the runtime environment vcp */
+        status = uShellRtEnvVcpInit(uShell, vcp);
         if (status != USHELL_NO_ERR)
         {
-            /* OSAL init error */
+            /* VCP init error */
             USHELL_ASSERT(0);
             break;
         }
@@ -1024,6 +1049,15 @@ static UShellErr_e uShellRtEnvInit(UShell_s* const uShell,
         if (status != USHELL_NO_ERR)
         {
             /* Cmd root init error */
+            USHELL_ASSERT(0);
+            break;
+        }
+
+        /* Initialize the runtime environment OSAL */
+        status = uShellRtEnvOsalInit(uShell, osal);
+        if (status != USHELL_NO_ERR)
+        {
+            /* OSAL init error */
             USHELL_ASSERT(0);
             break;
         }
@@ -1069,6 +1103,9 @@ static UShellErr_e uShellRtEnvDeInit(UShell_s* const uShell)
 
         /* Deinitialize the runtime environment cmd */
         uShellRtEnvCmdRootDeInit(uShell);
+
+        /* Deinitialize the runtime environment vcp */
+        uShellRtEnvVcpDeInit(uShell);
 
     } while (0);
 
@@ -1245,6 +1282,150 @@ static UShellErr_e uShellRtEnvOsalDeInit(UShell_s* const uShell)
     uShell->osal = NULL;
 
     /* Clear the object */
+    return status;
+}
+
+/**
+ * \brief Initialize the runtime environment HAL
+ * \param uShell - uShell object
+ * \param hal - hal object
+ * \return USHELL_NO_ERR if success, otherwise error code
+ */
+static UShellErr_e uShellRtEnvVcpInit(UShell_s* const uShell,
+                                      UShellVcp_s* const vcp)
+{
+    /* Local variables */
+    UShellErr_e status = USHELL_NO_ERR;
+    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;
+    UShellSocket_s* readSocket = NULL;
+    UShellSocket_s* writeSocket = NULL;
+
+    /* Initialize the runtime environment vcp */
+    do
+    {
+        /* Check input parameters */
+        if (((uShell == NULL) ||
+             (vcp == NULL)))
+        {
+            /* Invalid arguments */
+            USHELL_ASSERT(0);
+            status = USHELL_INVALID_ARGS_ERR;
+            break;
+        }
+
+        /* Attach the vcp object */
+        uShell->vcp = vcp;
+
+        /* Init config for read */
+        uShell->vcpSessionCfg.readParam.owner = uShell;
+        uShell->vcpSessionCfg.readParam.type = USHELL_VCP_DIR_READ;
+
+        /* Init config for write */
+        uShell->vcpSessionCfg.writeParam.owner = uShell;
+        uShell->vcpSessionCfg.writeParam.type = USHELL_VCP_DIR_WRITE;
+
+        /* Open session for read */
+        vcpStatus = UShellVcpSessionOpen(vcp,
+                                         uShell->vcpSessionCfg.readParam,
+                                         &readSocket);
+        if (vcpStatus != USHELL_VCP_NO_ERR)
+        {
+            /* Open session error */
+            USHELL_ASSERT(0);
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Save the read socket */
+        uShell->vcpSessionCfg.readSocket = readSocket;
+
+        /* Open session for write */
+        vcpStatus = UShellVcpSessionOpen(vcp,
+                                         uShell->vcpSessionCfg.writeParam,
+                                         &writeSocket);
+        if (vcpStatus != USHELL_VCP_NO_ERR)
+        {
+            /* Open session error */
+            USHELL_ASSERT(0);
+            status = USHELL_PORT_ERR;
+            break;
+        }
+
+        /* Save the write socket */
+        uShell->vcpSessionCfg.writeSocket = writeSocket;
+
+    } while (0);
+
+    return status;
+}
+
+/**
+ * \brief Deinitialize the runtime environment HAL
+ * \param uShell - uShell object
+ * \return USHELL_NO_ERR if success, otherwise error code
+ */
+static UShellErr_e uShellRtEnvVcpDeInit(UShell_s* const uShell)
+{
+    /* Local variables */
+    UShellErr_e status = USHELL_NO_ERR;
+    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;
+
+    /* Deinitialize the runtime environment vcp */
+    do
+    {
+        /* Check input parameter */
+        if ((uShell == NULL) ||
+            (uShell->vcp == NULL))
+        {
+            break;
+        }
+
+        /* Close read session */
+        do
+        {
+            /* Check input parameters */
+            if (uShell->vcpSessionCfg.readSocket == NULL)
+            {
+                break;
+            }
+
+            /* Close session for read */
+            vcpStatus = UShellVcpSessionClose(uShell->vcp,
+                                              uShell->vcpSessionCfg.readParam);
+            if (vcpStatus != USHELL_VCP_NO_ERR)
+            {
+                /* Close session error */
+                USHELL_ASSERT(0);
+                status = USHELL_PORT_ERR;
+                break;
+            }
+
+        } while (0);
+
+        /* Close write session */
+        do
+        {
+            /* Check input parameters */
+            if (uShell->vcpSessionCfg.writeSocket == NULL)
+            {
+                break;
+            }
+
+            /* Close session for write */
+            vcpStatus = UShellVcpSessionClose(uShell->vcp,
+                                              uShell->vcpSessionCfg.writeParam);
+            if (vcpStatus != USHELL_VCP_NO_ERR)
+            {
+                /* Close session error */
+                USHELL_ASSERT(0);
+                status = USHELL_PORT_ERR;
+                break;
+            }
+
+        } while (0);
+
+    } while (0);
+
     return status;
 }
 
@@ -1660,8 +1841,6 @@ static void uShellCmdLock(void* const cmd)
             (uShell == NULL) ||
             (osal == NULL))
         {
-            /* Invalid arguments */
-            USHELL_ASSERT(0);
             break;
         }
 
@@ -1713,7 +1892,6 @@ static void uShellCmdUnlock(void* const cmd)
             (osal == NULL))
         {
             /* Invalid arguments */
-            USHELL_ASSERT(0);
             break;
         }
 
@@ -1803,8 +1981,12 @@ static void uShellCmdCurExec(UShell_s* const uShell)
             token = strtok(NULL, " ");
         }
 
-        /* Выполняем команду с разобранными аргументами */
-        cmdStatus = UShellCmdExec(uShell->currCmd, argc, argv);
+        /* Execute the command */
+        cmdStatus = UShellCmdExec(uShell->currCmd,
+                                  uShell->vcpSessionCfg.readSocket,
+                                  uShell->vcpSessionCfg.writeSocket,
+                                  argc,
+                                  argv);
         if (cmdStatus != USHELL_CMD_NO_ERR)
         {
             /* Command execution error */
@@ -1914,25 +2096,27 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
 static void uShellPrintStr(UShell_s* const uShell,
                            const char* const str)
 { /* Local variable */
-    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;
-    UShellVcp_s* vcp = (UShellVcp_s*) uShell->vcp;
-
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;
+    UShellSocket_s* socket = (UShellSocket_s*) uShell->vcpSessionCfg.writeSocket;
+    size_t len = strlen(str);
     /* Print */
     do
     {
         /* Check input parameter */
         if ((uShell == NULL) ||
             (str == NULL) ||
-            (vcp == NULL))
+            (socket == NULL) ||
+            (len == 0))
         {
             /* Invalid arguments */
-            USHELL_ASSERT(0);
             break;
         }
 
         /* Print */
-        vcpStatus = UShellVcpPrintStr(vcp, str);
-        if (vcpStatus != USHELL_VCP_NO_ERR)
+        socketStatus = UShellSocketWriteBlocking(socket,
+                                                 (const uint8_t*) str,
+                                                 strlen(str));
+        if (socketStatus != USHELL_SOCKET_NO_ERR)
         {
             /* Print error */
             USHELL_ASSERT(0);

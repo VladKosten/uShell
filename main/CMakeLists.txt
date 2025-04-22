@@ -1,11 +1,13 @@
 # Add libraries
 add_library(UShell STATIC ushell.c
                           ushell_vcp.c
+                          ushell_socket.c
                           ushell_history.c
-                          )
+                          ushell_log.c)
 add_library(UShellHal STATIC ushell_hal.c)
 add_library(UShellOsal STATIC ushell_osal.c)
 add_library(UShellCmd STATIC ushell_cmd.c)
+
 
 # Set include directories for all libraries
 target_include_directories(UShell PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

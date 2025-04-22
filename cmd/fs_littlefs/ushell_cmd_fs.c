@@ -12,7 +12,7 @@
 //=====================================================================[ INTERNAL MACRO DEFINITIONS ]===============================================================================
 
 /**
- * \brief Assert macro for the UShellHal module.
+ * \brief Assert macro for the UShellFs module.
  */
 #ifndef USHELL_CMD_FS_ASSERT
     #ifdef USHELL_ASSERT
@@ -34,6 +34,8 @@
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsCdExec(void* const cmd,
+                                        UShellSocket_s* const readSocket,
+                                        UShellSocket_s* const writeSocket,
                                         const int argc,
                                         char* const argv []);
 
@@ -45,6 +47,8 @@ static UShellCmdErr_e uShellCmdFsCdExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsLsExec(void* const cmd,
+                                        UShellSocket_s* const readSocket,
+                                        UShellSocket_s* const writeSocket,
                                         const int argc,
                                         char* const argv []);
 
@@ -56,6 +60,8 @@ static UShellCmdErr_e uShellCmdFsLsExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsRmExec(void* const cmd,
+                                        UShellSocket_s* const readSocket,
+                                        UShellSocket_s* const writeSocket,
                                         const int argc,
                                         char* const argv []);
 
@@ -67,6 +73,8 @@ static UShellCmdErr_e uShellCmdFsRmExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsMkdirExec(void* const cmd,
+                                           UShellSocket_s* const readSocket,
+                                           UShellSocket_s* const writeSocket,
                                            const int argc,
                                            char* const argv []);
 
@@ -78,6 +86,8 @@ static UShellCmdErr_e uShellCmdFsMkdirExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsCatExec(void* const cmd,
+                                         UShellSocket_s* const readSocket,
+                                         UShellSocket_s* const writeSocket,
                                          const int argc,
                                          char* const argv []);
 
@@ -89,6 +99,8 @@ static UShellCmdErr_e uShellCmdFsCatExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
+                                           UShellSocket_s* const readSocket,
+                                           UShellSocket_s* const writeSocket,
                                            const int argc,
                                            char* const argv []);
 
@@ -100,6 +112,8 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
+                                          UShellSocket_s* const readSocket,
+                                          UShellSocket_s* const writeSocket,
                                           const int argc,
                                           char* const argv []);
 
@@ -113,13 +127,17 @@ static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
                                                       const int ms);
 
 /**
- * \brief TxByte function for the xmodem server.
+ * \brief Transmit function for the xmodem server.
  * \param[in] xmodem - xmodem server object
- * \param[in] byte - byte to transmit
+ * \param[in] data - byte to transmit
+ * \param[in] size - size of the data to transmit
+ * \param[in] timeMs - time in milliseconds to delay
  * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
-                                                       const uint8_t byte);
+static XModemServerErr_e uShellCmdFsXModemServerTransmit(void* server,
+                                                         uint8_t* data,
+                                                         const size_t size,
+                                                         size_t timeMs);
 
 /**
  * \brief RxByte function for the xmodem server.
@@ -127,8 +145,10 @@ static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
  * \param[in] byte - byte to receive
  * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
-                                                       uint8_t* byte);
+static XModemServerErr_e uShellCmdFsXModemServerReceive(void* server,
+                                                        uint8_t* data,
+                                                        const size_t size,
+                                                        size_t timeMs);
 
 /**
  * \brief IsRxByte function for the xmodem server.
@@ -180,16 +200,10 @@ static XModemClientErr_e uShellCmdFsXModemClientReadFromMemory(void* client,
  * \param byte - byte to receive
  * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
-static XModemClientErr_e uShellCmdFsXModemClientRxByte(void* client,
-                                                       uint8_t* byte);
-
-/**
- * \brief Delay function for the xmodem client.
- * \param client - xmodem client object
- * \param ms - delay in milliseconds
- * \return XModemClientErr_e - error code. non-zero = an error has occurred;
- */
-static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms);
+static XModemClientErr_e uShellCmdFsXModemClientReceive(void* client,
+                                                        uint8_t* const data,
+                                                        const size_t size,
+                                                        size_t timeMs);
 
 /**
  * \brief Transmit function for the xmodem client.
@@ -199,8 +213,9 @@ static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms);
  * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
 static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client,
-                                                         uint8_t* data,
-                                                         int size);
+                                                         uint8_t* const data,
+                                                         const size_t size,
+                                                         size_t timeMs);
 
 /**
  * \brief UShellCmdFsCd object (base object)
@@ -212,11 +227,9 @@ UShellCmdFs_s uShellCmdFs = {0};
  */
 static XModemServerPort_s uShellCmdFsXModemServerPort =
     {
-        .delayMs = uShellCmdFsXModemServerDelay,
-        .transmitByte = uShellCmdFsXModemServerTxByte,
-        .receiveByte = uShellCmdFsXModemServerRxByte,
+        .transmit = uShellCmdFsXModemServerTransmit,
+        .receive = uShellCmdFsXModemServerReceive,
         .writeToMemory = uShellCmdFsXModemServerWrite,
-        .isReceivedByte = uShellCmdFsXModemServerIsRxByte,
 };
 
 /**
@@ -224,12 +237,16 @@ static XModemServerPort_s uShellCmdFsXModemServerPort =
  */
 static XModemClientPort_s uShellCmdFsXModemClientPort =
     {
-        .delayMs = uShellCmdFsXModemClientDelay,
-        .isReceivedByte = uShellCmdFsXModemClientIsRxByte,
         .readFromMemory = uShellCmdFsXModemClientReadFromMemory,
-        .receiveByte = uShellCmdFsXModemClientRxByte,
+        .receive = uShellCmdFsXModemClientReceive,
         .transmit = uShellCmdFsXModemClientTransmit,
 };
+
+/**
+ * \brief For storing the current socket (i now its terrable, but i have no time to fix it)
+ */
+static UShellSocket_s* uShellCmdFsReadSocket = NULL;     ///< Pointer to the read socket
+static UShellSocket_s* uShellCmdFsWriteSocket = NULL;    ///< Pointer to the write socket
 
 //=======================================================================[ PUBLIC INTERFACE FUNCTIONS ]=============================================================================
 
@@ -242,8 +259,7 @@ static XModemClientPort_s uShellCmdFsXModemClientPort =
  * \return UShellOsalErr_e - error code
  */
 int UShellCmdFsInit(UShellCmd_s* const rootCmd,
-                    lfs_t* const lfs,
-                    UShellVcp_s* const vcp)
+                    lfs_t* const lfs)
 {
     /* Local variable */
     int status = 0;                                  // Variable to store command status
@@ -253,7 +269,6 @@ int UShellCmdFsInit(UShellCmd_s* const rootCmd,
     {
         /* Check input parameter */
         if ((lfs == NULL) ||
-            (vcp == NULL) ||
             (rootCmd == NULL))
         {
             USHELL_CMD_FS_ASSERT(0);    // Set status to error if lfs or vcp is NULL
@@ -428,11 +443,9 @@ int UShellCmdFsInit(UShellCmd_s* const rootCmd,
 
         /* Save the lfs object to the command object */
         uShellCmdFs.lfs = lfs;
-        /* Save the vcp object to the command object */
-        uShellCmdFs.vcp = vcp;
 
         /* Set the start path */
-        strncpy(uShellCmdFs.path, USHELL_CMD_FS_START_PATH, sizeof(uShellCmdFs.path) - 1);    // Copy the start path to the command object
+        strncpy(uShellCmdFs.path, USHELL_CMD_FS_START_PATH, sizeof(uShellCmdFs.path) - 1);
 
     } while (0);
 
@@ -498,11 +511,15 @@ int UShellCmdFsDeinit()
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsCdExec(void* const cmd,
+                                        UShellSocket_s* const readSocket,
+                                        UShellSocket_s* const writeSocket,
                                         const int argc,
                                         char* const argv [])
 {
     /* Local variable */
-    UShellCmdErr_e status = USHELL_CMD_NO_ERR;    // Variable to store command status
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;                // Variable to store command status
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store socket status
+    (void) socketStatus;
     const char* newDir = argv [0];
     char newPath [USHELL_CMD_FS_MAX_PATH] = {0};    // Buffer for the new path
     struct lfs_info info = {0};                     // Buffer for the file system info
@@ -513,7 +530,9 @@ static UShellCmdErr_e uShellCmdFsCdExec(void* const cmd,
         /* Check input parameter */
         if (argc != 1)
         {
-            printf("Usage: cd <directory>\n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "Usage: cd <directory>\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
@@ -523,7 +542,9 @@ static UShellCmdErr_e uShellCmdFsCdExec(void* const cmd,
             /* Make sure we are not at root directory */
             if (strcmp(uShellCmdFs.path, "/") == 0)
             {
-                printf("cd: Already at root directory.\n");
+                socketStatus = UShellSocketPrint(writeSocket,
+                                                 "cd: Already at root directory.\n");
+                USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
                 break;
             }
 
@@ -566,7 +587,10 @@ static UShellCmdErr_e uShellCmdFsCdExec(void* const cmd,
         statusFs = lfs_stat(uShellCmdFs.lfs, newPath, &info);
         if ((statusFs < 0) || (info.type != LFS_TYPE_DIR))
         {
-            printf("cd: directory %s does not exist or is not a directory \n", newPath);
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "cd: directory %s does not exist or is not a directory \n",
+                                             newPath);
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
@@ -575,7 +599,10 @@ static UShellCmdErr_e uShellCmdFsCdExec(void* const cmd,
         uShellCmdFs.path [sizeof(uShellCmdFs.path) - 1] = '\0';
 
         /* Print the new current path */
-        printf("cd: changed directory to %s\n", uShellCmdFs.path);
+        socketStatus = UShellSocketPrint(writeSocket,
+                                         "cd: changed directory to %s\n",
+                                         uShellCmdFs.path);
+        USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
 
     } while (0);
 
@@ -591,13 +618,16 @@ static UShellCmdErr_e uShellCmdFsCdExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsLsExec(void* const cmd,
+                                        UShellSocket_s* const readSocket,
+                                        UShellSocket_s* const writeSocket,
                                         const int argc,
                                         char* const argv [])
 {
     /* Local variable */
-    UShellCmdErr_e status = USHELL_CMD_NO_ERR;       // Variable to store command status
-    char fullPath [USHELL_CMD_FS_MAX_PATH] = {0};    // Buffer for the full path
-    int statusFs = 0;                                // Variable to store file system status
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;                // Variable to store command status
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store socket status
+    char fullPath [USHELL_CMD_FS_MAX_PATH] = {0};             // Buffer for the full path
+    int statusFs = 0;                                         // Variable to store file system status
     const char* path = (argc > 0) ? argv [0] : uShellCmdFs.path;
     lfs_dir_t dir;
     struct lfs_info info;
@@ -609,8 +639,11 @@ static UShellCmdErr_e uShellCmdFsLsExec(void* const cmd,
         statusFs = lfs_dir_open(uShellCmdFs.lfs, &dir, path);
         if (statusFs < 0)
         {
-            printf("ls: cannot open directory %s \n", path);
-            break;    // Error opening directory
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "ls: cannot open directory %s \n",
+                                             path);
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
+            break;                                                         // Error opening directory
         }
 
         printf("Listing of %s:\n", path);
@@ -631,19 +664,29 @@ static UShellCmdErr_e uShellCmdFsLsExec(void* const cmd,
             if (info.type == LFS_TYPE_DIR)
             {
                 /* Print dir name */
-                printf("  <DIR> %s\n", info.name);
+                socketStatus = UShellSocketPrint(writeSocket,
+                                                 "  <DIR> %s\n",
+                                                 info.name);
+                USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             }
             else
             {
                 /* Print file name and size */
-                printf("        %s (%u bytes)\n", info.name, (unsigned) info.size);
+                socketStatus = UShellSocketPrint(writeSocket,
+                                                 "        %s (%u bytes)\n",
+                                                 info.name,
+                                                 (unsigned) info.size);
+                USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             }
 
             /* Check for errors */
             if (statusFs < 0)
             {
-                printf("ls: error reading directory %s\n", path);
-                break;    // Error reading directory
+                socketStatus = UShellSocketPrint(writeSocket,
+                                                 "ls: error reading directory %s\n",
+                                                 path);
+                USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
+                break;                                                         // Error reading directory
             }
 
         } while (1);
@@ -664,11 +707,14 @@ static UShellCmdErr_e uShellCmdFsLsExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsRmExec(void* const cmd,
+                                        UShellSocket_s* const readSocket,
+                                        UShellSocket_s* const writeSocket,
                                         const int argc,
                                         char* const argv [])
 {
     /* Local variable */
     UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store socket status
     const char* filePath = argv [0];
     char fullPath [USHELL_CMD_FS_MAX_PATH] = {0};
     int statusFs = 0;    // Variable to store file system status
@@ -679,7 +725,9 @@ static UShellCmdErr_e uShellCmdFsRmExec(void* const cmd,
         /* Check input parameter */
         if (argc != 1)
         {
-            printf("Usage: rm <path>\n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "Usage: rm <path>\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
@@ -702,12 +750,18 @@ static UShellCmdErr_e uShellCmdFsRmExec(void* const cmd,
         if (statusFs < 0)
         {
             /* File or directory not found */
-            printf("rm: cannot remove %s \n", fullPath);
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "rm: cannot remove %s \n",
+                                             fullPath);
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
         /* File or directory removed successfully */
-        printf("rm: %s removed successfully\n", fullPath);
+        socketStatus = UShellSocketPrint(writeSocket,
+                                         "rm: %s removed successfully\n",
+                                         fullPath);
+        USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
 
     } while (0);
 
@@ -722,11 +776,15 @@ static UShellCmdErr_e uShellCmdFsRmExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsMkdirExec(void* const cmd,
+                                           UShellSocket_s* const readSocket,
+                                           UShellSocket_s* const writeSocket,
                                            const int argc,
                                            char* const argv [])
 {
     /* Local variable */
-    UShellCmdErr_e status = USHELL_CMD_NO_ERR;    // Variable to store command status
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;                // Variable to store command status
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store socket status
+    (void) socketStatus;
     const char* dir_path = argv [0];
     char fullPath [USHELL_CMD_FS_MAX_PATH] = {0};
     int statusFs = 0;    // Variable to store file system status
@@ -737,7 +795,9 @@ static UShellCmdErr_e uShellCmdFsMkdirExec(void* const cmd,
         /* Check input parameter */
         if (argc != 1)
         {
-            printf("Usage: mkdir <directory>\n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "Usage: mkdir <directory>\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
@@ -760,12 +820,18 @@ static UShellCmdErr_e uShellCmdFsMkdirExec(void* const cmd,
         if (statusFs < 0)
         {
             /* Directory already exists or error creating directory */
-            printf("mkdir: cannot create directory %s \n", fullPath);
-            break;    // Error creating directory
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "mkdir: cannot create directory %s \n",
+                                             fullPath);
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
+            break;                                                         // Error creating directory
         }
 
         /* Directory created successfully */
-        printf("mkdir: directory %s created successfully\n", fullPath);
+        socketStatus = UShellSocketPrint(writeSocket,
+                                         "mkdir: directory %s created successfully\n",
+                                         fullPath);
+        USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
 
     } while (0);
 
@@ -780,11 +846,15 @@ static UShellCmdErr_e uShellCmdFsMkdirExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsCatExec(void* const cmd,
+                                         UShellSocket_s* const readSocket,
+                                         UShellSocket_s* const writeSocket,
                                          const int argc,
                                          char* const argv [])
 {
     /* Local variable */
-    UShellCmdErr_e status = USHELL_CMD_NO_ERR;       // Variable to store command status
+    UShellCmdErr_e status = USHELL_CMD_NO_ERR;                // Variable to store command status
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store socket status
+    (void) socketStatus;
     const char* file_path = argv [0];                // Relative file path
     char fullPath [USHELL_CMD_FS_MAX_PATH] = {0};    // Buffer for the full path
     lfs_file_t file;
@@ -798,7 +868,9 @@ static UShellCmdErr_e uShellCmdFsCatExec(void* const cmd,
         /* Check input parameter */
         if (argc != 1)
         {
-            printf("Usage: cat <file>\n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "Usage: cat <file>\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
@@ -820,7 +892,10 @@ static UShellCmdErr_e uShellCmdFsCatExec(void* const cmd,
         lfsStatus = lfs_file_open(uShellCmdFs.lfs, &file, fullPath, LFS_O_RDONLY);
         if (lfsStatus < 0)
         {
-            printf("cat: cannot open file %s \n", fullPath);
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "cat: cannot open file %s \n",
+                                             fullPath);
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
@@ -834,14 +909,20 @@ static UShellCmdErr_e uShellCmdFsCatExec(void* const cmd,
             }
             else if (bytes_read < 0)
             {
-                printf("cat: error reading file %s \n", fullPath);
+                socketStatus = UShellSocketPrint(writeSocket,
+                                                 "cat: error reading file %s \n",
+                                                 fullPath);
+                USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
                 break;
             }
             printf("%.*s", bytes_read, buffer);
         }
 
         /* Print new line after reading the file */
-        printf("\n");
+        socketStatus = UShellSocketPrint(writeSocket,
+                                         "\ncat: file %s read successfully\n",
+                                         fullPath);
+        USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
 
         /* Close the file */
         lfs_file_close(uShellCmdFs.lfs, &file);
@@ -859,10 +940,14 @@ static UShellCmdErr_e uShellCmdFsCatExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
+                                           UShellSocket_s* const readSocket,
+                                           UShellSocket_s* const writeSocket,
                                            const int argc,
                                            char* const argv [])
 {
     UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;
+    (void) socketStatus;
     const char* fileName = argv [0];
     char fullPath [USHELL_CMD_FS_MAX_PATH] = {0};
     int statusFs = 0;
@@ -873,9 +958,15 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
         /* Check input parameter */
         if (argc != 1)
         {
-            printf("Usage: write <file>\n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "Usage: write <file>\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
+
+        /* Save socket for xmodem server */
+        uShellCmdFsReadSocket = readSocket;      // Save the read socket for xmodem server
+        uShellCmdFsWriteSocket = writeSocket;    // Save the write socket for xmodem server
 
         /* Form the full path using the current directory and the provided file name */
         if (uShellCmdFs.path [strlen(uShellCmdFs.path) - 1] == '/')
@@ -890,7 +981,10 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
                                  LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND);
         if (statusFs < 0)
         {
-            printf("write: cannot open file %s for writing\n", fullPath);
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "write: cannot open file %s for writing\n",
+                                             fullPath);
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
@@ -898,18 +992,25 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
         uShellCmdFs.currentFile = &file;    // Save the current file object to the xmodem server
 
         /* Initialize the xmodem server */
-        printf("write: ready to receive file %s via XModem...\n", fullPath);
+        socketStatus = UShellSocketPrint(writeSocket,
+                                         "write: ready to receive file %s via XModem...\n",
+                                         fullPath);
+        USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
 
         /* Receive file data via XModem transfer and write it to the file */
         XModemServerErr_e xmodemStatus = XModemServerProc(&uShellCmdFs.xModemServer);
         if (xmodemStatus != XMODEM_SERVER_NO_ERR)
         {
 
-            printf("write: XModem transfer error: \n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "write: XModem transfer error\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
         }
         else
         {
-            printf("write: XModem transfer completed successfully\n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "write: XModem transfer completed successfully\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
         }
 
         /* Close the file after transfer */
@@ -919,6 +1020,10 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
         uShellCmdFs.currentFile = NULL;    // Remove the current file object reference
 
     } while (0);
+
+    /* Flush the socket  */
+    uShellCmdFsReadSocket = NULL;     // Save the read socket for xmodem server
+    uShellCmdFsWriteSocket = NULL;    // Save the write socket for xmodem server
 
     return status;
 }
@@ -931,10 +1036,13 @@ static UShellCmdErr_e uShellCmdFsWriteExec(void* const cmd,
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
+                                          UShellSocket_s* const readSocket,
+                                          UShellSocket_s* const writeSocket,
                                           const int argc,
                                           char* const argv [])
 {
     UShellCmdErr_e status = USHELL_CMD_NO_ERR;
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store socket status
     const char* fileName = argv [0];
     char fullPath [USHELL_CMD_FS_MAX_PATH] = {0};
     int statusFs = 0;
@@ -945,9 +1053,15 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
         /* Check input parameter */
         if (argc != 1)
         {
-            printf("Usage: read <file>\n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "Usage: read <file>\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
+
+        /* Save socket for xmodem server */
+        uShellCmdFsReadSocket = readSocket;      // Save the read socket for xmodem server
+        uShellCmdFsWriteSocket = writeSocket;    // Save the write socket for xmodem server
 
         /* Form the full path using the current directory and the provided file name */
         if (uShellCmdFs.path [strlen(uShellCmdFs.path) - 1] == '/')
@@ -962,7 +1076,10 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
                                  LFS_O_RDONLY);
         if (statusFs < 0)
         {
-            printf("read: cannot open file %s for reading\n", fullPath);
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "read: cannot open file %s for reading\n",
+                                             fullPath);
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
             break;
         }
 
@@ -970,17 +1087,24 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
         uShellCmdFs.currentFile = &file;
 
         /* Initialize the xmodem server for transmitting file data */
-        printf("read: ready to send file %s via XModem...\n", fullPath);
+        socketStatus = UShellSocketPrint(writeSocket,
+                                         "read: ready to send file %s via XModem...\n",
+                                         fullPath);
+        USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
 
         /* Transmit file data via XModem transfer */
         XModemClientErr_e clientStatus = XModemClientProc(&uShellCmdFs.xModemClient);
         if (clientStatus != XMODEM_SERVER_NO_ERR)
         {
-            printf("read: XModem transfer err \n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "read: XModem transfer error\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
         }
         else
         {
-            printf("read: XModem transfer completed successfully\n");
+            socketStatus = UShellSocketPrint(writeSocket,
+                                             "read: XModem transfer completed successfully\n");
+            USHELL_CMD_FS_ASSERT(socketStatus == USHELL_SOCKET_NO_ERR);    // Check if the socket status is OK
         }
 
         /* Close the file after transfer */
@@ -991,63 +1115,35 @@ static UShellCmdErr_e uShellCmdFsReadExec(void* const cmd,
 
     } while (0);
 
-    return status;
-}
-
-/**
- * \brief Delay function for the xmodem server.
- * \param xmodem - xmodem server object
- * \param ms - delay in milliseconds
- * \return XModemServerErr_e - error code. non-zero = an error has occurred;
- */
-static XModemServerErr_e uShellCmdFsXModemServerDelay(void* const xmodem,
-                                                      const int ms)
-{
-    /* Local variable */
-    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;      // Variable to store the status of the operation
-    XModemServer_s* xdm = (XModemServer_s*) xmodem;       // Cast the xmodem object to UShellCmdFs_s type
-    UShellCmdFs_s* cmd = (UShellCmdFs_s*) xdm->parent;    // Cast the parent object to UShellCmdFs_s type
-
-    do
-    {
-        /* Check input parameter */
-        if ((xdm == NULL) ||
-            (cmd == NULL))
-        {
-            USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
-            status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
-            break;                                      // Exit the loop
-        }
-
-        /* Delay */
-        vTaskDelay(pdMS_TO_TICKS(ms));    // Delay for the specified time
-
-    } while (0);
+    /* Flush the socket  */
+    uShellCmdFsReadSocket = NULL;     // Save the read socket for xmodem server
+    uShellCmdFsWriteSocket = NULL;    // Save the write socket for xmodem server
 
     return status;
 }
 
 /**
- * \brief TxByte function for the xmodem server.
+ * \brief Transmit function for the xmodem server.
  * \param[in] xmodem - xmodem server object
- * \param[in] byte - byte to transmit
+ * \param[in] data - byte to transmit
+ * \param[in] size - size of the data to transmit
+ * \param[in] timeMs - time in milliseconds to delay
  * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
-                                                       const uint8_t byte)
+static XModemServerErr_e uShellCmdFsXModemServerTransmit(void* server,
+                                                         uint8_t* data,
+                                                         const size_t size,
+                                                         size_t timeMs)
 {
     /* Local variable */
-    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;      // Variable to store the status of the operation
-    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;         // Variable to store the status of the operation
-    XModemServer_s* xdm = (XModemServer_s*) xmodem;       // Cast the xmodem object to UShellCmdFs_s type
-    UShellCmdFs_s* cmd = (UShellCmdFs_s*) xdm->parent;    // Cast the parent object to UShellCmdFs_s type
-    UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;           // Cast the vcp object to UShellVcp_s type
+    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;          // Variable to store the status of the operation
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store the status of the operation
+    UShellSocket_s* socket = uShellCmdFsWriteSocket;
+
     do
     {
         /* Check input parameter */
-        if ((xdm == NULL) ||
-            (cmd == NULL) ||
-            (vcp == NULL))
+        if ((socket == NULL))
         {
             USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
@@ -1055,12 +1151,17 @@ static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
         }
 
         /* Send byte */
-        vcpStatus = UShellVcpPrintChar(vcp, byte);    // Send the byte to the vcp object
-        if (vcpStatus != USHELL_VCP_NO_ERR)
+        socketStatus = UShellSocketWrite(socket,
+                                         data,
+                                         size,
+                                         timeMs);    // Send the byte to the socket
+        if (socketStatus != USHELL_SOCKET_NO_ERR)
         {
-            USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
-            status = XMODEM_SERVER_PORT_ERR;    // Set status to error
-            break;                              // Exit the loop
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if vcp send fails
+            status = (socketStatus == USHELL_SOCKET_TIMEOUT_ERR)
+                         ? XMODEM_SERVER_TIMEOUT_ERR
+                         : XMODEM_SERVER_PORT_ERR;    // Set status to error
+            break;                                    // Exit the loop
         }
 
     } while (0);
@@ -1074,24 +1175,20 @@ static XModemServerErr_e uShellCmdFsXModemServerTxByte(void* const xmodem,
  * \param[in] byte - byte to receive
  * \return XModemServerErr_e - error code. non-zero = an error has occurred;
  */
-static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
-                                                       uint8_t* byte)
+static XModemServerErr_e uShellCmdFsXModemServerReceive(void* server, uint8_t* data, const size_t size, size_t timeMs)
 
 {
     /* Local variable */
-    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;      // Variable to store the status of the operation
-    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;         // Variable to store the status of the operation
-    XModemServer_s* xdm = (XModemServer_s*) xmodem;       // Cast the xmodem object to UShellCmdFs_s type
-    UShellCmdFs_s* cmd = (UShellCmdFs_s*) xdm->parent;    // Cast the parent object to UShellCmdFs_s type
-    UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;           // Cast the vcp object to UShellVcp_s type
+    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;          // Variable to store the status of the operation
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store the status of the operation
+    UShellSocket_s* socket = uShellCmdFsReadSocket;
 
     do
     {
         /* Check input parameter */
-        if ((xdm == NULL) ||
-            (cmd == NULL) ||
-            (vcp == NULL) ||
-            (byte == NULL))
+        if ((socket == NULL) ||
+            (data == NULL) ||
+            (size == 0))
         {
             USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
@@ -1099,60 +1196,17 @@ static XModemServerErr_e uShellCmdFsXModemServerRxByte(void* const xmodem,
         }
 
         /* Send byte */
-        vcpStatus = UShellVcpScanChar(vcp, byte);    // Receive the byte from the vcp object
-        if (vcpStatus != USHELL_VCP_NO_ERR)
+        socketStatus = UShellSocketRead(socket,
+                                        data,
+                                        size,
+                                        timeMs);    // Send the byte to the socket
+        if (socketStatus != USHELL_SOCKET_NO_ERR)
         {
-            USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
-            status = XMODEM_SERVER_PORT_ERR;    // Set status to error
-            break;                              // Exit the loop
+            status = (socketStatus == USHELL_SOCKET_TIMEOUT_ERR)
+                         ? XMODEM_SERVER_TIMEOUT_ERR
+                         : XMODEM_SERVER_PORT_ERR;    // Set status to error
+            break;                                    // Exit the loop
         }
-
-    } while (0);
-
-    return status;
-}
-
-/**
- * \brief IsRxByte function for the xmodem server.
- * \param[in] xmodem - xmodem server object
- * \param[in] byte - byte to check
- * \return XModemServerErr_e - error code. non-zero = an error has occurred;
- */
-static XModemServerErr_e uShellCmdFsXModemServerIsRxByte(void* const xmodem,
-                                                         bool* isRx)
-{
-    /* Local variable */
-    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;      // Variable to store the status of the operation
-    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;         // Variable to store the status of the operation
-    XModemServer_s* xdm = (XModemServer_s*) xmodem;       // Cast the xmodem object to UShellCmdFs_s type
-    UShellCmdFs_s* cmd = (UShellCmdFs_s*) xdm->parent;    // Cast the parent object to UShellCmdFs_s type
-    UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;           // Cast the vcp object to UShellVcp_s type
-    bool empty = false;                                   // Variable to check if the vcp is empty
-
-    do
-    {
-        /* Check input parameter */
-        if ((xdm == NULL) ||
-            (cmd == NULL) ||
-            (vcp == NULL) ||
-            (isRx == NULL))
-        {
-            USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
-            status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
-            break;                                      // Exit the loop
-        }
-
-        /* Send byte */
-        vcpStatus = UShellVcpScanIsEmpty(vcp, &empty);    // Check if the byte is empty from the vcp object
-        if (vcpStatus != USHELL_VCP_NO_ERR)
-        {
-            USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
-            status = XMODEM_SERVER_PORT_ERR;    // Set status to error
-            break;                              // Exit the loop
-        }
-
-        /* Set the isRx flag based on the empty status */
-        *isRx = (empty) ? false : true;    // Set the isRx flag based on the empty status
 
     } while (0);
 
@@ -1214,55 +1268,6 @@ static XModemServerErr_e uShellCmdFsXModemServerWrite(void* const xmodem,
     } while (0);
 
     return status;
-}
-
-/**
- * \brief Check byte is rx
- * \param client - xmodem client object
- * \param isRx - buffer to store the rx status
- * \return XModemClientErr_e - error code. non-zero = an error has occurred;
- */
-static XModemClientErr_e uShellCmdFsXModemClientIsRxByte(void* client,
-                                                         bool* isRx)
-{
-    {
-        /* Local variable */
-        XModemClientErr_e status = XMODEM_SERVER_NO_ERR;               // Variable to store the status of the operation
-        UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;                  // Variable to store the status of the operation
-        XModemClient_s* clientXmodem = (XModemClient_s*) client;       // Cast the xmodem object to UShellCmdFs_s type
-        UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientXmodem->parent;    // Cast the parent object to UShellCmdFs_s type
-        UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;                    // Cast the vcp object to UShellVcp_s type
-        bool empty = false;                                            // Variable to check if the vcp is empty
-
-        do
-        {
-            /* Check input parameter */
-            if ((clientXmodem == NULL) ||
-                (cmd == NULL) ||
-                (vcp == NULL) ||
-                (isRx == NULL))
-            {
-                USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
-                status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
-                break;                                      // Exit the loop
-            }
-
-            /* Send byte */
-            vcpStatus = UShellVcpScanIsEmpty(vcp, &empty);    // Check if the byte is empty from the vcp object
-            if (vcpStatus != USHELL_VCP_NO_ERR)
-            {
-                USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
-                status = XMODEM_SERVER_PORT_ERR;    // Set status to error
-                break;                              // Exit the loop
-            }
-
-            /* Set the isRx flag based on the empty status */
-            *isRx = (empty) ? false : true;    // Set the isRx flag based on the empty status
-
-        } while (0);
-
-        return status;
-    }
 }
 
 /**
@@ -1333,23 +1338,19 @@ static XModemClientErr_e uShellCmdFsXModemClientReadFromMemory(void* client,
  * \param byte - byte to receive
  * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
-static XModemClientErr_e uShellCmdFsXModemClientRxByte(void* client,
-                                                       uint8_t* byte)
+static XModemClientErr_e uShellCmdFsXModemClientReceive(void* client, uint8_t* const data, const size_t size, size_t timeMs)
 {
     /* Local variable */
-    XModemClientErr_e status = XMODEM_SERVER_NO_ERR;               // Variable to store the status of the operation
-    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;                  // Variable to store the status of the operation
-    XModemClient_s* clientXmodem = (XModemClient_s*) client;       // Cast the xmodem object to UShellCmdFs_s type
-    UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientXmodem->parent;    // Cast the parent object to UShellCmdFs_s type
-    UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;                    // Cast the vcp object to UShellVcp_s type
+    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;          // Variable to store the status of the operation
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store the status of the operation
+    UShellSocket_s* socket = uShellCmdFsReadSocket;
 
     do
     {
         /* Check input parameter */
-        if ((clientXmodem == NULL) ||
-            (cmd == NULL) ||
-            (vcp == NULL) ||
-            (byte == NULL))
+        if ((socket == NULL) ||
+            (data == NULL) ||
+            (size == 0))
         {
             USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
@@ -1357,45 +1358,17 @@ static XModemClientErr_e uShellCmdFsXModemClientRxByte(void* client,
         }
 
         /* Send byte */
-        vcpStatus = UShellVcpScanChar(vcp, byte);    // Receive the byte from the vcp object
-        if (vcpStatus != USHELL_VCP_NO_ERR)
+        socketStatus = UShellSocketRead(socket,
+                                        data,
+                                        size,
+                                        timeMs);    // Send the byte to the socket
+        if (socketStatus != USHELL_SOCKET_NO_ERR)
         {
-            USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
-            status = XMODEM_SERVER_PORT_ERR;    // Set status to error
-            break;                              // Exit the loop
+            status = (socketStatus == USHELL_SOCKET_TIMEOUT_ERR)
+                         ? XMODEM_SERVER_TIMEOUT_ERR
+                         : XMODEM_SERVER_PORT_ERR;    // Set status to error
+            break;                                    // Exit the loop
         }
-
-    } while (0);
-
-    return status;
-}
-
-/**
- * \brief Delay function for the xmodem client.
- * \param client - xmodem client object
- * \param ms - delay in milliseconds
- * \return XModemClientErr_e - error code. non-zero = an error has occurred;
- */
-static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms)
-{
-    /* Local variable */
-    XModemClientErr_e status = XMODEM_SERVER_NO_ERR;               // Variable to store the status of the operation
-    XModemClient_s* clientXModem = (XModemClient_s*) client;       // Cast the xmodem object to UShellCmdFs_s type
-    UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientXModem->parent;    // Cast the parent object to UShellCmdFs_s type
-
-    do
-    {
-        /* Check input parameter */
-        if ((clientXModem == NULL) ||
-            (cmd == NULL))
-        {
-            USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
-            status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
-            break;                                      // Exit the loop
-        }
-
-        /* Delay */
-        vTaskDelay(pdMS_TO_TICKS(ms));    // Delay for the specified time
 
     } while (0);
 
@@ -1409,22 +1382,19 @@ static XModemClientErr_e uShellCmdFsXModemClientDelay(void* client, int ms)
  * \param size - size of the data to transmit
  * \return XModemClientErr_e - error code. non-zero = an error has occurred;
  */
-static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client,
-                                                         uint8_t* data,
-                                                         int size)
+static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client, uint8_t* const data, const size_t size, size_t timeMs)
 {
     /* Local variable */
-    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;              // Variable to store the status of the operation
-    UShellVcpErr_e vcpStatus = USHELL_VCP_NO_ERR;                 // Variable to store the status of the operation
-    XModemServer_s* clientModem = (XModemServer_s*) client;       // Cast the xmodem object to UShellCmdFs_s type
-    UShellCmdFs_s* cmd = (UShellCmdFs_s*) clientModem->parent;    // Cast the parent object to UShellCmdFs_s type
-    UShellVcp_s* vcp = (UShellVcp_s*) cmd->vcp;                   // Cast the vcp object to UShellVcp_s type
+    XModemServerErr_e status = XMODEM_SERVER_NO_ERR;          // Variable to store the status of the operation
+    UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;    // Variable to store the status of the operation
+    UShellSocket_s* socket = uShellCmdFsWriteSocket;
+
     do
     {
         /* Check input parameter */
-        if ((clientModem == NULL) ||
-            (cmd == NULL) ||
-            (vcp == NULL))
+        if ((socket == NULL) ||
+            (data == NULL) ||
+            (size == 0))
         {
             USHELL_CMD_FS_ASSERT(0);                    // Set status to error if xmodem or cmd is NULL
             status = XMODEM_SERVER_INVALID_ARGS_ERR;    // Set status to error
@@ -1432,12 +1402,17 @@ static XModemClientErr_e uShellCmdFsXModemClientTransmit(void* client,
         }
 
         /* Send byte */
-        vcpStatus = UShellVcpPrintRawByte(vcp, data, size);    // Send the byte to the vcp object
-        if (vcpStatus != USHELL_VCP_NO_ERR)
+        socketStatus = UShellSocketWrite(socket,
+                                         data,
+                                         size,
+                                         timeMs);    // Send the byte to the socket
+        if (socketStatus != USHELL_SOCKET_NO_ERR)
         {
-            USHELL_CMD_FS_ASSERT(0);            // Set status to error if vcp send fails
-            status = XMODEM_SERVER_PORT_ERR;    // Set status to error
-            break;                              // Exit the loop
+            USHELL_CMD_FS_ASSERT(0);    // Set status to error if vcp send fails
+            status = (socketStatus == USHELL_SOCKET_TIMEOUT_ERR)
+                         ? XMODEM_SERVER_TIMEOUT_ERR
+                         : XMODEM_SERVER_PORT_ERR;    // Set status to error
+            break;                                    // Exit the loop
         }
 
     } while (0);

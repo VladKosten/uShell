@@ -20,6 +20,7 @@ extern "C" {
 #include "ushell_history.h"
 #include "ushell_vcp.h"
 #include "ushell_cfg.h"
+#include "ushell_socket.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -157,7 +158,6 @@ typedef struct
 {
     UShellItem_t buffer [USHELL_BUFFER_SIZE];    ///< Buffer for commands
     size_t ind;                                  ///< Size of the buffer
-
 } UShellIo_s;
 
 /**
@@ -203,9 +203,21 @@ typedef struct
 } UShellCfg_s;
 
 /**
+ * @brief
+ */
+typedef struct
+{
+    UShellVcpSessionParam_s readParam;
+    UShellSocket_s* readSocket;
+    UShellVcpSessionParam_s writeParam;
+    UShellSocket_s* writeSocket;
+} UShellVcpSessionConfig_s;
+
+/**
  * \brief Description of the uShell object
  */
 typedef struct
+
 {
     /* Non-optional fields */
     const void* parent;    ///< Parent object
@@ -216,13 +228,14 @@ typedef struct
     const UShellHal_s* hal;      ///< HAL object
     const UShellVcp_s* vcp;      ///< VCP object
 
-    /* Optional fields */
-    UShellFsmState_e fsmState;    ///< Finite state machine state
-    UShellCfg_s cfg;              ///< Configuration object
-    UShellCmd_s* cmdRoot;         ///< Commands array
-    UShellHistory_s history;      ///< History object
-    UShellCmd_s* currCmd;         ///< Current command
-    UShellIo_s io;                ///< IO object
+    /* Internal use */
+    UShellFsmState_e fsmState;                 ///< Finite state machine state
+    UShellCfg_s cfg;                           ///< Configuration object
+    UShellCmd_s* cmdRoot;                      ///< Commands array
+    UShellHistory_s history;                   ///< History object
+    UShellCmd_s* currCmd;                      ///< Current command
+    UShellIo_s io;                             ///< IO object
+    UShellVcpSessionConfig_s vcpSessionCfg;    ///< Session configuration object
 
 } UShell_s;
 

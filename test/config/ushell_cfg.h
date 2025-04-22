@@ -63,9 +63,9 @@ extern "C" {
 
 // UShell history configuration macros
 // Maximum number of command strings stored in the history buffer
-#define USHELL_HISTORY_SIZE                     3
+#define USHELL_HISTORY_SIZE                     2
 // Maximum length of each command string in the history buffer
-#define USHELL_HISTORY_MAX_STR_LEN              20
+#define USHELL_HISTORY_MAX_STR_LEN              40
 
 // UShell CMD configuration macros
 // Maximum number of arguments in the UShell command
@@ -79,7 +79,7 @@ extern "C" {
 // Number of threads in the UShell OSAL
 #define USHELL_OSAL_THREADS_NUM                 (1)
 // Number of stream buffer slots in the UShell OSAL
-#define USHELL_OSAL_STREAM_BUFF_SLOTS_NUM       (2)
+#define USHELL_OSAL_STREAM_BUFF_SLOTS_NUM       (6)
 // Number of timers in the UShell OSAL
 #define USHELL_OSAL_TIMER_NUM                   (1)
 // Number of event groups in the UShell OSAL

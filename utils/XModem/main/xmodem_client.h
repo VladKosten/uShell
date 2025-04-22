@@ -28,7 +28,7 @@ extern "C" {
  * \brief XModem start timeout
  */
 #ifndef XMODEM_CLIENT_START_TIMEOUT_MS
-    #define XMODEM_CLIENT_START_TIMEOUT_MS 200U    ///< Timeout for the start of the transfer
+    #define XMODEM_CLIENT_START_TIMEOUT_MS 3000U    ///< Timeout for the start of the transfer
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/
@@ -43,6 +43,7 @@ typedef enum
     XMODEM_CLIENT_RUN_TIME_ERR,        ///< Exit: error - runtime error (e.g. invalid state)
     XMODEM_CLIENT_TRANSFER_ERR,        ///< Exit: error - transfer err
     XMODEM_CLIENT_PORT_ERR,            ///< Exit: error - port err
+    XMODEM_CLIENT_TIMEOUT_ERR,         ///< Exit: error - timeout err
 
 } XModemClientErr_e;
 
@@ -79,10 +80,8 @@ typedef enum
  */
 typedef struct
 {
-    XModemClientErr_e (*isReceivedByte)(void* client, bool* isRx);                    ///< Hooks to check if a byte is available from the xmodem client
-    XModemClientErr_e (*transmit)(void* client, uint8_t* data, const size_t size);    ///< Hooks to transmit a byte to the xmodem client
-    XModemClientErr_e (*receiveByte)(void* client, uint8_t* byte);                    ///< Hooks to receive a byte from the xmodem client
-    XModemClientErr_e (*delayMs)(void* client, int ms);                               ///< Hooks to delay for a specified time
+    XModemClientErr_e (*transmit)(void* client, uint8_t* data, const size_t size, size_t timeMs);
+    XModemClientErr_e (*receive)(void* client, uint8_t* const data, const size_t size, size_t timeMs);
     XModemClientErr_e (*readFromMemory)(void* client,
                                         uint8_t* data,
                                         const size_t size,

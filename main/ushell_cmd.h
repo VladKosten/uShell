@@ -14,6 +14,7 @@ extern "C" {
 #include <string.h>
 
 #include "ushell_cfg.h"
+#include "ushell_socket.h"
 
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
@@ -48,6 +49,11 @@ typedef enum
 typedef char* UShellCmdHelp_t;
 
 /**
+ * \brief Describe a cmd name.
+ */
+typedef char* UShellCmdName_t;
+
+/**
  * \brief Describe size of one item in the UShell.
  */
 typedef char UShellCmdItem_t;
@@ -56,6 +62,8 @@ typedef char UShellCmdItem_t;
  * \brief Describe a cmd exec function.
  */
 typedef UShellCmdErr_e(UShellCmdExec_f)(void* const cmd,
+                                        UShellSocket_s* const readSocket,
+                                        UShellSocket_s* const writeSocket,
                                         const int argc,
                                         char* const argv []);
 
@@ -75,12 +83,12 @@ typedef struct
 typedef struct UShellCmd_t
 {
     /* Mandatory */
-    const void* parent;             ///< Pointer to the parent object
-    const char* name;               ///< Pointer to the name of the object (aka command)
-    const UShellCmdHelp_t* help;    ///< Pointer to the help string (Must be string)
-    UShellCmdExec_f* execFunc;      ///< Pointer to the function to be executed
-    struct UShellCmd_t* next;       ///< Pointer to the next command in the list
-    UShellCmdHookTable_s* hook;     ///< Pointer to the hook table
+    const void* parent;            ///< Pointer to the parent object
+    UShellCmdName_t name;          ///< Pointer to the name of the object (aka command)
+    UShellCmdHelp_t help;          ///< Pointer to the help string (Must be string)
+    UShellCmdExec_f* execFunc;     ///< Pointer to the function to be executed
+    struct UShellCmd_t* next;      ///< Pointer to the next command in the list
+    UShellCmdHookTable_s* hook;    ///< Pointer to the hook table
 
 } UShellCmd_s;
 
@@ -96,9 +104,9 @@ typedef struct UShellCmd_t
  * \return UShellOsalErr_e - error code
  */
 UShellCmdErr_e UShellCmdInit(UShellCmd_s* const cmd,
-                             char* const name,
-                             UShellCmdHelp_t* const help,
-                             UShellCmdExec_f* const execFunc);
+                             UShellCmdName_t name,
+                             UShellCmdHelp_t help,
+                             UShellCmdExec_f* execFunc);
 
 /**
  * \brief Deinitialize the UShell  module.
@@ -129,11 +137,15 @@ UShellCmdErr_e UShellCmdHookTableSet(UShellCmd_s* const cmd,
 /**
  * \brief Execute the cmd
  * \param[in] cmd - UShellCmd obj to be executed
+ * \param[in] readSocket - socket to read from
+ * \param[in] writeSocket - socket to write to
  * \param[in] argc - number of arguments
  * \param[in] argv - array of arguments
  * \return UShellCmdErr_e - error code. non-zero = an error has occurred;
  */
 UShellCmdErr_e UShellCmdExec(UShellCmd_s* const cmd,
+                             UShellSocket_s* const readSocket,
+                             UShellSocket_s* const writeSocket,
                              const int argc,
                              char* const argv []);
 

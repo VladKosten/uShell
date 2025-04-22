@@ -467,12 +467,22 @@ UShellOsalErr_e uShellOsalFreertosEventGroupBitsActiveGet(void* const osal,
                                                           UShellOsalEventGroupBits_e* const bitsActive);
 
 /**
+ * \brief Get the current time in milliseconds.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[out] timeMs Pointer to store the current time in milliseconds.
+ * \return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e uShellOsalFreertosGetTimeMs(void* const osal,
+                                            UShellOsalTimeMs_t* const timeMs);
+
+/**
  * \brief Perform thread parameters validation procedure
  *        in terms of the requirements of the FreeRTOS
  * \param[in] threadCfg - pointer to the thread configuration structure
  * \return bool - true if the parameters are valid, false otherwise
  */
-static bool uShellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const threadCfg);
+static bool
+uShellOsalFreertosCheckParam(const UShellOsalThreadCfg_s* const threadCfg);
 
 /**
  * \brief FreeRTOS priority levels hash-table.
@@ -533,6 +543,7 @@ static const UShellOsalPortable_s FreeRtosPortable =
         .eventGroupBitsWait = uShellOsalFreertosEventGroupBitsWait,
         .eventGroupDelete = uShellOsalFreertosEventGroupDelete,
         .eventGroupCreate = uShellOsalFreertosEventGroupCreate,
+        .timeMsGet = uShellOsalFreertosGetTimeMs,
 };
 
 //=======================================================================[PUBLIC INTERFACE FUNCTIONS]==============================================================================
@@ -2882,6 +2893,30 @@ UShellOsalErr_e uShellOsalFreertosEventGroupBitsActiveGet(void* const osal,
     while (0);
 
     return retVal;
+}
+
+/**
+ * \brief Get the current time in milliseconds.
+ * \param[in] osal Pointer to the OSAL instance.
+ * \param[out] timeMs Pointer to store the current time in milliseconds.
+ * \return Error code indicating the result of the operation.
+ */
+UShellOsalErr_e uShellOsalFreertosGetTimeMs(void* const osal,
+                                            UShellOsalTimeMs_t* const timeMs)
+{
+    /* Checking of params */
+    USHELL_OSAL_FREERTOS_ASSERT(osal);
+    USHELL_OSAL_FREERTOS_ASSERT(timeMs);
+
+    /* Check where the call is coming from */
+    if (xPortIsInsideInterrupt())
+    {
+        return USHELL_OSAL_CALL_FROM_ISR_ERR;
+    }
+
+    *timeMs = xTaskGetTickCount() * portTICK_PERIOD_MS;
+
+    return USHELL_OSAL_NO_ERR;    // Exit: no errors
 }
 
 /**

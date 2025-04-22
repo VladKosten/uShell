@@ -2017,6 +2017,50 @@ UShellOsalErr_e UShellEventGroupBitsActiveGet(UShellOsal_s* const osal,
 }
 
 /**
+ * @brief Get time in milliseconds
+ * @param[in] osal - pointer to OSAL instance
+ * @param[in] timeMs - pointer to an object into which the current time in milliseconds will be copied
+ * @return UShellOsalErr_e - error code. non-zero = an error has occurred;
+ */
+UShellOsalErr_e UShellOsalTimeMsGet(UShellOsal_s* const osal,
+                                    UShellOsalTimeMs_t* const timeMs)
+{
+    /* Local variables */
+    UShellOsalErr_e status = USHELL_OSAL_NO_ERR;
+
+    /* Get the time in milliseconds */
+    do
+    {
+        /* Checking of params */
+        if ((NULL == osal) ||
+            (NULL == timeMs))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_INVALID_ARGS;
+            break;
+        }
+
+        /* Checking is init obj */
+        if ((NULL == osal->portable) ||
+            (NULL == osal->portable->timeMsGet))
+        {
+            /* Invalid input parameter */
+            USHELL_OSAL_ASSERT(0);
+            status = USHELL_OSAL_PORT_SPECIFIC_ERR;
+            break;
+        }
+
+        /* Get the time in milliseconds */
+        status = osal->portable->timeMsGet(osal, timeMs);
+
+    } while (0);
+
+    /* Return the status */
+    return status;
+}
+
+/**
  * \brief Get an event group handle of the given OSAL object
  * \param[in] osal - pointer to OSAL instance
  * \param[in] eventGroupSlotInd - index of event group slots

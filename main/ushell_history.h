@@ -22,7 +22,7 @@ extern "C" {
  * \brief The number of command strings stored in the history buffer.
  */
 #ifndef USHELL_HISTORY_SIZE
-    #define USHELL_HISTORY_SIZE 3
+    #define USHELL_HISTORY_SIZE 2
 #endif
 
 /**
@@ -30,7 +30,7 @@ extern "C" {
  * \brief The maximum length of each command string in the history buffer.
  */
 #ifndef USHELL_HISTORY_MAX_STR_LEN
-    #define USHELL_HISTORY_MAX_STR_LEN 20
+    #define USHELL_HISTORY_MAX_STR_LEN 40
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/

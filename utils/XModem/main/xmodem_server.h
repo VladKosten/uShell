@@ -14,7 +14,6 @@ extern "C" {
 #include <string.h>
 
 #include "xmodem.h"
-#include "xmodem_cfg.h"
 /*===========================================================[MACRO DEFINITIONS]============================================*/
 
 /**
@@ -39,6 +38,7 @@ typedef enum
     XMODEM_SERVER_RUN_TIME_ERR,        ///< Exit: error - runtime error (e.g. invalid state)
     XMODEM_SERVER_TRANSFER_ERR,        ///< Exit: error - transfer err
     XMODEM_SERVER_PORT_ERR,            ///< Exit: error - port err
+    XMODEM_SERVER_TIMEOUT_ERR,         ///< Exit: error - timeout err
 
 } XModemServerErr_e;
 
@@ -71,11 +71,9 @@ typedef enum
  */
 typedef struct
 {
-    XModemServerErr_e (*isReceivedByte)(void* server, bool* isRx);                ///< Hooks to check if a byte is available from the xmodem server
-    XModemServerErr_e (*transmitByte)(void* server, uint8_t byte);                ///< Hooks to transmit a byte to the xmodem server
-    XModemServerErr_e (*receiveByte)(void* server, uint8_t* byte);                ///< Hooks to receive a byte from the xmodem server
-    XModemServerErr_e (*delayMs)(void* server, int ms);                           ///< Hooks to delay for a specified time
-    XModemServerErr_e (*writeToMemory)(void* server, uint8_t* data, int size);    ///< Hooks to write data from the xmodem server
+    XModemServerErr_e (*transmit)(void* server, uint8_t* data, const size_t size, size_t timeMs);    ///< Hooks to transmit a byte to the xmodem server
+    XModemServerErr_e (*receive)(void* server, uint8_t* data, const size_t size, size_t timeMs);     ///< Hooks to receive a byte from the xmodem server
+    XModemServerErr_e (*writeToMemory)(void* server, uint8_t* data, int size);                       ///< Hooks to write data from the xmodem server
 
 } XModemServerPort_s;
 
