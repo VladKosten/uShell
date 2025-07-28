@@ -63,6 +63,13 @@ typedef enum
      */
     USHELL_RX_TX_ERR,
 
+    /**
+     * \brief Size error.
+     *
+     * Indicates that a size error occurred during a buffer operation.
+     */
+    USHELL_HAL_SIZE_ERR
+
 } UShellHalErr_e;
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/

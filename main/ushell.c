@@ -83,7 +83,7 @@ typedef enum
  * \note This function is the main loop of the UShell module.
  *       It is responsible for the processing of the commands and the interaction with the user.
  */
-static void uShellVcpWorker(void* const uShell);
+static void uShellWorker(void* const uShell);
 
 /**
  * \brief Initialize the runtime environment
@@ -603,7 +603,7 @@ UShellErr_e UShellCmdDetach(UShell_s* const uShell, const UShellCmd_s* const cmd
  * \return none
  * \note This function is the main loop of the UShell module. It is responsible for the processing of the commands and the interaction with the user.
  */
-static void uShellVcpWorker(void* const uShell)
+static void uShellWorker(void* const uShell)
 {
     /* Check input parameters */
     USHELL_ASSERT(uShell != NULL);
@@ -612,7 +612,6 @@ static void uShellVcpWorker(void* const uShell)
     UShell_s* ushell = (UShell_s*) uShell;
     UShellSocketErr_e socketStatus = USHELL_SOCKET_NO_ERR;
     UShellSocket_s* readSocket = ushell->vcpSessionCfg.readSocket;
-    UShellSocket_s* writeSocket = ushell->vcpSessionCfg.writeSocket;
     UShellItem_t item = 0;
 
     /* Delay to start the thread */
@@ -1184,7 +1183,7 @@ static UShellErr_e uShellRtEnvOsalInit(UShell_s* const uShell,
                 .stackSize = USHELL_THREAD_STACK_SIZE_BYTE,
                 .threadParam = uShell,
                 .threadPriority = USHELL_THREAD_PRIORITY,
-                .threadWorker = uShellVcpWorker};
+                .threadWorker = uShellWorker};
         osalStatus = UShellOsalThreadCreate(thisOsal, &thread, threadCfg);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
             (thread == NULL))
@@ -1390,7 +1389,7 @@ static UShellErr_e uShellRtEnvVcpDeInit(UShell_s* const uShell)
             }
 
             /* Close session for read */
-            vcpStatus = UShellVcpSessionClose(uShell->vcp,
+            vcpStatus = UShellVcpSessionClose((UShellVcp_s*) uShell->vcp,
                                               uShell->vcpSessionCfg.readParam);
             if (vcpStatus != USHELL_VCP_NO_ERR)
             {
@@ -1412,7 +1411,7 @@ static UShellErr_e uShellRtEnvVcpDeInit(UShell_s* const uShell)
             }
 
             /* Close session for write */
-            vcpStatus = UShellVcpSessionClose(uShell->vcp,
+            vcpStatus = UShellVcpSessionClose((UShellVcp_s*) uShell->vcp,
                                               uShell->vcpSessionCfg.writeParam);
             if (vcpStatus != USHELL_VCP_NO_ERR)
             {
@@ -1684,7 +1683,6 @@ static UShellCmd_s* uShellCmdFind(UShell_s* const uShell)
                 (cmdName == NULL))
             {
                 /* Get name error */
-                USHELL_ASSERT(0);
                 cmd = NULL;
                 break;
             }
@@ -2034,8 +2032,6 @@ static void uShellCmdAutoComplete(UShell_s* const uShell)
             if ((cmdStatus != USHELL_CMD_NO_ERR) ||
                 (cmdName == NULL))
             {
-                /* Get name error */
-                USHELL_ASSERT(0);
                 break;
             }
 
@@ -2114,7 +2110,7 @@ static void uShellPrintStr(UShell_s* const uShell,
 
         /* Print */
         socketStatus = UShellSocketWriteBlocking(socket,
-                                                 (const uint8_t*) str,
+                                                 (char*) str,
                                                  strlen(str));
         if (socketStatus != USHELL_SOCKET_NO_ERR)
         {

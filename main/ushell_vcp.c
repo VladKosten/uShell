@@ -69,7 +69,7 @@ typedef enum
  * \note This function is the main loop of the UShell module.
  *       It is responsible for the processing of the commands and the interaction with the user.
  */
-static void uShellVcpWorker(void* const arg);
+static void uShellWorker(void* const arg);
 
 /**
  * \brief Callback for the received data
@@ -690,7 +690,7 @@ UShellVcpErr_e UShellVcpSessionClose(UShellVcp_s* const vcp,
  * \return none
  * \note This function is the main loop of the UShell module. It is responsible for the processing of the commands and the interaction with the user.
  */
-static void uShellVcpWorker(void* const arg)
+static void uShellWorker(void* const arg)
 {
     /* Check input parameters */
     USHELL_VCP_ASSERT(vcp != NULL);
@@ -1319,7 +1319,7 @@ static UShellVcpErr_e uShellVcpRtEnvOsalInit(UShellVcp_s* const vcp,
                 .stackSize = USHELL_VCP_THREAD_STACK_SIZE_BYTE,
                 .threadParam = vcp,
                 .threadPriority = USHELL_VCP_THREAD_PRIORITY,
-                .threadWorker = uShellVcpWorker};
+                .threadWorker = uShellWorker};
         osalStatus = UShellOsalThreadCreate(thisOsal, &thread, threadCfg);
         if ((osalStatus != USHELL_OSAL_NO_ERR) ||
             (thread == NULL))
@@ -2574,7 +2574,7 @@ static void uShellVcpSocketWriteCb(void* socket,
  * \param len Maximum number of bytes to read.
  * \return The number of bytes actually read.
  */
-int __attribute__((weak)) _read(int file, char* ptr, int len)
+int _read(int file, char* ptr, int len)
 {
     /* Local variable */
     UShellSocketErr_e status = USHELL_VCP_NO_ERR;
@@ -2625,7 +2625,7 @@ int __attribute__((weak)) _read(int file, char* ptr, int len)
  * \param len Number of bytes to write.
  * \return The number of bytes actually written.
  */
-int __attribute__((weak)) _write(int file, char* ptr, int len)
+int _write(int file, char* ptr, int len)
 {
     /* Local variable */
     UShellSocketErr_e status = USHELL_VCP_NO_ERR;
