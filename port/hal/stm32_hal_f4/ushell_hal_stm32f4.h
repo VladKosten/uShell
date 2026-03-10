@@ -17,7 +17,7 @@ extern "C" {
  * \brief Input/Output buffer size
  */
 #ifndef USHELL_HAL_PORT_IO_BUFFER_SIZE
-    #define USHELL_HAL_PORT_IO_BUFFER_SIZE 256    ///< Default IO buffer size
+    #define USHELL_HAL_PORT_IO_BUFFER_SIZE 1024    ///< Default IO buffer size
 #endif
 
 /*========================================================[DATA TYPES DEFINITIONS]==========================================*/

@@ -372,9 +372,9 @@ void UShellLogPrintWithFile(const UShellLogLevel_e level,
         }
 
         /* Check the level */
-        if ((level < uShellLog.cfg.curLevel) ||
-            (module == NULL) ||
-            (module->logLevel < uShellLog.cfg.curLevel))
+        if ((module == NULL) ||
+            (level < uShellLog.cfg.curLevel) ||
+            (level < module->logLevel))
         {
             /* Level is lower than the current level or module is not found */
             break;
@@ -460,9 +460,9 @@ void UShellLogPrint(const UShellLogLevel_e level,
         }
 
         /* Check the level */
-        if ((level < uShellLog.cfg.curLevel) ||
-            (module == NULL) ||
-            (module->logLevel < uShellLog.cfg.curLevel))
+        if ((module == NULL) ||
+            (level < uShellLog.cfg.curLevel) ||
+            (level < module->logLevel))
         {
             /* Level is lower than the current level or module is not found */
             break;

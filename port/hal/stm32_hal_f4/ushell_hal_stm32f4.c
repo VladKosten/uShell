@@ -876,7 +876,7 @@ static UShellHalErr_e uShellHalPortWrite(void* const hal,
             (halPort->uart == NULL))
         {
             /* Input parameters are invalid */
-            USHELL_HAL_PORT_ASSERT(0);
+            // USHELL_HAL_PORT_ASSERT(0);
             status = USHELL_HAL_INVALID_ARGS_ERR;
             break;
         }
